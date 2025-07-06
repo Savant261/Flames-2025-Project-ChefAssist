@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChefAI - AI Recipe Generator</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Navbar -->
+    <nav class="navbar flex items-center justify-between px-8 py-4 bg-[#FFF8E7] shadow-md rounded-b-3xl sticky top-0 z-50" style="font-family:'Poppins',Arial,sans-serif">
+  <div class="flex items-center gap-4 min-w-0">
+    <span class="inline-flex items-center justify-center h-10 w-10 rounded-full border-2 border-[#FF6F61] bg-white shadow-md mr-2">
+  <!-- Chef hat SVG icon -->
+  <svg width="28" height="28" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="24" cy="18" rx="12" ry="8" fill="#FFF8E7" stroke="#D35400" stroke-width="2"/>
+    <ellipse cx="14" cy="26" rx="4" ry="3" fill="#FFF8E7" stroke="#D35400" stroke-width="2"/>
+    <ellipse cx="34" cy="26" rx="4" ry="3" fill="#FFF8E7" stroke="#D35400" stroke-width="2"/>
+    <rect x="18" y="26" width="12" height="8" rx="4" fill="#D35400" stroke="#D35400" stroke-width="2"/>
+    <rect x="18" y="34" width="12" height="4" rx="2" fill="#FF6F61"/>
+  </svg>
+</span>
+<span class="text-2xl font-extrabold tracking-tight whitespace-nowrap" style="color:#D35400;">ChefAssist</span>
+  </div>
+  <div class="flex-1 flex items-center gap-6 justify-start md:justify-center min-w-0 overflow-x-auto">
+    <a href="#flow-usage" class="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onclick="event.preventDefault();document.getElementById('flow-usage').scrollIntoView({behavior: 'smooth'});">Instructions</a>
+    <a href="#features-chefai" class="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onclick="event.preventDefault();document.getElementById('features-chefai').scrollIntoView({behavior: 'smooth'});">Features</a>
+    <a href="#testimonials" class="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onclick="event.preventDefault();document.getElementById('testimonials').scrollIntoView({behavior: 'smooth'});">Testimonials</a>
+    <a href="#footer-chefai" class="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap">Contact Us</a>
+  </div>
+  <div class="flex items-center gap-2 ml-auto">
+    <button id="dark-mode-toggle" aria-label="Toggle dark mode" class="w-10 h-10 rounded-full bg-[#FFDAB9] border border-[#E5C6B0] shadow hover:bg-[#FF6F61] transition flex items-center justify-center">
+      <span id="dark-mode-icon" class="text-xl" style="color:#D35400;">🌙</span>
+    </button>
+    <div id="user-profile-preview" class="w-10 h-10 rounded-full bg-[#FFDAB9] border border-[#E5C6B0] flex items-center justify-center shadow cursor-pointer">
+      <svg width="26" height="26" fill="#D35400" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M12 14c-4.418 0-8 1.79-8 4v2h16v-2c0-2.21-3.582-4-8-4z"/></svg>
+    </div>
+  </div>
+</nav>
+    <!-- Hero Section -->
+    <section class="flex flex-col md:flex-row justify-between items-center px-8 py-12 gap-16 flex-1">
+        <!-- Left: Text and Search -->
+        <div class="flex-[1.1] flex flex-col gap-8 max-w-3xl w-full">
+            <h1 class="text-4xl md:text-5xl font-extrabold leading-tight drop-shadow-lg" style="color:#D35400; letter-spacing:-1px;">
+    Create Delicious<br><span style="color:#FF6F61;">Recipes in Seconds!</span>
+</h1>
+<p class="text-lg md:text-xl font-semibold mb-2" style="color:#B35C00;">
+    Enter your ingredients, choose your preferences, and let our AI create the perfect recipe for you.
+</p>
+<form class="flex gap-2 mt-4 relative">
+    <input id="typing-input" type="text" placeholder="Enter your Recipes name, Ingredients..." class="flex-1 px-4 py-3 rounded-full focus:outline-none text-base shadow-md border-2 border-[#FF6F61] bg-[#FFF8E7] text-[#D35400] font-medium" autocomplete="off">
+    <button type="submit" class="hero-btn px-6 py-3 rounded-full font-bold text-base transition shadow-md">Get Started</button>
+</form>
+<script src="logic.js"></script>
+            <!-- Example Prompts -->
+            <div class="mt-6 bg-[#4A5F4D]/20 rounded-xl p-4">
+                <div class="font-semibold mb-2" style="color:#F5F1E9">Example Prompts</div>
+                <div class="flex flex-wrap gap-2">
+                    <span class="example-prompt px-3 py-1 rounded-lg text-sm">Eggs, spinach, and mushrooms</span>
+                    <span class="example-prompt px-3 py-1 rounded-lg text-sm">I have tomatoes, onions, and pasta.</span>
+                    <span class="example-prompt px-3 py-1 rounded-lg text-sm">Healthy recipe with lentils, kale, and carrots.</span>
+                    <span class="example-prompt px-3 py-1 rounded-lg text-sm">Vegan recipe with quinoa, chickpeas, and bell peppers.</span>
+                </div>
+            </div>
+        </div>
+        <!-- Right: Reference-Inspired Image Showcase -->
+        <div class="flex-[0.9] flex flex-col md:justify-center items-center w-full h-full">
+            <!-- Hero Image Carousel -->
+            <div id="hero-carousel" class="relative w-full max-w-2xl h-[38rem] md:h-[44rem] flex items-center justify-center overflow-hidden rounded-3xl shadow-xl bg-white">
+                <div class="carousel-track w-full h-full flex transition-transform duration-700 ease-in-out">
+                    <img src="images/food1.jpg" alt="Delicious Food 1" class="carousel-image object-cover w-full h-full flex-shrink-0 rounded-3xl" />
+                    <img src="images/food2.jpg" alt="Delicious Food 2" class="carousel-image object-cover w-full h-full flex-shrink-0 rounded-3xl" />
+                    <img src="images/food5.jpg" alt="Delicious Food 5" class="carousel-image object-cover w-full h-full flex-shrink-0 rounded-3xl" />
+                    <img src="images/food3.webp" alt="Delicious Food 3" class="carousel-image object-cover w-full h-full flex-shrink-0 rounded-3xl" />
+                    <img src="images/food4.webp" alt="Delicious Food 4" class="carousel-image object-cover w-full h-full flex-shrink-0 rounded-3xl" />
+                    <img src="images/food6.jpeg" alt="Delicious Food 6" class="carousel-image object-cover w-full h-full flex-shrink-0 rounded-3xl" />
+                    <img src="images/food4.jpg" alt="Delicious Food 2b" class="carousel-image object-cover w-full h-full flex-shrink-0 rounded-3xl" />
+                </div>
+                <!-- Carousel navigation arrows -->
+                <button id="carousel-prev" class="absolute left-2 top-1/2 -translate-y-1/2 bg-[#FFDAB9] text-[#D35400] rounded-full w-10 h-10 flex items-center justify-center shadow hover:bg-[#FF6F61] hover:text-white transition z-20"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg></button>
+                <button id="carousel-next" class="absolute right-2 top-1/2 -translate-y-1/2 bg-[#FFDAB9] text-[#D35400] rounded-full w-10 h-10 flex items-center justify-center shadow hover:bg-[#FF6F61] hover:text-white transition z-20"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+                <!-- Carousel dots -->
+                <div id="carousel-dots" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20"></div>
+            </div>
+        </div>
+    </section>
+<!-- Flow Usage Section -->
+<section id="flow-usage" class="w-full py-16 px-4 md:px-16 bg-[#FFDAB9]">
+  <h2 class="text-3xl md:text-4xl font-bold text-center mb-12" style="color:#D35400;">How ChefAI Works</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+  <!-- Step 1 -->
+  <div class="flow-card opacity-0 transform -translate-x-16 transition-all duration-700 bg-[#FFF8E7] rounded-3xl shadow-xl p-8 flex flex-col items-center text-center">
+    <div class="flex justify-between items-center w-full mb-4">
+      <span class="font-semibold text-lg text-[#FF6F61]">Prompt</span>
+      <button class="text-[#FF6F61] font-bold text-lg">×</button>
+    </div>
+    <textarea class="w-full rounded-xl border-2 border-[#FFDAB9] p-3 mb-3 text-[#D35400] bg-white resize-none" placeholder="Enter your ingredients.." rows="2"></textarea>
+    <button class="w-full py-3 rounded-xl bg-[#D35400] text-[#FFF8E7] font-bold shadow">Generate</button>
+    <h3 class="mt-6 text-lg font-bold text-[#D35400]">1. Enter Your Ingredients</h3>
+    <p class="mt-2 text-[#B35C00] text-sm">Type the ingredients you have in your kitchen. ChefAI can work with whatever you've got, from a few items to a full pantry!</p>
+  </div>
+  <!-- Step 2 -->
+  <div class="flow-card opacity-0 transform translate-x-16 transition-all duration-700 bg-[#FFF8E7] rounded-3xl shadow-xl p-8 flex flex-col items-center text-center">
+    <div class="flex justify-center items-center w-full mb-4">
+      <span class="font-semibold text-lg text-[#FF6F61]">We are making your recipe...</span>
+    </div>
+    <div class="flex items-center justify-center w-full h-24 mb-3">
+      <svg class="animate-spin" width="38" height="38" viewBox="0 0 38 38"><circle cx="19" cy="19" r="16" stroke="#FF6F61" stroke-width="4" fill="none" stroke-dasharray="80" stroke-dashoffset="60"></circle></svg>
+    </div>
+    <h3 class="mt-6 text-lg font-bold text-[#D35400]">2. AI Processing</h3>
+    <p class="mt-2 text-[#B35C00] text-sm">ChefAI whips up your personalized recipe based on your input. In moments, you'll have a delicious dish ready to cook!</p>
+  </div>
+  <!-- Step 3 (Dietary Restrictions) -->
+  <div class="flow-card opacity-0 transform -translate-x-16 transition-all duration-700 bg-[#FFF8E7] rounded-3xl shadow-xl p-8 flex flex-col items-center text-center">
+    <div class="flex justify-between items-center w-full mb-4">
+      <span class="font-semibold text-lg text-[#FF6F61]">Dietary</span>
+      <button class="text-[#FF6F61] font-bold text-lg">⚙️</button>
+    </div>
+    <div class="w-full mb-3">
+      <input type="text" class="w-full rounded-xl border-2 border-[#FFDAB9] p-3 mb-2 text-[#D35400] bg-white" placeholder="E.g. Vegan, Gluten-Free, Nut-Free...">
+      <div class="flex flex-wrap gap-2 justify-center">
+        <span class="px-3 py-1 rounded-lg bg-[#FF6F61] text-[#FFF8E7] text-xs font-semibold">Vegan</span>
+        <span class="px-3 py-1 rounded-lg bg-[#FF6F61] text-[#FFF8E7] text-xs font-semibold">Gluten-Free</span>
+        <span class="px-3 py-1 rounded-lg bg-[#FF6F61] text-[#FFF8E7] text-xs font-semibold">Nut-Free</span>
+        <span class="px-3 py-1 rounded-lg bg-[#FF6F61] text-[#FFF8E7] text-xs font-semibold">Dairy-Free</span>
+      </div>
+    </div>
+    <h3 class="mt-6 text-lg font-bold text-[#D35400]">3. Set Dietary Restrictions</h3>
+    <p class="mt-2 text-[#B35C00] text-sm">Choose dietary preferences, allergens, or cuisines to avoid. ChefAI tailors recipes to your needs!</p>
+  </div>
+  <!-- Step 4 -->
+  <div class="flow-card opacity-0 transform translate-x-16 transition-all duration-700 bg-[#FFF8E7] rounded-3xl shadow-xl p-8 flex flex-col items-center text-center">
+    <div class="flex justify-between items-center w-full mb-4">
+      <span class="font-semibold text-lg text-[#FF6F61]">Re-Generate</span>
+      <button class="text-[#FF6F61] font-bold text-lg">⟳</button>
+    </div>
+    <img src="images/image3.jpg" alt="Dish" class="rounded-2xl w-32 h-24 object-cover mx-auto mb-3 shadow">
+    <h3 class="mt-6 text-lg font-bold text-[#D35400]">4. Cook, Save, or Share</h3>
+    <p class="mt-2 text-[#B35C00] text-sm">Get cooking, save your AI recipe, or share it with friends and family at the touch of a button!</p>
+  </div>
+</div>
+</section>
+
+<!-- Features of ChefAI Section -->
+<section id="features-chefai" class="relative max-w-7xl mx-auto mt-12 mb-16 px-12 py-20 bg-[#FFF8E7] rounded-[2.5rem] shadow-lg">
+  <!-- Chef avatar at top right -->
+  <div class="absolute top-6 right-8 z-10">
+    <span class="inline-flex items-center justify-center rounded-full bg-[#FFDAB9] border-2 border-[#FF6F61] shadow-lg" style="width:60px;height:60px;">
+      <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="24" cy="16" rx="13" ry="9" fill="#FFF8E7" stroke="#FF6F61" stroke-width="2"/>
+        <ellipse cx="14" cy="24" rx="4" ry="3" fill="#FFF8E7" stroke="#FF6F61" stroke-width="2"/>
+        <ellipse cx="34" cy="24" rx="4" ry="3" fill="#FFF8E7" stroke="#FF6F61" stroke-width="2"/>
+        <rect x="18" y="24" width="12" height="9" rx="4" fill="#FF6F61" stroke="#D35400" stroke-width="2"/>
+        <rect x="18" y="33" width="12" height="4" rx="2" fill="#D35400"/>
+      </svg>
+    </span>
+  </div>
+  <div class="mb-10">
+    <h2 class="text-3xl md:text-4xl font-extrabold mb-2" style="color:#2C2C2C; font-family:'Poppins',Arial,sans-serif">Features of ChefAI</h2>
+    <p class="text-lg text-[#6B4F3A] font-medium" style="font-family:'Poppins',Arial,sans-serif">Strong features to assist you in creating dishes that are both healthy and tasty.</p>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <!-- Card 1 -->
+    <div class="features-card rounded-2xl bg-white p-7 shadow-md border border-[#E5C6B0] flex flex-col gap-3 hover:shadow-lg transition-all" style="font-family:'Poppins',Arial,sans-serif">
+      <span class="features-icon inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#FFDAB9] text-[#D35400] mb-2 animate-jump"><svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M7 10c0-3.314 2.686-6 6-6s6 2.686 6 6c0 2.21-1.79 4-4 4h-4c-2.21 0-4-1.79-4-4zm6 8h-2v-2h2v2zm-4 0h2v2H9v-2zm8 0h-2v2h2v-2z" fill="#D35400"/></svg></span>
+      <h3 class="font-bold text-lg text-[#2C2C2C]">Dynamic Recipe Creation</h3>
+      <p class="text-[#6B4F3A] text-base">Our AI instantly generates personalized recipes based on the ingredients you have at hand. Whether it's a single ingredient or a pantry full, you'll get a delicious meal idea within seconds!</p>
+    </div>
+    <!-- Card 2 -->
+    <div class="features-card rounded-2xl bg-white p-7 shadow-md border border-[#E5C6B0] flex flex-col gap-3 hover:shadow-lg transition-all" style="font-family:'Poppins',Arial,sans-serif">
+      <span class="features-icon inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#FFDAB9] text-[#D35400] mb-2"><svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M12 2a6 6 0 016 6c0 3.314-2.686 6-6 6s-6-2.686-6-6a6 6 0 016-6zm0 16c-4.418 0-8-2.239-8-5v3c0 2.761 3.582 5 8 5s8-2.239 8-5v-3c0 2.761-3.582 5-8 5z" fill="#D35400"/></svg></span>
+      <h3 class="font-bold text-lg text-[#2C2C2C]">Personalized to Your Dietary Needs</h3>
+      <p class="text-[#6B4F3A] text-base">Choose recipes that fit your lifestyle. Whether you're vegan, vegetarian, gluten-free, keto, or looking for low-carb options, our AI accommodates your dietary preferences with ease.</p>
+    </div>
+    <!-- Card 3 -->
+    <div class="features-card rounded-2xl bg-white p-7 shadow-md border border-[#E5C6B0] flex flex-col gap-3 hover:shadow-lg transition-all" style="font-family:'Poppins',Arial,sans-serif">
+      <span class="features-icon inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#FFDAB9] text-[#D35400] mb-2"><svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M17 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2zm0 2v2H7V5h10zm0 4v10H7V9h10z" fill="#D35400"/></svg></span>
+      <h3 class="font-bold text-lg text-[#2C2C2C]">Accurate Nutritional Breakdown</h3>
+      <p class="text-[#6B4F3A] text-base">Each recipe comes with a detailed nutritional profile. From calories to macronutrients, know exactly what's going into your meals for better meal planning and health tracking.</p>
+    </div>
+    <!-- Card 4 -->
+    <div class="features-card rounded-2xl bg-white p-7 shadow-md border border-[#E5C6B0] flex flex-col gap-3 hover:shadow-lg transition-all" style="font-family:'Poppins',Arial,sans-serif">
+      <span class="features-icon inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#FFDAB9] text-[#D35400] mb-2"><svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M21 6.5a2.5 2.5 0 00-5 0v1a2.5 2.5 0 005 0v-1zm-5 9.5a2.5 2.5 0 01-5 0v-1a2.5 2.5 0 015 0v1zM6 6.5a2.5 2.5 0 00-5 0v1a2.5 2.5 0 005 0v-1zm8 6.5a2.5 2.5 0 01-5 0v-1a2.5 2.5 0 015 0v1z" fill="#D35400"/></svg></span>
+      <h3 class="font-bold text-lg text-[#2C2C2C]">Plan Meals and Shop Efficiently</h3>
+      <p class="text-[#6B4F3A] text-base">Create weekly meal plans or use our AI to generate a full shopping list for your recipes. Save time at the store and always have what you need to cook amazing meals.</p>
+    </div>
+    <!-- Card 5 -->
+    <div class="features-card rounded-2xl bg-white p-7 shadow-md border border-[#E5C6B0] flex flex-col gap-3 hover:shadow-lg transition-all" style="font-family:'Poppins',Arial,sans-serif">
+      <span class="features-icon inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#FFDAB9] text-[#D35400] mb-2"><svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M20 17.17V19a2 2 0 01-2 2H6a2 2 0 01-2-2v-1.83A3 3 0 016.17 16H17.83A3 3 0 0120 17.17zm-8-1.17a4 4 0 100-8 4 4 0 000 8z" fill="#D35400"/></svg></span>
+      <h3 class="font-bold text-lg text-[#2C2C2C]">Save Your Favorites & Share with Friends</h3>
+      <p class="text-[#6B4F3A] text-base">Easily save your favorite recipes for future use or share them with family and friends via social media, email, or text.</p>
+    </div>
+    <!-- Card 6 -->
+    <div class="features-card rounded-2xl bg-white p-7 shadow-md border border-[#E5C6B0] flex flex-col gap-3 hover:shadow-lg transition-all" style="font-family:'Poppins',Arial,sans-serif">
+      <span class="features-icon inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#FFDAB9] text-[#D35400] mb-2"><svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M12 2C6.486 2 2 6.486 2 12c0 5.514 4.486 10 10 10s10-4.486 10-10c0-5.514-4.486-10-10-10zm0 18c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8z" fill="#D35400"/></svg></span>
+      <h3 class="font-bold text-lg text-[#2C2C2C]">Explore Global Flavors</h3>
+      <p class="text-[#6B4F3A] text-base">From Italian pasta to Mexican tacos and Indian curries, our AI brings a world of cuisines to your kitchen. Discover new flavors and cooking techniques every time you generate a recipe.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- FAQ Section (relocated and redesigned) -->
+<section id="faq-section" class="w-full flex justify-center my-16 px-4">
+  <div class="faq-card w-full max-w-5xl rounded-[2.5rem] shadow-2xl bg-[#FFF8E7] border-2 border-[#FFDAB9] py-12 px-8 md:px-16 flex flex-col items-center">
+    <h2 class="text-3xl md:text-4xl font-extrabold mb-8 text-center" style="color:#D35400; font-family:'Poppins',Arial,sans-serif">Frequently Asked Questions</h2>
+    <div class="faq-list w-full divide-y divide-[#FFDAB9]">
+      <div class="faq-item py-5 cursor-pointer">
+        <div class="faq-question flex items-center justify-between text-lg md:text-xl font-semibold" style="color:#D35400;">
+          How does ChefAI generate recipes?
+          <span class="faq-toggle text-2xl">+</span>
+        </div>
+        <div class="faq-answer text-[#6B4F3A] mt-2 hidden md:text-base text-sm">
+          ChefAI uses advanced AI models trained on thousands of recipes and culinary rules to generate creative, delicious, and personalized recipes based on your input.
+        </div>
+      </div>
+      <div class="faq-item py-5 cursor-pointer">
+        <div class="faq-question flex items-center justify-between text-lg md:text-xl font-semibold" style="color:#D35400;">
+          Can I specify dietary restrictions or allergies?
+          <span class="faq-toggle text-2xl">+</span>
+        </div>
+        <div class="faq-answer text-[#6B4F3A] mt-2 hidden md:text-base text-sm">
+          Yes! You can enter dietary preferences and allergies, and ChefAI will ensure your recipes avoid those ingredients or cuisines.
+        </div>
+      </div>
+      <div class="faq-item py-5 cursor-pointer">
+        <div class="faq-question flex items-center justify-between text-lg md:text-xl font-semibold" style="color:#D35400;">
+          Is ChefAI free to use?
+          <span class="faq-toggle text-2xl">+</span>
+        </div>
+        <div class="faq-answer text-[#6B4F3A] mt-2 hidden md:text-base text-sm">
+          ChefAI is free for basic use. Premium features such as advanced analytics, meal planning, and shopping lists may require a subscription in the future.
+        </div>
+      </div>
+      <div class="faq-item py-5 cursor-pointer">
+        <div class="faq-question flex items-center justify-between text-lg md:text-xl font-semibold" style="color:#D35400;">
+          Can I save or share my recipes?
+          <span class="faq-toggle text-2xl">+</span>
+        </div>
+        <div class="faq-answer text-[#6B4F3A] mt-2 hidden md:text-base text-sm">
+          Absolutely! You can save your favorite recipes and share them via social media, email, or text.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="testimonials" class="max-w-7xl mx-auto mb-16 px-6 py-16 bg-[#FEF2D7] dark:bg-[#FEF2D7] rounded-[2.5rem] shadow-lg">
+  <h2 class="text-3xl md:text-4xl font-bold text-center mb-12" style="color:#D35400; font-family:'Poppins',Arial,sans-serif">What Our Users Say</h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+    <!-- Testimonial 1 -->
+    <div class="testimonial-card opacity-0 translate-y-8 transition-all duration-700 rounded-2xl bg-white p-8 shadow-md border border-[#E5C6B0] flex flex-col items-center text-center">
+      <img src="images/priya.webp" alt="Priya Sharma" class="w-16 h-16 rounded-full object-cover border-2 border-[#FF6F61] mb-4 bg-[#FFDAB9] shadow" />
+      <div class="font-bold text-lg text-[#2C2C2C]">Priya Sharma</div>
+      <div class="text-[#6B4F3A] text-base mb-3">“ChefAI made dinner so much easier! I love how quick and healthy the recipes are.”</div>
+      <div class="flex gap-1 justify-center mb-1">
+        <span class="text-[#FF6F61]">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+      </div>
+    </div>
+    <!-- Testimonial 2 -->
+    <div class="testimonial-card opacity-0 translate-y-8 transition-all duration-700 rounded-2xl bg-white p-8 shadow-md border border-[#E5C6B0] flex flex-col items-center text-center">
+      <img src="images/alex.webp" alt="Alex Johnson" class="w-16 h-16 rounded-full object-cover border-2 border-[#FF6F61] mb-4 bg-[#FFDAB9] shadow" />
+      <div class="font-bold text-lg text-[#2C2C2C]">Alex Johnson</div>
+      <div class="text-[#6B4F3A] text-base mb-3">“The step-by-step flow is so intuitive. ChefAI is my new kitchen buddy!”</div>
+      <div class="flex gap-1 justify-center mb-1">
+        <span class="text-[#FF6F61]">&#9733;&#9733;&#9733;&#9733;&#9734;</span>
+      </div>
+    </div>
+    <!-- Testimonial 3 -->
+    <div class="testimonial-card opacity-0 translate-y-8 transition-all duration-700 rounded-2xl bg-white p-8 shadow-md border border-[#E5C6B0] flex flex-col items-center text-center">
+      <img src="images/meera.webp" alt="Meera Patel" class="w-16 h-16 rounded-full object-cover border-2 border-[#FF6F61] mb-4 bg-[#FFDAB9] shadow" />
+      <div class="font-bold text-lg text-[#2C2C2C]">Meera Patel</div>
+      <div class="text-[#6B4F3A] text-base mb-3">“I never run out of ideas now. ChefAI is a lifesaver for busy weeks!”</div>
+      <div class="flex gap-1 justify-center mb-1">
+        <span class="text-[#FF6F61]">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer Section -->
+<footer id="footer-chefai" class="w-full bg-[#FFDAB9] border-t border-[#E5C6B0] py-12 px-6 md:px-16 mt-8 rounded-t-3xl shadow-inner">
+  <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-12 md:gap-0">
+    <!-- Logo & Description -->
+    <div class="flex-1 min-w-[220px] mb-8 md:mb-0">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="inline-flex items-center justify-center rounded-full bg-[#FF6F61]/20 border-2 border-[#FF6F61] p-2" style="box-shadow:0 2px 8px #FF6F6130;">
+          <svg width="32" height="32" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="24" cy="16" rx="13" ry="9" fill="#FFF8E7" stroke="#FF6F61" stroke-width="2"/>
+            <ellipse cx="14" cy="24" rx="4" ry="3" fill="#FFF8E7" stroke="#FF6F61" stroke-width="2"/>
+            <ellipse cx="34" cy="24" rx="4" ry="3" fill="#FFF8E7" stroke="#FF6F61" stroke-width="2"/>
+            <rect x="18" y="24" width="12" height="9" rx="4" fill="#FF6F61" stroke="#D35400" stroke-width="2"/>
+            <rect x="18" y="33" width="12" height="4" rx="2" fill="#D35400"/>
+          </svg>
+        </span>
+        <span class="text-2xl font-bold" style="color:#FF6F61; font-family:'Poppins',Arial,sans-serif">ChefAI</span>
+      </div>
+      <p class="text-[#6B4F3A] text-base font-medium mb-4" style="font-family:'Poppins',Arial,sans-serif">ChefAI helps you create delicious, healthy recipes in seconds using AI. Plan meals, get nutritional info, and explore cuisines—all in one elegant app.</p>
+      <div class="flex gap-3 mt-2">
+        <a href="#" class="group"><span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white border border-[#E5C6B0] text-[#FF6F61] shadow-md transition hover:bg-[#FF6F61] hover:text-white animate-jump" style="font-size:1.3rem;"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2zm.75 3A2.25 2.25 0 0 0 6.25 7.25v9.5A2.25 2.25 0 0 0 8.75 19h6.5A2.25 2.25 0 0 0 17.75 16.75v-9.5A2.25 2.25 0 0 0 15.25 5h-6.5z"/></svg></span></a>
+        <a href="#" class="group"><span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white border border-[#E5C6B0] text-[#FF6F61] shadow-md transition hover:bg-[#FF6F61] hover:text-white animate-jump" style="font-size:1.3rem;"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M22.46 6c-.77.35-1.6.58-2.46.69a4.3 4.3 0 0 0 1.88-2.38c-.83.5-1.75.87-2.72 1.07A4.28 4.28 0 0 0 16.11 4c-2.37 0-4.29 1.92-4.29 4.29 0 .34.04.68.1 1A12.13 12.13 0 0 1 3.1 4.7a4.29 4.29 0 0 0 1.33 5.72c-.7-.02-1.36-.21-1.93-.53v.05c0 2.13 1.51 3.91 3.53 4.31-.37.1-.76.16-1.16.16-.28 0-.55-.03-.82-.08.55 1.73 2.15 2.99 4.05 3.02A8.6 8.6 0 0 1 2 19.54 12.16 12.16 0 0 0 8.29 21.5c7.55 0 11.69-6.26 11.69-11.69 0-.18 0-.36-.01-.54A8.5 8.5 0 0 0 22.46 6z"/></svg></span></a>
+        <a href="#" class="group"><span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white border border-[#E5C6B0] text-[#FF6F61] shadow-md transition hover:bg-[#FF6F61] hover:text-white animate-jump" style="font-size:1.3rem;"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.04c-5.5 0-9.96 4.46-9.96 9.96 0 4.41 3.6 8.07 8.22 8.93v-6.32h-2.47v-2.61h2.47v-2c0-2.44 1.49-3.78 3.68-3.78 1.07 0 2.19.19 2.19.19v2.41h-1.24c-1.22 0-1.6.76-1.6 1.54v1.64h2.72l-.44 2.61h-2.28v6.32c4.62-.86 8.22-4.52 8.22-8.93 0-5.5-4.46-9.96-9.96-9.96z"/></svg></span></a>
+        <a href="#" class="group"><span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-white border border-[#E5C6B0] text-[#FF6F61] shadow-md transition hover:bg-[#FF6F61] hover:text-white animate-jump" style="font-size:1.3rem;"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-2.5 6c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5.67-1.5 1.5-1.5zm-4.5 2c1.38 0 2.5 1.12 2.5 2.5s-1.12 2.5-2.5 2.5-2.5-1.12-2.5-2.5 1.12-2.5 2.5-2.5zm8 11c0 1.1-.9 2-2 2h-12c-1.1 0-2-.9-2-2v-7h16v7z"/></svg></span></a>
+      </div>
+    </div>
+    <!-- Links -->
+    <div class="flex-1 min-w-[160px] mb-8 md:mb-0">
+      <h4 class="font-bold text-lg mb-3 text-[#D35400]">Quick Links</h4>
+      <ul class="flex flex-col gap-1 text-[#6B4F3A]">
+        <li><a href="#flow-usage" class="hover:text-[#FF6F61] transition" onclick="event.preventDefault();document.getElementById('flow-usage').scrollIntoView({behavior: 'smooth'});">Instructions</a></li>
+        <li><a href="#features-chefai" class="hover:text-[#FF6F61] transition" onclick="event.preventDefault();document.getElementById('features-chefai').scrollIntoView({behavior: 'smooth'});">Features</a></li>
+        <li><a href="#footer-chefai" class="hover:text-[#FF6F61] transition">Contact Us</a></li>
+      </ul>
+    </div>
+    <!-- Contact Info -->
+    <div class="flex-1 min-w-[220px] mb-8 md:mb-0">
+      <h4 class="font-bold text-lg mb-3 text-[#D35400]">Contact</h4>
+      <ul class="text-[#6B4F3A] text-base flex flex-col gap-2">
+        <li><span class="font-semibold">Email:</span> hello@chefai.com</li>
+        <li><span class="font-semibold">Phone:</span> +1 (800) 123-4567</li>
+        <li><span class="font-semibold">Address:</span> 123 Foodie Lane, Flavor Town, USA</li>
+      </ul>
+    </div>
+    <!-- Newsletter -->
+    <div class="flex-1 min-w-[220px]">
+      <h4 class="font-bold text-lg mb-3 text-[#D35400]">Stay Updated</h4>
+      <form class="flex gap-2">
+        <input type="email" placeholder="Your email" class="px-4 py-2 rounded-lg border border-[#E5C6B0] bg-white text-[#D35400] focus:outline-none focus:ring-2 focus:ring-[#FF6F61] flex-1" />
+        <button type="submit" class="px-5 py-2 rounded-lg bg-[#FF6F61] text-white font-bold hover:bg-[#D35400] transition">Subscribe</button>
+      </form>
+    </div>
+  </div>
+  <div class="w-full text-center mt-10 text-[#B35C00] text-sm opacity-70" style="font-family:'Poppins',Arial,sans-serif">
+    &copy; 2025 ChefAI. Designed with <span style="color:#FF6F61">&#10084;</span> by the ChefAI Team.
+  </div>
+</footer>
+
+<script>
+// Flow Usage Section Animation
+function animateFlowCards() {
+  const cards = document.querySelectorAll('.flow-card');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, idx) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.remove('opacity-0');
+          entry.target.classList.remove('-translate-x-16');
+          entry.target.classList.remove('translate-x-16');
+          entry.target.classList.add('opacity-100');
+          entry.target.classList.add('translate-x-0');
+        }, idx * 150);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.2 });
+  cards.forEach(card => observer.observe(card));
+}
+document.addEventListener('DOMContentLoaded', animateFlowCards);
+</script>
+</body>
+</html>
