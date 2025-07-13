@@ -1,0 +1,630 @@
+/* Recipe Page Styles */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+@keyframes bounce {
+    0%, 20%, 53%, 80%, 100% {
+        transform: translate3d(0,0,0);
+    }
+    40%, 43% {
+        transform: translate3d(0, -30px, 0);
+    }
+    70% {
+        transform: translate3d(0, -15px, 0);
+    }
+    90% {
+        transform: translate3d(0, -4px, 0);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes stackFan {
+    0% {
+        transform: translateX(0) translateY(0) rotate(0deg);
+    }
+    100% {
+        transform: translateX(var(--fan-x)) translateY(var(--fan-y)) rotate(var(--fan-rotation));
+    }
+}
+
+/* Recipe Card Styles */
+.recipe-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.recipe-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.recipe-card .recipe-image {
+    transition: transform 0.3s ease;
+    overflow: hidden;
+}
+
+.recipe-card:hover .recipe-image img {
+    transform: scale(1.1);
+}
+
+.recipe-card .quick-actions {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+}
+
+.recipe-card:hover .quick-actions {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Badge Styles */
+.badge-new {
+    background: linear-gradient(135deg, #10B981, #059669);
+    animation: pulse 2s infinite;
+}
+
+.badge-trending {
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+    animation: float 3s ease-in-out infinite;
+}
+
+.badge-chefs-pick {
+    background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+}
+
+.badge-vegetarian {
+    background: linear-gradient(135deg, #10B981, #059669);
+}
+
+.badge-hot {
+    background: linear-gradient(135deg, #EF4444, #DC2626);
+    animation: pulse 1.5s infinite;
+}
+
+/* Difficulty Indicators */
+.difficulty-easy {
+    background-color: #10B981;
+}
+
+.difficulty-medium {
+    background-color: #F59E0B;
+}
+
+.difficulty-hard {
+    background-color: #EF4444;
+}
+
+/* Filter Dropdown Animations */
+.filter-dropdown {
+    animation: slideInRight 0.2s ease-out;
+    transform-origin: top;
+}
+
+.filter-button.active {
+    background-color: #FEF3E2;
+    border-color: #D97706;
+    color: #D97706;
+}
+
+/* Active Filter Chips */
+.filter-chip {
+    background: linear-gradient(135deg, #D97706, #F59E0B);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    animation: slideInLeft 0.3s ease-out;
+}
+
+.filter-chip button {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 1.25rem;
+    height: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.filter-chip button:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Loading Skeleton */
+.loading-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 0.75rem;
+}
+
+.skeleton-card {
+    height: 320px;
+}
+
+.skeleton-text {
+    height: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.skeleton-text.short {
+    width: 60%;
+}
+
+.skeleton-text.medium {
+    width: 80%;
+}
+
+/* Recipe Stack Animation */
+.recipe-stack {
+    position: relative;
+    perspective: 1000px;
+}
+
+.stack-card {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.stack-card:nth-child(1) {
+    z-index: 3;
+    transform: translateY(0px) rotate(0deg);
+}
+
+.stack-card:nth-child(2) {
+    z-index: 2;
+    transform: translateY(8px) rotate(-2deg);
+}
+
+.stack-card:nth-child(3) {
+    z-index: 1;
+    transform: translateY(16px) rotate(1deg);
+}
+
+.recipe-stack:hover .stack-card:nth-child(1) {
+    transform: translateX(-60px) translateY(-20px) rotate(-10deg);
+}
+
+.recipe-stack:hover .stack-card:nth-child(2) {
+    transform: translateX(0px) translateY(-10px) rotate(0deg);
+}
+
+.recipe-stack:hover .stack-card:nth-child(3) {
+    transform: translateX(60px) translateY(-20px) rotate(10deg);
+}
+
+/* List View Styles */
+.recipe-list-item {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+    border: 1px solid #FED7AA;
+    border-radius: 0.75rem;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.recipe-list-item:hover {
+    border-color: #D97706;
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.15);
+    transform: translateX(4px);
+}
+
+.recipe-list-image {
+    width: 120px;
+    height: 120px;
+    border-radius: 0.5rem;
+    object-fit: cover;
+    margin-right: 1.5rem;
+}
+
+/* Quick View Modal */
+.modal-enter {
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Pagination Styles */
+.page-number {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.page-number:hover {
+    border-color: #D97706;
+    background-color: #FEF3E2;
+}
+
+.page-number.active {
+    background-color: #D97706;
+    color: white;
+    border-color: #D97706;
+}
+
+/* Search Suggestions */
+.search-suggestion {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.search-suggestion:hover {
+    background-color: #FEF3E2;
+}
+
+.search-suggestion:last-child {
+    border-bottom: none;
+}
+
+/* Floating Action Buttons */
+.floating-btn {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.floating-btn:hover {
+    transform: scale(1.1) translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Scroll to Top Button */
+.scroll-to-top {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+
+.scroll-to-top.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Rating Stars */
+.rating-stars {
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+/* Cuisine Tags */
+.cuisine-tag {
+    background: linear-gradient(135deg, #FED7AA, #FDBA74);
+    color: #B45309;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Author Avatar */
+.author-avatar {
+    border: 2px solid #FED7AA;
+    transition: border-color 0.3s ease;
+}
+
+.recipe-card:hover .author-avatar {
+    border-color: #D97706;
+}
+
+/* Quick Actions */
+.quick-action-btn {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(217, 119, 6, 0.2);
+    transition: all 0.3s ease;
+}
+
+.quick-action-btn:hover {
+    background: #D97706;
+    color: white;
+    transform: scale(1.1);
+}
+
+/* Countdown Timer */
+.countdown-timer {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    color: #FED7AA;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .recipe-card {
+        margin-bottom: 1rem;
+    }
+    
+    .filter-dropdown {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90vw;
+        max-width: 400px;
+        max-height: 80vh;
+        overflow-y: auto;
+        z-index: 1000;
+    }
+    
+    .recipe-stack {
+        width: 280px;
+        height: 320px;
+    }
+    
+    .recipe-list-item {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .recipe-list-image {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-3.xl\:grid-cols-4 {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+    
+    .floating-btn {
+        width: 3rem;
+        height: 3rem;
+    }
+    
+    .floating-btn svg {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #D97706;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #B45309;
+}
+
+/* Focus States for Accessibility */
+button:focus,
+input:focus,
+select:focus {
+    outline: 2px solid #D97706;
+    outline-offset: 2px;
+}
+
+/* Smooth Transitions */
+* {
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Video Spotlight Styles */
+.video-spotlight {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1rem;
+}
+
+.video-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+    display: flex;
+    align-items: flex-end;
+    padding: 1.5rem;
+    color: white;
+}
+
+.video-play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    width: 4rem;
+    height: 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.video-play-btn:hover {
+    background: white;
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* Enhanced Card Hover Effects */
+.card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Ingredient Highlight */
+.ingredient-highlight {
+    background: linear-gradient(135deg, #FEF3E2, #FED7AA);
+    border: 1px solid #D97706;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    margin: 0.25rem 0;
+    animation: fadeInUp 0.3s ease-out;
+}
+
+/* Social Proof Indicators */
+.social-proof {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.social-proof .icon {
+    color: #D97706;
+}
+
+/* Enhanced Button Styles */
+.btn-primary {
+    background: linear-gradient(135deg, #D97706, #F59E0B);
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #B45309, #D97706);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #FED7AA, #FDBA74);
+    color: #B45309;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #FDBA74, #FB923C);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(251, 146, 60, 0.4);
+}
+
+/* Loading States */
+.loading-shimmer {
+    position: relative;
+    overflow: hidden;
+}
+
+.loading-shimmer::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+    animation: shimmer 2s infinite;
+    content: '';
+}
+
+/* Masonry Grid Alternative */
+.masonry-grid {
+    column-count: 4;
+    column-gap: 1.5rem;
+}
+
+.masonry-item {
+    break-inside: avoid;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+    .masonry-grid {
+        column-count: 3;
+    }
+}
+
+@media (max-width: 768px) {
+    .masonry-grid {
+        column-count: 2;
+    }
+}
+
+@media (max-width: 640px) {
+    .masonry-grid {
+        column-count: 1;
+    }
+}

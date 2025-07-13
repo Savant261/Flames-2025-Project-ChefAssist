@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipes - ChefAssist</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'chef-orange': '#D97706',
+                        'chef-orange-light': '#F59E0B',
+                        'chef-orange-dark': '#B45309',
+                        'chef-cream': '#FEF3E2',
+                        'chef-peach': '#FED7AA',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="recipesstyles.css">
+</head>
+<body class="bg-chef-cream min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-chef-peach/30 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                    <button onclick="window.location.href='index.html'" class="p-2 text-gray-600 hover:text-chef-orange transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <div class="w-10 h-10 bg-chef-orange rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8.1 13.34l2.83-2.83L3.91 3.5c-1.56 1.56-1.56 4.09 0 5.66l4.19 4.18zm6.78-1.81c1.53.71 3.68.21 5.27-1.38 1.91-1.91 2.28-4.65.81-6.12-1.46-1.46-4.20-1.10-6.12.81-1.59 1.59-2.09 3.74-1.38 5.27L3.7 19.87l1.41 1.41L12 14.41l6.88 6.88 1.41-1.41L13.41 13l1.47-1.47z"/>
+                        </svg>
+                    </div>
+                    <h1 class="text-2xl font-bold text-chef-orange">Recipes</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="viewToggle" class="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:border-chef-orange transition-colors">
+                        <svg id="gridIcon" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M3 3h7v7H3V3zm0 11h7v7H3v-7zm11-11h7v7h-7V3zm0 11h7v7h-7v-7z"/>
+                        </svg>
+                        <svg id="listIcon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                        </svg>
+                        <span id="viewText">Grid</span>
+                    </button>
+                    <button class="bg-chef-orange text-white px-4 py-2 rounded-lg hover:bg-chef-orange-dark transition-colors">
+                        + Add Recipe
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Search Bar -->
+            <div class="relative mb-4">
+                <input type="text" id="mainSearch" placeholder="Search recipes, ingredients, or cuisines..." 
+                       class="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chef-orange focus:border-transparent text-lg">
+                <svg class="absolute left-4 top-3.5 w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <div id="searchSuggestions" class="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 hidden z-10"></div>
+            </div>
+            
+            <!-- Ingredient Search -->
+            <div class="relative mb-4">
+                <input type="text" id="ingredientSearch" placeholder="What can I cook with... (e.g., chicken, tomatoes)" 
+                       class="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent">
+                <svg class="absolute left-4 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+            </div>
+        </div>
+    </header>
+
+    <!-- Filters Section -->
+    <div class="bg-white border-b border-chef-peach/30 sticky top-[120px] z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex flex-wrap items-center gap-4">
+                <!-- Cuisine Filter -->
+                <div class="relative">
+                    <button id="cuisineFilter" class="filter-button flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:border-chef-orange transition-colors">
+                        <span>Cuisine</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div id="cuisineDropdown" class="filter-dropdown hidden absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-64 z-10">
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
+                                <input type="checkbox" value="italian" class="cuisine-checkbox">
+                                <span>🍝 Italian</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
+                                <input type="checkbox" value="indian" class="cuisine-checkbox">
+                                <span>🍛 Indian</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
+                                <input type="checkbox" value="chinese" class="cuisine-checkbox">
+                                <span>🥢 Chinese</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
+                                <input type="checkbox" value="mexican" class="cuisine-checkbox">
+                                <span>🌮 Mexican</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
+                                <input type="checkbox" value="thai" class="cuisine-checkbox">
+                                <span>🌶️ Thai</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
+                                <input type="checkbox" value="japanese" class="cuisine-checkbox">
+                                <span>🍣 Japanese</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
+                                <input type="checkbox" value="mediterranean" class="cuisine-checkbox">
+                                <span>🫒 Mediterranean</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
+                                <input type="checkbox" value="american" class="cuisine-checkbox">
+                                <span>🍔 American</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dietary Filter -->
+                <div class="relative">
+                    <button id="dietaryFilter" class="filter-button flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:border-chef-orange transition-colors">
+                        <span>Dietary</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div id="dietaryDropdown" class="filter-dropdown hidden absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-56 z-10">
+                        <div class="space-y-2">
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
+                                <input type="checkbox" value="vegetarian" class="dietary-checkbox">
+                                <span>🥬 Vegetarian</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
+                                <input type="checkbox" value="vegan" class="dietary-checkbox">
+                                <span>🌱 Vegan</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
+                                <input type="checkbox" value="gluten-free" class="dietary-checkbox">
+                                <span>🌾 Gluten-Free</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
+                                <input type="checkbox" value="dairy-free" class="dietary-checkbox">
+                                <span>🥛 Dairy-Free</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
+                                <input type="checkbox" value="keto" class="dietary-checkbox">
+                                <span>🥑 Keto</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Difficulty Filter -->
+                <div class="relative">
+                    <button id="difficultyFilter" class="filter-button flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:border-chef-orange transition-colors">
+                        <span>Difficulty</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div id="difficultyDropdown" class="filter-dropdown hidden absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-48 z-10">
+                        <div class="space-y-2">
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
+                                <input type="checkbox" value="easy" class="difficulty-checkbox">
+                                <span class="w-3 h-3 bg-green-500 rounded-full"></span>
+                                <span>Easy</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
+                                <input type="checkbox" value="medium" class="difficulty-checkbox">
+                                <span class="w-3 h-3 bg-yellow-500 rounded-full"></span>
+                                <span>Medium</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
+                                <input type="checkbox" value="hard" class="difficulty-checkbox">
+                                <span class="w-3 h-3 bg-red-500 rounded-full"></span>
+                                <span>Hard</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Time Filter -->
+                <div class="relative">
+                    <button id="timeFilter" class="filter-button flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:border-chef-orange transition-colors">
+                        <span>Time</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div id="timeDropdown" class="filter-dropdown hidden absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-48 z-10">
+                        <div class="space-y-2">
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
+                                <input type="checkbox" value="under-30" class="time-checkbox">
+                                <span>⚡ Under 30 min</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
+                                <input type="checkbox" value="30-60" class="time-checkbox">
+                                <span>⏰ 30-60 min</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
+                                <input type="checkbox" value="over-60" class="time-checkbox">
+                                <span>🕐 Over 60 min</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sort By -->
+                <select id="sortBy" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent">
+                    <option value="popularity">Most Popular</option>
+                    <option value="rating">Highest Rated</option>
+                    <option value="newest">Newest</option>
+                    <option value="time">Quickest</option>
+                    <option value="alphabetical">A-Z</option>
+                </select>
+
+                <!-- Clear Filters -->
+                <button id="clearFilters" class="px-4 py-2 text-chef-orange hover:bg-chef-cream rounded-lg transition-colors">
+                    Clear All
+                </button>
+            </div>
+
+            <!-- Active Filters -->
+            <div id="activeFilters" class="flex flex-wrap gap-2 mt-3 hidden">
+                <!-- Active filter chips will be added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Featured Section -->
+        <div class="mb-12">
+            <!-- Recipe of the Day -->
+            <div class="bg-gradient-to-r from-chef-orange to-chef-orange-light rounded-2xl p-8 mb-8 text-white relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+                <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></div>
+                <div class="relative z-10">
+                    <div class="flex flex-col md:flex-row items-center justify-between">
+                        <div class="flex-1 mb-6 md:mb-0">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">Recipe of the Day</span>
+                                <div id="countdown" class="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">
+                                    New recipe in: <span id="countdownTimer">13h 21m</span>
+                                </div>
+                            </div>
+                            <h2 class="text-3xl font-bold mb-2">Spicy Thai Basil Chicken</h2>
+                            <p class="text-white/90 mb-4">Authentic Thai street food with aromatic basil and chilies. Quick, flavorful, and absolutely delicious!</p>
+                            <div class="flex items-center space-x-4 mb-4">
+                                <div class="flex items-center space-x-1">
+                                    <span class="text-yellow-300">⭐⭐⭐⭐⭐</span>
+                                    <span>4.8 (234 reviews)</span>
+                                </div>
+                                <span>⏱️ 25 min</span>
+                                <span>👨‍🍳 Medium</span>
+                            </div>
+                            <p class="text-sm text-white/80 mb-4">🔥 Cooked by 1,245 users today</p>
+                            <button class="bg-white text-chef-orange px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                                Cook This Recipe
+                            </button>
+                        </div>
+                        <div class="relative">
+                            <img src="https://images.pexels.com/photos/2347311/pexels-photo-2347311.jpeg?auto=compress&cs=tinysrgb&w=400" 
+                                 alt="Thai Basil Chicken" 
+                                 class="w-64 h-64 rounded-xl object-cover shadow-2xl">
+                            <div class="absolute -top-2 -right-2 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold animate-pulse">
+                                HOT
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chef's Pick -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 mb-8 border border-chef-peach/30">
+                <div class="flex items-center space-x-4 mb-6">
+                    <div class="w-16 h-16 bg-chef-orange rounded-full flex items-center justify-center">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-chef-orange">Chef's Pick</h3>
+                        <p class="text-gray-600">Handpicked by our culinary experts</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <img src="https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=500" 
+                             alt="Creamy Garlic Parmesan Pasta" 
+                             class="w-full h-64 rounded-xl object-cover">
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-bold text-gray-800 mb-3">Creamy Garlic Parmesan Pasta</h4>
+                        <div class="flex items-center space-x-4 mb-4">
+                            <img src="https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100" 
+                                 alt="Chef Maria" 
+                                 class="w-12 h-12 rounded-full object-cover">
+                            <div>
+                                <p class="font-semibold">Chef Maria Rodriguez</p>
+                                <p class="text-sm text-gray-600">Italian Cuisine Expert</p>
+                            </div>
+                        </div>
+                        <blockquote class="text-gray-700 italic mb-4 border-l-4 border-chef-orange pl-4">
+                            "This recipe brings back memories of my grandmother's kitchen in Tuscany. The secret is in the timing - never rush the garlic!"
+                        </blockquote>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <span class="text-yellow-400">⭐⭐⭐⭐⭐</span>
+                                <span class="text-sm text-gray-600">4.9 (156 reviews)</span>
+                            </div>
+                            <button class="text-chef-orange hover:text-chef-orange-dark font-semibold">
+                                Meet the Chef →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seasonal Banner -->
+            <div class="bg-gradient-to-r from-orange-400 to-red-500 rounded-2xl p-8 mb-8 text-white relative overflow-hidden">
+                <div class="absolute inset-0 bg-black/20"></div>
+                <div class="relative z-10 text-center">
+                    <div class="mb-4">
+                        <span class="text-6xl">🍂</span>
+                        <span class="text-6xl">🎃</span>
+                        <span class="text-6xl">🍁</span>
+                    </div>
+                    <h3 class="text-3xl font-bold mb-2">Autumn Comfort Foods</h3>
+                    <p class="text-xl mb-6">Warm up with seasonal favorites and cozy recipes</p>
+                    <button class="bg-white text-orange-500 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                        Explore Autumn Recipes
+                    </button>
+                </div>
+            </div>
+
+            <!-- Trending Now Section -->
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold text-chef-orange mb-6 text-center">Trending Now</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6" id="trendingGrid">
+                    <!-- Trending recipe cards will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Personalized Sections -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+            <!-- Recommended for You -->
+            <div class="bg-white rounded-xl shadow-lg p-6 border border-chef-peach/30">
+                <h3 class="text-xl font-bold text-chef-orange mb-4">Recommended for You</h3>
+                <div class="space-y-4" id="recommendedGrid">
+                    <!-- Recommended recipes will be populated here -->
+                </div>
+            </div>
+
+            <!-- Recently Viewed -->
+            <div class="bg-white rounded-xl shadow-lg p-6 border border-chef-peach/30">
+                <h3 class="text-xl font-bold text-chef-orange mb-4">Recently Viewed</h3>
+                <div class="space-y-4" id="recentlyViewedGrid">
+                    <!-- Recently viewed recipes will be populated here -->
+                </div>
+            </div>
+
+            <!-- Top Rated by Chefs -->
+            <div class="bg-white rounded-xl shadow-lg p-6 border border-chef-peach/30">
+                <h3 class="text-xl font-bold text-chef-orange mb-4">Top Rated by Chefs</h3>
+                <div class="space-y-4" id="topRatedGrid">
+                    <!-- Top rated recipes will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Recipe Grid -->
+        <div class="bg-white rounded-xl shadow-lg p-6 border border-chef-peach/30">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-chef-orange">All Recipes</h2>
+                <div class="flex items-center space-x-2 text-sm text-gray-600">
+                    <span id="recipeCount">Showing 1-12 of 1,247 recipes</span>
+                </div>
+            </div>
+
+            <!-- Loading Skeleton -->
+            <div id="loadingSkeleton" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 hidden">
+                <!-- Loading skeletons will be generated here -->
+            </div>
+
+            <!-- Recipe Grid -->
+            <div id="recipeGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Recipe cards will be populated here -->
+            </div>
+
+            <!-- Recipe List View -->
+            <div id="recipeList" class="space-y-4 hidden">
+                <!-- Recipe list items will be populated here -->
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex items-center justify-center mt-8">
+                <div class="flex items-center space-x-2">
+                    <button id="prevPage" class="px-4 py-2 border border-gray-300 rounded-lg hover:border-chef-orange transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        Previous
+                    </button>
+                    <div id="pageNumbers" class="flex items-center space-x-1">
+                        <!-- Page numbers will be generated here -->
+                    </div>
+                    <button id="nextPage" class="px-4 py-2 border border-gray-300 rounded-lg hover:border-chef-orange transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                        Next
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick View Modal -->
+    <div id="quickViewModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-2xl font-bold text-chef-orange">Recipe Preview</h3>
+                    <button id="closeQuickView" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+                <div id="quickViewContent">
+                    <!-- Quick view content will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2">
+        <!-- Toast notifications will appear here -->
+    </div>
+
+    <!-- Floating Action Buttons -->
+    <div class="fixed bottom-6 right-6 flex flex-col space-y-3">
+        <button id="submitRecipeBtn" class="bg-chef-orange text-white p-4 rounded-full shadow-lg hover:bg-chef-orange-dark transition-all hover:scale-110">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+        </button>
+        <button id="scrollToTop" class="bg-gray-600 text-white p-4 rounded-full shadow-lg hover:bg-gray-700 transition-all hover:scale-110 opacity-0">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+            </svg>
+        </button>
+    </div>
+
+    <script src="recipeslogic.js"></script>
+</body>
+</html>
