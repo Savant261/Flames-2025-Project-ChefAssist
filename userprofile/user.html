@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Priya Malhotra - ChefAssist Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'chef-orange': '#D97706',
+                        'chef-orange-light': '#F59E0B',
+                        'chef-orange-dark': '#B45309',
+                        'chef-cream': '#FEF3E2',
+                        'chef-peach': '#FED7AA',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="userstyles.css">
+</head>
+<body class="bg-chef-cream min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-chef-peach/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-chef-orange rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8.1 13.34l2.83-2.83L3.91 3.5c-1.56 1.56-1.56 4.09 0 5.66l4.19 4.18zm6.78-1.81c1.53.71 3.68.21 5.27-1.38 1.91-1.91 2.28-4.65.81-6.12-1.46-1.46-4.20-1.10-6.12.81-1.59 1.59-2.09 3.74-1.38 5.27L3.7 19.87l1.41 1.41L12 14.41l6.88 6.88 1.41-1.41L13.41 13l1.47-1.47z"/>
+                        </svg>
+                    </div>
+                    <h1 class="text-2xl font-bold text-chef-orange">ChefAssist</h1>
+                </div>
+                <!-- <div class="flex items-center space-x-4">
+                    <button class="p-2 text-gray-600 hover:text-chef-orange transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4 19h10v-1a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v1z"/>
+                        </svg>
+                    </button>
+                    <button class="p-2 text-gray-600 hover:text-chef-orange transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        </svg>
+                    </button>
+                </div> -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Back Button -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        <button onclick="window.location.href='index.html#hero-section'" class="flex items-center text-chef-orange font-semibold hover:text-chef-orange-dark transition mb-4">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Home
+        </button>
+    </div>
+    <!-- Profile Header -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div class="bg-gradient-to-r from-chef-orange to-chef-orange-light p-8">
+                <div class="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
+                    <div class="relative group">
+                        <img src="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400" 
+                             alt="Priya Malhotra" 
+                             class="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover transition-transform group-hover:scale-105">
+                        <button onclick="window.location.href='edit.html'" class="absolute bottom-2 right-2 bg-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                            <svg class="w-4 h-4 text-chef-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="flex-1 text-center md:text-left">
+                        <div class="flex flex-col md:flex-row md:items-center md:space-x-4 mb-4">
+                            <h1 class="text-3xl font-bold text-white mb-2 md:mb-0">Priya Malhotra</h1>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-500 text-white">
+                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                Premium
+                            </span>
+                        </div>
+                        <p class="text-white/90 text-lg mb-4 max-w-2xl">
+                            Passionate home chef & recipe creator. Lover of all things pasta & spice! 
+                            Sharing my culinary adventures one recipe at a time.
+                        </p>
+                        
+                        <!-- Achievement Badges -->
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-white/20 text-white">
+                                🏆 Top Creator
+                            </span>
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-white/20 text-white">
+                                🔥 30-Day Streak
+                            </span>
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-white/20 text-white">
+                                ⭐ 5-Star Chef
+                            </span>
+                        </div>
+                        
+                        <!-- Cooking Preferences -->
+                        <div class="flex flex-wrap gap-2">
+                            <span class="px-3 py-1 bg-white/10 text-white rounded-full text-sm">🍝 Italian</span>
+                            <span class="px-3 py-1 bg-white/10 text-white rounded-full text-sm">🌶️ Spicy</span>
+                            <span class="px-3 py-1 bg-white/10 text-white rounded-full text-sm">🥗 Healthy</span>
+                            <span class="px-3 py-1 bg-white/10 text-white rounded-full text-sm">⚡ Quick</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stats Section -->
+            <div class="bg-white p-6">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <div class="text-center group cursor-pointer">
+                        <div class="bg-chef-peach/30 rounded-full w-20 h-20 mx-auto flex items-center justify-center mb-3 group-hover:bg-chef-peach/50 transition-colors">
+                            <span class="text-3xl font-bold text-chef-orange stat-number" data-target="24">0</span>
+                        </div>
+                        <p class="text-gray-600 font-medium">Recipes</p>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                            <div class="bg-chef-orange h-2 rounded-full transition-all duration-1000" style="width: 48%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center group cursor-pointer">
+                        <div class="bg-chef-peach/30 rounded-full w-20 h-20 mx-auto flex items-center justify-center mb-3 group-hover:bg-chef-peach/50 transition-colors">
+                            <span class="text-2xl font-bold text-chef-orange stat-number" data-target="1200">0</span>
+                        </div>
+                        <p class="text-gray-600 font-medium">Followers</p>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                            <div class="bg-chef-orange h-2 rounded-full transition-all duration-1000" style="width: 75%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center group cursor-pointer">
+                        <div class="bg-chef-peach/30 rounded-full w-20 h-20 mx-auto flex items-center justify-center mb-3 group-hover:bg-chef-peach/50 transition-colors">
+                            <span class="text-3xl font-bold text-chef-orange stat-number" data-target="89">0</span>
+                        </div>
+                        <p class="text-gray-600 font-medium">Favorites</p>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                            <div class="bg-chef-orange h-2 rounded-full transition-all duration-1000" style="width: 89%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center group cursor-pointer">
+                        <div class="bg-chef-peach/30 rounded-full w-20 h-20 mx-auto flex items-center justify-center mb-3 group-hover:bg-chef-peach/50 transition-colors">
+                            <span class="text-2xl font-bold text-chef-orange stat-number" data-target="4.8">0</span>
+                        </div>
+                        <p class="text-gray-600 font-medium">Avg Rating</p>
+                        <div class="flex justify-center mt-2">
+                            <div class="flex text-yellow-400">
+                                ⭐⭐⭐⭐⭐
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Sidebar -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Subscription Card -->
+                <div class="bg-white rounded-xl shadow-lg p-6 border border-chef-peach/30">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-chef-orange">Subscription</h3>
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Premium
+                        </span>
+                    </div>
+                    <p class="text-gray-600 mb-4">Enjoy unlimited recipe uploads, advanced meal planning, and exclusive chef badges.</p>
+                    
+                    <div class="space-y-3 mb-4">
+                        <div class="flex items-center text-sm text-gray-600">
+                            <svg class="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Unlimited recipe uploads
+                        </div>
+                        <div class="flex items-center text-sm text-gray-600">
+                            <svg class="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Advanced meal planning
+                        </div>
+                        <div class="flex items-center text-sm text-gray-600">
+                            <svg class="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Exclusive chef badges
+                        </div>
+                    </div>
+                    
+                    <div class="text-sm text-gray-500 mb-4">
+                        Next billing: Dec 15, 2024
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bg-white rounded-xl shadow-lg p-6 border border-chef-peach/30">
+                    <h3 class="text-xl font-bold text-chef-orange mb-4">Recent Activity</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-2 h-2 bg-chef-orange rounded-full mt-2"></div>
+                            <div>
+                                <p class="text-sm text-gray-800">Published "Spicy Pasta Arrabbiata"</p>
+                                <p class="text-xs text-gray-500">2 hours ago</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                            <div>
+                                <p class="text-sm text-gray-800">Received 5-star review</p>
+                                <p class="text-xs text-gray-500">5 hours ago</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                            <div>
+                                <p class="text-sm text-gray-800">Gained 15 new followers</p>
+                                <p class="text-xs text-gray-500">1 day ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cooking Calendar -->
+                <div class="bg-white rounded-xl shadow-lg p-6 border border-chef-peach/30">
+                    <h3 class="text-xl font-bold text-chef-orange mb-4">This Week's Plan</h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center p-2 bg-chef-cream rounded-lg">
+                            <span class="text-sm font-medium">Mon</span>
+                            <span class="text-xs text-gray-600">Pasta Night</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2 bg-gray-50 rounded-lg">
+                            <span class="text-sm font-medium">Tue</span>
+                            <span class="text-xs text-gray-600">Stir Fry</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2 bg-chef-cream rounded-lg">
+                            <span class="text-sm font-medium">Wed</span>
+                            <span class="text-xs text-gray-600">Curry Night</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="lg:col-span-2">
+                <!-- Navigation Tabs -->
+                <div class="bg-white rounded-xl shadow-lg mb-6 border border-chef-peach/30">
+                    <div class="flex flex-wrap border-b border-gray-200">
+                        <button class="tab-button active px-6 py-4 text-sm font-medium border-b-2 border-chef-orange text-chef-orange" data-tab="favorites">
+                            Favorites
+                        </button>
+                        <button class="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-chef-orange hover:border-chef-orange/50 transition-colors" data-tab="reviews">
+                            Reviews
+                        </button>
+                        <button class="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-chef-orange hover:border-chef-orange/50 transition-colors" data-tab="activity">
+                            Activity Feed
+                        </button>
+                        <button class="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-chef-orange hover:border-chef-orange/50 transition-colors" data-tab="collections">
+                            Collections
+                        </button>
+                    </div>
+
+                    <!-- Search and Filter -->
+                    <div class="p-4 border-b border-gray-200">
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <div class="flex-1 relative">
+                                <input type="text" id="recipe-search" placeholder="Search recipes..." 
+                                       class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent">
+                                <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                </svg>
+                            </div>
+                            <select class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent">
+                                <option>All Cuisines</option>
+                                <option>Italian</option>
+                                <option>Asian</option>
+                                <option>Mexican</option>
+                                <option>Indian</option>
+                            </select>
+                            <select class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent">
+                                <option>All Difficulty</option>
+                                <option>Easy</option>
+                                <option>Medium</option>
+                                <option>Hard</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Tab Content -->
+                    <div class="p-6">
+                        <!-- Favorites Tab -->
+                        <div id="favorites-content" class="tab-content">
+                            <div class="flex items-center justify-between mb-6">
+                                <h2 class="text-2xl font-bold text-chef-orange">Your Favorite Recipes</h2>
+                                <div class="flex items-center space-x-2">
+                                    <button class="p-2 text-gray-400 hover:text-chef-orange transition-colors" title="Grid View">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M3 3h7v7H3V3zm0 11h7v7H3v-7zm11-11h7v7h-7V3zm0 11h7v7h-7v-7z"/>
+                                        </svg>
+                                    </button>
+                                    <button class="p-2 text-gray-400 hover:text-chef-orange transition-colors" title="List View">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="recipe-grid">
+                                <!-- Recipe cards will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Other tab contents (hidden by default) -->
+                        <div id="reviews-content" class="tab-content hidden">
+                            <h2 class="text-2xl font-bold text-chef-orange mb-6">Recipe Reviews</h2>
+                            <div class="space-y-4">
+                                <div class="border border-gray-200 rounded-lg p-4">
+                                    <div class="flex items-start space-x-4">
+                                        <img src="https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100" 
+                                             class="w-12 h-12 rounded-full object-cover">
+                                        <div class="flex-1">
+                                            <div class="flex items-center space-x-2 mb-2">
+                                                <h4 class="font-semibold">Sarah Johnson</h4>
+                                                <div class="flex text-yellow-400 text-sm">⭐⭐⭐⭐⭐</div>
+                                            </div>
+                                            <p class="text-gray-600 mb-2">"Amazing pasta recipe! The flavors were incredible and my family loved it."</p>
+                                            <p class="text-sm text-gray-500">On: Spicy Pasta Arrabbiata • 2 days ago</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="activity-content" class="tab-content hidden">
+                            <h2 class="text-2xl font-bold text-chef-orange mb-6">Activity Feed</h2>
+                            <div class="space-y-4">
+                                <div class="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg">
+                                    <div class="w-10 h-10 bg-chef-orange rounded-full flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium">Recipe "Spicy Pasta Arrabbiata" received a 5-star review</p>
+                                        <p class="text-sm text-gray-500">2 hours ago</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="collections-content" class="tab-content hidden">
+                            <h2 class="text-2xl font-bold text-chef-orange mb-6">Recipe Collections</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                    <h3 class="font-semibold mb-2">🍝 Pasta Perfection</h3>
+                                    <p class="text-sm text-gray-600 mb-2">12 recipes</p>
+                                    <p class="text-xs text-gray-500">All my favorite pasta dishes</p>
+                                </div>
+                                <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                    <h3 class="font-semibold mb-2">🌶️ Spice It Up</h3>
+                                    <p class="text-sm text-gray-600 mb-2">8 recipes</p>
+                                    <p class="text-xs text-gray-500">For those who love heat</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- My Recipes Section -->
+                <div class="bg-white rounded-xl shadow-lg border border-chef-peach/30">
+                    <div class="p-6 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <h2 class="text-2xl font-bold text-chef-orange">My Recipes</h2>
+                            <button class="bg-chef-orange text-white px-4 py-2 rounded-lg hover:bg-chef-orange-dark transition-colors">
+                                + Add Recipe
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="my-recipes-grid">
+                            <!-- My recipe cards will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recommended Section -->
+                <div class="bg-white rounded-xl shadow-lg mt-6 border border-chef-peach/30">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-2xl font-bold text-chef-orange">Recommended For You</h2>
+                        <p class="text-gray-600 mt-1">Based on your cooking preferences and activity</p>
+                    </div>
+                    
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="recommended-grid">
+                            <!-- Recommended recipe cards will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="fixed bottom-6 left-6 flex flex-col space-y-3">
+        <button onclick="window.location.href='edit.html'" class="bg-chef-orange text-white p-4 rounded-full shadow-lg hover:bg-chef-orange-dark transition-all hover:scale-110">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+            </svg>
+        </button>
+        <button class="bg-pink-500 text-white p-4 rounded-full shadow-lg hover:bg-pink-600 transition-all hover:scale-110">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            </svg>
+        </button>
+        <button class="bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600 transition-all hover:scale-110">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Notification Badge -->
+    <div class="fixed top-4 right-4 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold animate-pulse">
+        3
+    </div>
+
+    <script src="userlogic.js"></script>
+</body>
+</html>
