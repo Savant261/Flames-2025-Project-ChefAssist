@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChefAI - AI Recipe Generator</title>
+    <title>ChefAssist - AI Recipe Generator</title>
     <!-- Tailwind CSS via CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Poppins -->
@@ -28,8 +28,8 @@
 <span class="text-2xl font-extrabold tracking-tight whitespace-nowrap" style="color:#D35400;">ChefAssist</span>
   </div>
   <div class="flex-1 flex items-center gap-6 justify-start md:justify-center min-w-0 overflow-x-auto">
-    <a href="#flow-usage" class="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onclick="event.preventDefault();document.getElementById('flow-usage').scrollIntoView({behavior: 'smooth'});">Instructions</a>
-    <a href="#features-chefai" class="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onclick="event.preventDefault();document.getElementById('features-chefai').scrollIntoView({behavior: 'smooth'});">Features</a>
+    <a href="recipes.html" class="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap">Explore Recipes</a>
+    <a href="#" class="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap">Cook With AI</a>
     <a href="#testimonials" class="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onclick="event.preventDefault();document.getElementById('testimonials').scrollIntoView({behavior: 'smooth'});">Testimonials</a>
     <a href="#footer-chefai" class="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap">Contact Us</a>
   </div>
@@ -37,11 +37,43 @@
     <button id="dark-mode-toggle" aria-label="Toggle dark mode" class="w-10 h-10 rounded-full bg-[#FFDAB9] border border-[#E5C6B0] shadow hover:bg-[#FF6F61] transition flex items-center justify-center">
       <span id="dark-mode-icon" class="text-xl" style="color:#D35400;">🌙</span>
     </button>
-    <div id="user-profile-preview" class="w-10 h-10 rounded-full bg-[#FFDAB9] border border-[#E5C6B0] flex items-center justify-center shadow cursor-pointer">
-      <svg width="26" height="26" fill="#D35400" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M12 14c-4.418 0-8 1.79-8 4v2h16v-2c0-2.21-3.582-4-8-4z"/></svg>
+    <div id="user-profile-preview" class="relative w-10 h-10 rounded-full bg-[#FFDAB9] border border-[#E5C6B0] flex items-center justify-center shadow cursor-pointer">
+  <svg width="26" height="26" fill="#D35400" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M12 14c-4.418 0-8 1.79-8 4v2h16v-2c0-2.21-3.582-4-8-4z"/></svg>
+  <!-- User Profile Dropdown -->
+  <div id="profile-dropdown" class="hidden absolute right-0 top-full mt-1 w-64 bg-[#23201d] rounded-xl shadow-lg z-50 border border-[#FFDAB9] p-3">
+    <div class="flex flex-col items-center gap-2 mb-3">
+      <div class="w-12 h-12 rounded-full border-2 border-[#FF6F61] flex items-center justify-center text-2xl bg-[#FFDAB9]" style="color:#FF6F61;">🍳</div>
+      <div class="font-bold text-base" style="color:#FFDAB9;">ChefAssist User</div>
+      <div class="text-xs opacity-80 mb-1" style="color:#fff;">user@email.com</div>
+    </div>
+    <div class="flex flex-col gap-1.5 mb-2">
+      <a href="user.html" class="w-full text-center py-2.5 rounded-lg font-semibold text-sm bg-[#FF6F61] text-white transition-all duration-200 hover:bg-[#E65A4D] hover:shadow-md hover:scale-[1.02] active:scale-95 block">User Profile</a>
+      <a href="dashboard.html" id="dashboard-link" class="w-full text-center py-2.5 rounded-lg font-semibold text-sm bg-[#FF6F61] text-white transition-all duration-200 hover:bg-[#E65A4D] hover:shadow-md hover:scale-[1.02] active:scale-95 block">Dashboard</a>
+      <button class="w-full text-center py-2.5 rounded-lg font-semibold text-sm bg-[#FF6F61] text-white transition-all duration-200 hover:bg-[#E65A4D] hover:shadow-md hover:scale-[1.02] active:scale-95">Community</button>
+      <button class="w-full text-center py-2.5 rounded-lg font-semibold text-sm bg-[#FF6F61] text-white transition-all duration-200 hover:bg-[#E65A4D] hover:shadow-md hover:scale-[1.02] active:scale-95">Give Feedback</button>
+      <a href="subscriptions.html" class="w-full text-center py-2.5 rounded-lg font-semibold text-sm bg-[#FF6F61] text-white transition-all duration-200 hover:bg-[#E65A4D] hover:shadow-md hover:scale-[1.02] active:scale-95 block">Subscriptions</a>
+    </div>
+    <div class="pt-1.5 border-t border-[#FFDAB9] mt-2">
+      <button id="auth-action" class="w-full text-center py-2.5 rounded-lg font-bold text-sm bg-[#3a291b] text-[#FFDAB9] transition-all duration-200 hover:bg-[#4a3a2b] hover:shadow-md hover:scale-[1.02] active:scale-95"></button>
     </div>
   </div>
+</div>
+  </div>
 </nav>
+
+    <!-- Auth Modal (Dynamic) -->
+    <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm hidden">
+      <div class="bg-white rounded-3xl shadow-2xl flex flex-col md:flex-row overflow-hidden max-w-2xl w-full relative">
+        <!-- Left: Form -->
+        <div id="auth-form-container" class="flex-1 p-8 flex flex-col justify-center">
+          <!-- Dynamic Form content will be injected here by JS -->
+        </div>
+        <!-- Right: Image -->
+        <div class="hidden md:block flex-1 bg-cover bg-center" style="background-image:url('images/signin.jpg'); min-height:28rem;"></div>
+        <button class="absolute top-4 right-6 text-3xl text-[#FF6F61] hover:text-[#D35400]" id="close-auth-modal">&times;</button>
+      </div>
+    </div>
+
     <!-- Hero Section -->
     <section class="flex flex-col md:flex-row justify-between items-center px-8 py-12 gap-16 flex-1">
         <!-- Left: Text and Search -->
@@ -89,6 +121,37 @@
             </div>
         </div>
     </section>
+
+<!-- 3D Recipe Slider Section -->
+<section id="recipe-slider-section" class="relative flex flex-col items-center justify-center py-24 bg-[#FFF8E7]">
+  <h2 class="text-4xl md:text-5xl font-extrabold text-[#D35400] mb-4 drop-shadow-lg tracking-tight">Our Most Liked Recipes</h2>
+  <p class="text-lg md:text-xl text-[#B35C00] mb-10 max-w-2xl text-center">Discover our most popular dishes, handpicked for their taste and loved by our community. Swipe or click to explore!</p>
+  <div class="relative w-full max-w-6xl flex flex-col items-center min-h-[540px]">
+  <!-- Main image with right-side overlay -->
+  <div class="relative flex items-center justify-center w-full" style="background: #FFF8E7;">
+    <div id="slider-bg-wallpaper" class="relative flex items-center justify-start overflow-hidden rounded-3xl shadow-2xl z-0 transition-all duration-700"
+      style="width: 74%; height: 550px; max-width: 820px; min-width: 320px;">
+      <!-- Description overlay on right -->
+      <div class="absolute top-0 right-0 h-full flex flex-col justify-center"
+        style="width: 38%; min-width: 21px; background: rgba(44,44,44,0.7); border-top-right-radius: 1.5rem; border-bottom-right-radius: 1.5rem; box-shadow: -3px 0 18px #0002;">
+        <!-- <div class="p-7">
+          <div id="slider-title" class="text-2xl md:text-3xl font-extrabold text-[#FFDAB9] mb-2 drop-shadow">Recipe Title</div>
+          <div id="slider-rating" class="text-lg md:text-xl font-bold text-white flex items-center gap-2 mb-2">★★★★★ <span class="ml-3 text-[#FFDAB9] text-base md:text-lg">4.8/5</span></div>
+          <div id="slider-desc" class="text-base md:text-lg text-[#FFF8E7] mt-1">Recipe description goes here.</div>
+        </div> -->
+      </div>
+      <!-- Full-screen button overlay -->
+      <button id="slider-fullscreen" title="View Fullscreen" class="absolute top-4 right-6 bg-[#2c2c2cbb] text-[#FFDAB9] rounded-full w-12 h-12 flex items-center justify-center shadow-md hover:bg-[#FFDAB9] hover:text-[#2C2C2C] transition z-20"><svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M4 8V4h4M20 8V4h-4M4 16v4h4M20 16v4h-4"/></svg></button>
+    </div>
+  </div>
+  <!-- Navigation arrows -->
+  <button id="slider-prev" class="absolute left-4 top-[calc(50%+30px)] -translate-y-1/2 bg-[#FFDAB9] text-[#D35400] rounded-full w-14 h-14 flex items-center justify-center shadow hover:bg-[#FF6F61] hover:text-white transition z-20"><svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg></button>
+  <button id="slider-next" class="absolute right-4 top-[calc(50%+30px)] -translate-y-1/2 bg-[#FFDAB9] text-[#D35400] rounded-full w-14 h-14 flex items-center justify-center shadow hover:bg-[#FF6F61] hover:text-white transition z-20"><svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+  <!-- Thumbnails Row -->
+  <div id="slider-thumbnails" class="flex items-center justify-center gap-4 mt-10 w-full z-10"></div>
+</div>
+</section>
+
 <!-- Flow Usage Section -->
 <section id="flow-usage" class="w-full py-16 px-4 md:px-16 bg-[#FFDAB9]">
   <h2 class="text-3xl md:text-4xl font-bold text-center mb-12" style="color:#D35400;">How ChefAI Works</h2>
@@ -363,5 +426,6 @@ function animateFlowCards() {
 }
 document.addEventListener('DOMContentLoaded', animateFlowCards);
 </script>
+
 </body>
 </html>
