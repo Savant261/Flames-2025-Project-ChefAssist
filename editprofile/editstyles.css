@@ -1,0 +1,479 @@
+/* Custom animations and styles for edit profile page */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Form animations */
+.form-section {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Input focus effects */
+input:focus, textarea:focus, select:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.15);
+}
+
+/* Custom toggle switch styles */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.3s;
+    border-radius: 24px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+    background-color: #D97706;
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(20px);
+}
+
+/* Profile picture upload area */
+.profile-upload-area {
+    position: relative;
+    overflow: hidden;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.profile-upload-area:hover {
+    transform: scale(1.05);
+}
+
+.upload-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 50%;
+}
+
+.profile-upload-area:hover .upload-overlay {
+    opacity: 1;
+}
+
+/* Progress bar animations */
+.progress-bar {
+    background: linear-gradient(90deg, #D97706, #F59E0B);
+    transition: width 0.3s ease;
+    border-radius: 4px;
+}
+
+/* Dropdown animations */
+.dropdown-enter {
+    animation: slideInRight 0.2s ease-out;
+}
+
+.dropdown-exit {
+    animation: slideInRight 0.2s ease-out reverse;
+}
+
+/* Checkbox and radio custom styles */
+input[type="checkbox"]:checked {
+    background-color: #D97706;
+    border-color: #D97706;
+}
+
+input[type="radio"]:checked {
+    background-color: #D97706;
+    border-color: #D97706;
+}
+
+/* Multi-select dropdown */
+.multi-select-dropdown {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.multi-select-option {
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.multi-select-option:hover {
+    background-color: #FEF3E2;
+}
+
+.multi-select-option.selected {
+    background-color: #FED7AA;
+    color: #B45309;
+}
+
+/* Password strength indicator */
+.strength-weak {
+    background-color: #ef4444;
+}
+
+.strength-medium {
+    background-color: #f59e0b;
+}
+
+.strength-strong {
+    background-color: #10b981;
+}
+
+/* Modal animations */
+.modal-enter {
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+.modal-exit {
+    animation: modalFadeIn 0.3s ease-out reverse;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Form validation styles */
+.input-error {
+    border-color: #ef4444 !important;
+    animation: shake 0.5s ease-in-out;
+}
+
+.input-success {
+    border-color: #10b981 !important;
+}
+
+.error-message {
+    color: #ef4444;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    animation: fadeInUp 0.3s ease-out;
+}
+
+.success-message {
+    color: #10b981;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    animation: fadeInUp 0.3s ease-out;
+}
+
+/* Loading states */
+.loading-spinner {
+    border: 2px solid #f3f4f6;
+    border-top: 2px solid #D97706;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Button hover effects */
+.btn-primary {
+    background: linear-gradient(135deg, #D97706, #F59E0B);
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #B45309, #D97706);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.4);
+}
+
+.btn-secondary {
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Social link input styling */
+.social-input-group {
+    position: relative;
+}
+
+.social-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+}
+
+.social-input {
+    padding-left: 48px;
+}
+
+/* Character counter */
+.char-counter {
+    font-size: 0.75rem;
+    color: #6b7280;
+    transition: color 0.3s ease;
+}
+
+.char-counter.warning {
+    color: #f59e0b;
+}
+
+.char-counter.danger {
+    color: #ef4444;
+}
+
+/* Dietary preferences grid */
+.dietary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.dietary-option {
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+.dietary-option:hover {
+    border-color: #D97706;
+    background-color: #FEF3E2;
+}
+
+.dietary-option.selected {
+    border-color: #D97706;
+    background-color: #FED7AA;
+}
+
+/* Notification preferences */
+.notification-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+}
+
+.notification-item:hover {
+    border-color: #D97706;
+    box-shadow: 0 2px 8px rgba(217, 119, 6, 0.1);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #D97706;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #B45309;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .form-section {
+        margin-bottom: 1.5rem;
+    }
+    
+    .grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+    
+    .flex-col {
+        flex-direction: column;
+    }
+    
+    .space-x-4 > * + * {
+        margin-left: 0;
+        margin-top: 1rem;
+    }
+}
+
+/* Success/Error message styling */
+.message-toast {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    animation: slideInRight 0.3s ease-out;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.message-success {
+    background-color: #d1fae5;
+    border-left: 4px solid #10b981;
+    color: #065f46;
+}
+
+.message-error {
+    background-color: #fee2e2;
+    border-left: 4px solid #ef4444;
+    color: #991b1b;
+}
+
+.message-warning {
+    background-color: #fef3c7;
+    border-left: 4px solid #f59e0b;
+    color: #92400e;
+}
+
+/* Enhanced focus states for accessibility */
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 2px solid #D97706;
+    outline-offset: 2px;
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* File upload drag and drop styling */
+.file-upload-area {
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.file-upload-area:hover {
+    border-color: #D97706;
+    background-color: #FEF3E2;
+}
+
+.file-upload-area.dragover {
+    border-color: #D97706;
+    background-color: #FED7AA;
+}
+
+/* Enhanced button states */
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+/* Custom select arrow */
+select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 8px center;
+    background-repeat: no-repeat;
+    background-size: 16px 12px;
+    padding-right: 40px;
+    appearance: none;
+}
+
+/* Form section spacing */
+.form-section + .form-section {
+    margin-top: 2rem;
+}
+
+/* Enhanced card hover effects */
+.card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}

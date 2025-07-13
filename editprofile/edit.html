@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile - ChefAssist</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'chef-orange': '#D97706',
+                        'chef-orange-light': '#F59E0B',
+                        'chef-orange-dark': '#B45309',
+                        'chef-cream': '#FEF3E2',
+                        'chef-peach': '#FED7AA',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="editstyles.css">
+</head>
+<body class="bg-chef-cream min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-chef-peach/30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <button onclick="goBack()" class="p-2 text-gray-600 hover:text-chef-orange transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <div class="w-10 h-10 bg-chef-orange rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8.1 13.34l2.83-2.83L3.91 3.5c-1.56 1.56-1.56 4.09 0 5.66l4.19 4.18zm6.78-1.81c1.53.71 3.68.21 5.27-1.38 1.91-1.91 2.28-4.65.81-6.12-1.46-1.46-4.20-1.10-6.12.81-1.59 1.59-2.09 3.74-1.38 5.27L3.7 19.87l1.41 1.41L12 14.41l6.88 6.88 1.41-1.41L13.41 13l1.47-1.47z"/>
+                        </svg>
+                    </div>
+                    <h1 class="text-2xl font-bold text-chef-orange">Edit Profile</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="cancelChanges()" class="px-4 py-2 text-gray-600 hover:text-chef-orange transition-colors">
+                        Cancel
+                    </button>
+                    <button onclick="saveProfile()" class="bg-chef-orange text-white px-6 py-2 rounded-lg hover:bg-chef-orange-dark transition-colors">
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <form id="editProfileForm" class="space-y-8">
+            <!-- Profile Picture Section -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 border border-chef-peach/30">
+                <h2 class="text-2xl font-bold text-chef-orange mb-6">Profile Picture</h2>
+                <div class="flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8">
+                    <div class="relative group">
+                        <img id="profileImage" src="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400" 
+                             alt="Profile Picture" 
+                             class="w-32 h-32 rounded-full border-4 border-chef-peach object-cover">
+                        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 rounded-full transition-all duration-300 flex items-center justify-center">
+                            <svg class="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <input type="file" id="imageUpload" accept="image/*" class="hidden">
+                        <div class="flex flex-wrap gap-3">
+                            <button type="button" onclick="document.getElementById('imageUpload').click()" 
+                                    class="bg-chef-orange text-white px-4 py-2 rounded-lg hover:bg-chef-orange-dark transition-colors">
+                                Upload New Photo
+                            </button>
+                            <button type="button" onclick="removeProfilePicture()" 
+                                    class="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:border-chef-orange hover:text-chef-orange transition-colors">
+                                Remove Photo
+                            </button>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-2">
+                            Recommended: Square image, at least 400x400px. Max file size: 5MB.
+                        </p>
+                        <div id="uploadProgress" class="hidden mt-3">
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div id="progressBar" class="bg-chef-orange h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Basic Information -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 border border-chef-peach/30">
+                <h2 class="text-2xl font-bold text-chef-orange mb-6">Basic Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="fullName" class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+                        <input type="text" id="fullName" name="fullName" value="Priya Malhotra" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent transition-colors">
+                    </div>
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
+                            Username *
+                            <span class="text-xs text-gray-500">(Cannot be changed)</span>
+                        </label>
+                        <input type="text" id="username" name="username" value="priya_chef" readonly
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                            Email Address *
+                            <span class="inline-flex items-center ml-2">
+                                <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span class="text-xs text-green-600 ml-1">Verified</span>
+                            </span>
+                        </label>
+                        <div class="flex">
+                            <input type="email" id="email" name="email" value="priya.malhotra@email.com" readonly
+                                   class="flex-1 px-4 py-3 border border-gray-300 rounded-l-lg bg-gray-50 text-gray-500">
+                            <button type="button" onclick="resendVerification()" 
+                                    class="px-4 py-3 bg-chef-orange text-white rounded-r-lg hover:bg-chef-orange-dark transition-colors">
+                                Change
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                        <div class="flex">
+                            <select id="countryCode" name="countryCode" class="px-3 py-3 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent">
+                                <option value="+1">🇺🇸 +1</option>
+                                <option value="+91" selected>🇮🇳 +91</option>
+                                <option value="+44">🇬🇧 +44</option>
+                                <option value="+86">🇨🇳 +86</option>
+                                <option value="+81">🇯🇵 +81</option>
+                            </select>
+                            <input type="tel" id="phone" name="phone" value="9876543210" placeholder="Enter phone number"
+                                   class="flex-1 px-4 py-3 border-l-0 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Personal Details -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 border border-chef-peach/30">
+                <h2 class="text-2xl font-bold text-chef-orange mb-6">Personal Details</h2>
+                <div class="space-y-6">
+                    <div>
+                        <label for="bio" class="block text-sm font-medium text-gray-700 mb-2">
+                            Bio/About Me
+                            <span id="bioCounter" class="text-xs text-gray-500 ml-2">(0/200)</span>
+                        </label>
+                        <textarea id="bio" name="bio" rows="4" maxlength="200" placeholder="Tell us about yourself and your cooking journey..."
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent resize-none">Passionate home chef & recipe creator. Lover of all things pasta & spice! Sharing my culinary adventures one recipe at a time.</textarea>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="location" class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                            <input type="text" id="location" name="location" value="Mumbai, India" placeholder="City, Country"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent">
+                        </div>
+                        <div>
+                            <label for="website" class="block text-sm font-medium text-gray-700 mb-2">Website/Blog</label>
+                            <input type="url" id="website" name="website" placeholder="https://your-website.com"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="birthday" class="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
+                            <div class="relative">
+                                <input type="date" id="birthday" name="birthday" value="1990-05-15"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent">
+                                <div class="flex items-center mt-2">
+                                    <input type="checkbox" id="hideAge" name="hideAge" class="mr-2 text-chef-orange focus:ring-chef-orange">
+                                    <label for="hideAge" class="text-sm text-gray-600">Hide my age from public profile</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="gender" class="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+                            <select id="gender" name="gender" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent">
+                                <option value="">Select Gender</option>
+                                <option value="female" selected>Female</option>
+                                <option value="male">Male</option>
+                                <option value="non-binary">Non-binary</option>
+                                <option value="prefer-not-to-say">Prefer not to say</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                            <input type="text" id="customGender" name="customGender" placeholder="Please specify" 
+                                   class="hidden w-full mt-2 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Links -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 border border-chef-peach/30">
+                <h2 class="text-2xl font-bold text-chef-orange mb-6">Social Links</h2>
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-10 h-10 bg-pink-500 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.024-.105-.949-.199-2.403.041-3.439.219-.937 1.404-5.965 1.404-5.965s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.402.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.357-.629-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24.009 12.017 24.009c6.624 0 11.99-5.367 11.99-11.988C24.007 5.367 18.641.001 12.017.001z"/>
+                            </svg>
+                        </div>
+                        <input type="url" id="instagram" name="instagram" placeholder="https://instagram.com/username"
+                               class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent">
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                            </svg>
+                        </div>
+                        <input type="url" id="twitter" name="twitter" placeholder="https://twitter.com/username"
+                               class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent">
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                            </svg>
+                        </div>
+                        <input type="url" id="youtube" name="youtube" placeholder="https://youtube.com/channel/..."
+                               class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cooking Preferences -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 border border-chef-peach/30">
+                <h2 class="text-2xl font-bold text-chef-orange mb-6">Cooking Preferences</h2>
+                <div class="space-y-6">
+                    <div>
+                        <label for="cuisines" class="block text-sm font-medium text-gray-700 mb-2">
+                            Preferred Cuisines
+                            <span class="text-xs text-gray-500">(Select multiple)</span>
+                        </label>
+                        <div class="relative">
+                            <button type="button" id="cuisineDropdown" onclick="toggleDropdown('cuisineOptions')"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent text-left flex items-center justify-between">
+                                <span id="selectedCuisines">Italian, Indian, Thai</span>
+                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+                            <div id="cuisineOptions" class="hidden absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                                <div class="p-2 space-y-1">
+                                    <label class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                        <input type="checkbox" name="cuisines" value="italian" checked class="mr-3 text-chef-orange focus:ring-chef-orange">
+                                        <span>🍝 Italian</span>
+                                    </label>
+                                    <label class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                        <input type="checkbox" name="cuisines" value="indian" checked class="mr-3 text-chef-orange focus:ring-chef-orange">
+                                        <span>🍛 Indian</span>
+                                    </label>
+                                    <label class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                        <input type="checkbox" name="cuisines" value="thai" checked class="mr-3 text-chef-orange focus:ring-chef-orange">
+                                        <span>🌶️ Thai</span>
+                                    </label>
+                                    <label class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                        <input type="checkbox" name="cuisines" value="chinese" class="mr-3 text-chef-orange focus:ring-chef-orange">
+                                        <span>🥢 Chinese</span>
+                                    </label>
+                                    <label class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                        <input type="checkbox" name="cuisines" value="mexican" class="mr-3 text-chef-orange focus:ring-chef-orange">
+                                        <span>🌮 Mexican</span>
+                                    </label>
+                                    <label class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                        <input type="checkbox" name="cuisines" value="japanese" class="mr-3 text-chef-orange focus:ring-chef-orange">
+                                        <span>🍣 Japanese</span>
+                                    </label>
+                                    <label class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                        <input type="checkbox" name="cuisines" value="mediterranean" class="mr-3 text-chef-orange focus:ring-chef-orange">
+                                        <span>🫒 Mediterranean</span>
+                                    </label>
+                                    <label class="flex items-center p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                        <input type="checkbox" name="cuisines" value="american" class="mr-3 text-chef-orange focus:ring-chef-orange">
+                                        <span>🍔 American</span>
+                                    </label>
+                                </div>
+                                <div class="border-t p-2">
+                                    <input type="text" id="customCuisine" placeholder="Add custom cuisine..." 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-chef-orange focus:border-transparent">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-4">
+                            Dietary Preferences
+                            <button type="button" onclick="showDietaryInfo()" class="ml-2 text-chef-orange hover:text-chef-orange-dark">
+                                <svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </button>
+                        </label>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                            <label class="flex items-center p-3 border border-gray-300 rounded-lg hover:border-chef-orange cursor-pointer transition-colors">
+                                <input type="checkbox" name="dietary" value="vegetarian" class="mr-3 text-chef-orange focus:ring-chef-orange">
+                                <span class="text-sm">🥬 Vegetarian</span>
+                            </label>
+                            <label class="flex items-center p-3 border border-gray-300 rounded-lg hover:border-chef-orange cursor-pointer transition-colors">
+                                <input type="checkbox" name="dietary" value="vegan" class="mr-3 text-chef-orange focus:ring-chef-orange">
+                                <span class="text-sm">🌱 Vegan</span>
+                            </label>
+                            <label class="flex items-center p-3 border border-gray-300 rounded-lg hover:border-chef-orange cursor-pointer transition-colors">
+                                <input type="checkbox" name="dietary" value="gluten-free" class="mr-3 text-chef-orange focus:ring-chef-orange">
+                                <span class="text-sm">🌾 Gluten-Free</span>
+                            </label>
+                            <label class="flex items-center p-3 border border-gray-300 rounded-lg hover:border-chef-orange cursor-pointer transition-colors">
+                                <input type="checkbox" name="dietary" value="dairy-free" class="mr-3 text-chef-orange focus:ring-chef-orange">
+                                <span class="text-sm">🥛 Dairy-Free</span>
+                            </label>
+                            <label class="flex items-center p-3 border border-gray-300 rounded-lg hover:border-chef-orange cursor-pointer transition-colors">
+                                <input type="checkbox" name="dietary" value="keto" class="mr-3 text-chef-orange focus:ring-chef-orange">
+                                <span class="text-sm">🥑 Keto</span>
+                            </label>
+                            <label class="flex items-center p-3 border border-gray-300 rounded-lg hover:border-chef-orange cursor-pointer transition-colors">
+                                <input type="checkbox" name="dietary" value="paleo" class="mr-3 text-chef-orange focus:ring-chef-orange">
+                                <span class="text-sm">🦴 Paleo</span>
+                            </label>
+                        </div>
+                        <input type="text" id="customDietary" placeholder="Add custom dietary preference..." 
+                               class="w-full mt-3 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security & Privacy -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 border border-chef-peach/30">
+                <h2 class="text-2xl font-bold text-chef-orange mb-6">Security & Privacy</h2>
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div>
+                            <h3 class="font-medium text-gray-900">Public Profile</h3>
+                            <p class="text-sm text-gray-500">Make your profile visible to other users</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="publicProfile" name="publicProfile" checked class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-chef-orange/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-chef-orange"></div>
+                        </label>
+                    </div>
+
+                    <div class="border-t pt-6">
+                        <button type="button" onclick="openPasswordModal()" 
+                                class="flex items-center justify-between w-full p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 text-gray-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                </svg>
+                                <div>
+                                    <h3 class="font-medium text-gray-900">Change Password</h3>
+                                    <p class="text-sm text-gray-500">Update your account password</p>
+                                </div>
+                            </div>
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notification Preferences -->
+            <div class="bg-white rounded-2xl shadow-lg p-8 border border-chef-peach/30">
+                <h2 class="text-2xl font-bold text-chef-orange mb-6">Notification Preferences</h2>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div class="flex-1">
+                            <h3 class="font-medium text-gray-900">Recipe Alerts</h3>
+                            <p class="text-sm text-gray-500">Get notified about new recipes from chefs you follow</p>
+                            <select class="mt-2 text-xs text-gray-600 border-none bg-transparent p-0 focus:ring-0">
+                                <option>Daily</option>
+                                <option selected>Weekly</option>
+                                <option>Monthly</option>
+                            </select>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="notifications" value="recipe-alerts" checked class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-chef-orange/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-chef-orange"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div class="flex-1">
+                            <h3 class="font-medium text-gray-900">Newsletter</h3>
+                            <p class="text-sm text-gray-500">Weekly cooking tips and featured recipes</p>
+                            <select class="mt-2 text-xs text-gray-600 border-none bg-transparent p-0 focus:ring-0">
+                                <option selected>Weekly</option>
+                                <option>Monthly</option>
+                            </select>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="notifications" value="newsletter" checked class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-chef-orange/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-chef-orange"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div class="flex-1">
+                            <h3 class="font-medium text-gray-900">Comments & Reviews</h3>
+                            <p class="text-sm text-gray-500">When someone comments on or reviews your recipes</p>
+                            <select class="mt-2 text-xs text-gray-600 border-none bg-transparent p-0 focus:ring-0">
+                                <option selected>Immediately</option>
+                                <option>Daily</option>
+                                <option>Weekly</option>
+                            </select>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="notifications" value="comments" checked class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-chef-orange/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-chef-orange"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div class="flex-1">
+                            <h3 class="font-medium text-gray-900">Marketing Updates</h3>
+                            <p class="text-sm text-gray-500">Special offers and product updates</p>
+                            <select class="mt-2 text-xs text-gray-600 border-none bg-transparent p-0 focus:ring-0">
+                                <option>Weekly</option>
+                                <option selected>Monthly</option>
+                            </select>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="notifications" value="marketing" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-chef-orange/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-chef-orange"></div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Password Change Modal -->
+    <div id="passwordModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold text-chef-orange">Change Password</h3>
+                <button onclick="closePasswordModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <form id="passwordForm" class="space-y-4">
+                <div>
+                    <label for="currentPassword" class="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
+                    <input type="password" id="currentPassword" name="currentPassword" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label for="newPassword" class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+                    <input type="password" id="newPassword" name="newPassword" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent">
+                    <div id="passwordStrength" class="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div id="strengthBar" class="h-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                    <p id="strengthText" class="text-xs text-gray-500 mt-1">Password strength: Weak</p>
+                </div>
+                
+                <div>
+                    <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent">
+                    <p id="passwordMatch" class="text-xs mt-1 hidden"></p>
+                </div>
+                
+                <div class="flex space-x-4 pt-4">
+                    <button type="button" onclick="closePasswordModal()" 
+                            class="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                        Cancel
+                    </button>
+                    <button type="submit" 
+                            class="flex-1 px-4 py-3 bg-chef-orange text-white rounded-lg hover:bg-chef-orange-dark transition-colors">
+                        Update Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div id="messageContainer" class="fixed top-4 right-4 z-50"></div>
+
+    <script src="editlogic.js"></script>
+</body>
+</html>
