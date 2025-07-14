@@ -7,10 +7,11 @@ import { Routes, Route } from 'react-router-dom';
 import Favorite from "./pages/Favorite.jsx"
 import Explore from "./pages/Explore.jsx"
 import Profile from "./pages/Profile.jsx"
+import EditProfile from "./pages/EditProfile.jsx"
 
-function App() {
+function App() { 
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
     <Navbar/>
     <Routes>
       <Route path="/" element={<Home/>}/>
@@ -18,9 +19,10 @@ function App() {
       <Route path="/explore" element={<Explore/>}/>
       <Route path="/favorite" element={<Favorite/>}/>
       <Route path="/profile" element={<Profile/>}/>
+      <Route path="/editProfile" element={<EditProfile/>}/>
     </Routes>
     <Footer/>
-    </>
+    </div>
   )
 }
 

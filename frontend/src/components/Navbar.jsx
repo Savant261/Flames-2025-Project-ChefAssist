@@ -1,7 +1,12 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import ProfilePopUp from './home/profilePopUp.jsx';
+import Signin from './Signin.jsx';
 const Navbar = () => {
-      const navigate = useNavigate();
+    const navigate = useNavigate();
+    const [popUp, setPopUp] = useState(false);
+    const [signinPopUp, setSigninPopUp] = useState(false);
+    const [what, setWhat] = useState("SignIn");
     return (
         <nav className="navbar flex items-center justify-between px-8 py-4 bg-[#FFF8E7] shadow-md rounded-b-3xl sticky top-0 z-50" style={{ fontfamily: "Poppins,Arial,sans-serif" }}>
             <div className="flex items-center gap-4 min-w-0">
@@ -18,17 +23,20 @@ const Navbar = () => {
                 <span className="text-2xl font-extrabold tracking-tight whitespace-nowrap" style={{ color: "#D35400" }}>ChefAssist</span>
             </div>
             <div className="flex-1 flex items-center gap-6 justify-start md:justify-center min-w-0 overflow-x-auto">
-                <div className="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onClick={()=> navigate("/")}>Home</div>
-                <div className="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onClick={()=> navigate("/ai")}>Ai</div>
-                <div className="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onClick={()=> navigate("/explore")}>Explore</div>
-                <div className="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onClick={()=> navigate("/favorite")}>Favorite Recipe</div>
+                <div className="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onClick={() => navigate("/")}>Home</div>
+                <div className="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onClick={() => navigate("/ai")}>Cook With Ai</div>
+                <div className="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onClick={() => navigate("/explore")}>Explore Recipes</div>
+                <div className="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onClick={() => navigate("/favorite")}>Favorite Recipe</div>
             </div>
             <div className="flex items-center gap-2 ml-auto">
                 <button id="dark-mode-toggle" aria-label="Toggle dark mode" className="w-10 h-10 rounded-full bg-[#FFDAB9] border border-[#E5C6B0] shadow hover:bg-[#FF6F61] transition flex items-center justify-center">
                     <span id="dark-mode-icon" className="text-xl" style={{ color: "#D35400" }}>🌙</span>
                 </button>
-                <div id="user-profile-preview" className="w-10 h-10 rounded-full bg-[#FFDAB9] border border-[#E5C6B0] flex items-center justify-center shadow cursor-pointer" onClick={()=> navigate("/profile")}>
+                <div className="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap"  onClick={()=> setSigninPopUp((prev)=> !prev)}>SignIn/SignUp</div>
+                {signinPopUp && (<Signin setSigninPopUp={setSigninPopUp} what={what} setWhat={setWhat}/>)}
+                <div id="user-profile-preview" className="w-10 h-10 rounded-full bg-[#FFDAB9] border border-[#E5C6B0] flex items-center justify-center shadow cursor-pointer" onClick={() => setPopUp((prev) => !prev)}>
                     <svg width="26" height="26" fill="#D35400" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M12 14c-4.418 0-8 1.79-8 4v2h16v-2c0-2.21-3.582-4-8-4z" /></svg>
+                    {popUp && (<ProfilePopUp/>)}
                 </div>
             </div>
         </nav>

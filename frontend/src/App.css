@@ -1,1 +1,9 @@
 @import "tailwindcss";
+
+:root {
+  --color-chef-orange: #D97706;
+  --color-chef-orange-light: #F59E0B;
+  --color-chef-orange-dark: #B45309;
+  --color-chef-cream: #FEF3E2;
+  --color-chef-peach: #FED7AA;
+}
