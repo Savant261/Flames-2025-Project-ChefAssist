@@ -8,6 +8,8 @@ import Favorite from "./pages/Favorite.jsx"
 import Explore from "./pages/Explore.jsx"
 import Profile from "./pages/Profile.jsx"
 import EditProfile from "./pages/EditProfile.jsx"
+import Subscription from "./pages/subscription/Subscription.jsx"
+import DashBoard from "./pages/DashBoard.jsx"
 
 function App() { 
   return (
@@ -20,6 +22,8 @@ function App() {
       <Route path="/favorite" element={<Favorite/>}/>
       <Route path="/profile" element={<Profile/>}/>
       <Route path="/editProfile" element={<EditProfile/>}/>
+      <Route path="/subscription" element={<Subscription/>}/>
+      <Route path="/dashboard" element={<DashBoard/>}/>
     </Routes>
     <Footer/>
     </div>

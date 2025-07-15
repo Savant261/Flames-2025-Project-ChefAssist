@@ -27,6 +27,7 @@ const HeroSection = () => {
             <div className="flex-[0.9] flex flex-col md:justify-center items-center w-full h-full">
                 <div id="hero-carousel" className="relative w-full max-w-2xl h-[38rem] md:h-[44rem] flex items-center justify-center overflow-hidden rounded-3xl shadow-xl bg-white">
                     <div className={`carousel-track w-full h-full flex transition-transform duration-700 ease-in-out`}>
+                        
                         <div src="images/food1.jpg"  className=" bg-[url('/Images/food1.jpg')] bg-cover carousel-image object-cover w-full h-full flex-shrink-0 rounded-3xl" />
                         <img src="images/food2.jpg" alt="Delicious Food 2" className="carousel-image object-cover w-full h-full flex-shrink-0 rounded-3xl" />
                         <img src="images/food5.jpg" alt="Delicious Food 5" className="carousel-image object-cover w-full h-full flex-shrink-0 rounded-3xl" />

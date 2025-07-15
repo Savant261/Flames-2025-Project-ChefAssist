@@ -3,9 +3,299 @@ import { useNavigate } from "react-router-dom"
 import Filter from '../components/explore/Filter.jsx'
 import RecipeOfTheDay from '../components/explore/RecipeOfTheDay.jsx'
 import ChefPick from "../components/explore/ChefPick.jsx"
-
+import RecipeCard from '../components/RecipeCard.jsx'
 const Explore = () => {
     const navigate = useNavigate();
+    const sampleRecipes = [
+    {
+        id: 1,
+        title: "Creamy Garlic Parmesan Pasta",
+        image: "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=400",
+        cuisine: "Italian",
+        rating: 4.8,
+        reviews: 124,
+        cookTime: "25 min",
+        difficulty: "Easy",
+        description: "Rich and creamy pasta with garlic and parmesan cheese, perfect for a quick weeknight dinner.",
+        author: {
+            name: "Chef Maria",
+            avatar: "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100"
+        },
+        badges: ["Chef's Pick"],
+        dietary: ["Vegetarian"],
+        ingredients: ["pasta", "garlic", "parmesan", "cream"],
+        views: 2340,
+        saves: 89,
+        isNew: false,
+        isTrending: true,
+        isLiked: false,
+        isSaved: false
+    },
+    {
+        id: 2,
+        title: "Spicy Thai Basil Stir Fry",
+        image: "https://images.pexels.com/photos/2347311/pexels-photo-2347311.jpeg?auto=compress&cs=tinysrgb&w=400",
+        cuisine: "Thai",
+        rating: 4.6,
+        reviews: 89,
+        cookTime: "15 min",
+        difficulty: "Medium",
+        description: "Authentic Thai stir fry with fresh basil and chilies, bursting with flavor.",
+        author: {
+            name: "Chef Somchai",
+            avatar: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100"
+        },
+        badges: ["Hot", "Trending"],
+        dietary: [],
+        ingredients: ["chicken", "basil", "chilies", "soy sauce"],
+        views: 1890,
+        saves: 67,
+        isNew: false,
+        isTrending: true,
+        isLiked: false,
+        isSaved: false
+    },
+    {
+        id: 3,
+        title: "Classic Margherita Pizza",
+        image: "https://images.pexels.com/photos/315755/pexels-photo-315755.jpeg?auto=compress&cs=tinysrgb&w=400",
+        cuisine: "Italian",
+        rating: 4.9,
+        reviews: 203,
+        cookTime: "45 min",
+        difficulty: "Medium",
+        description: "Traditional pizza with fresh mozzarella, tomatoes, and basil.",
+        author: {
+            name: "Chef Giuseppe",
+            avatar: "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100"
+        },
+        badges: ["Chef's Pick", "Vegetarian"],
+        dietary: ["Vegetarian"],
+        ingredients: ["pizza dough", "mozzarella", "tomatoes", "basil"],
+        views: 3210,
+        saves: 156,
+        isNew: false,
+        isTrending: false,
+        isLiked: false,
+        isSaved: false
+    },
+    {
+        id: 4,
+        title: "Butter Chicken Curry",
+        image: "https://images.pexels.com/photos/2474661/pexels-photo-2474661.jpeg?auto=compress&cs=tinysrgb&w=400",
+        cuisine: "Indian",
+        rating: 4.7,
+        reviews: 167,
+        cookTime: "40 min",
+        difficulty: "Medium",
+        description: "Creamy and rich Indian curry with tender chicken in tomato-based sauce.",
+        author: {
+            name: "Chef Priya",
+            avatar: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100"
+        },
+        badges: ["New"],
+        dietary: [],
+        ingredients: ["chicken", "tomatoes", "cream", "spices"],
+        views: 2780,
+        saves: 134,
+        isNew: true,
+        isTrending: false,
+        isLiked: false,
+        isSaved: false
+    },
+    {
+        id: 5,
+        title: "Avocado Toast Supreme",
+        image: "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400",
+        cuisine: "American",
+        rating: 4.4,
+        reviews: 78,
+        cookTime: "10 min",
+        difficulty: "Easy",
+        description: "Elevated avocado toast with poached egg and everything seasoning.",
+        author: {
+            name: "Chef Sarah",
+            avatar: "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100"
+        },
+        badges: ["Vegetarian"],
+        dietary: ["Vegetarian"],
+        ingredients: ["avocado", "bread", "egg", "seasoning"],
+        views: 1450,
+        saves: 45,
+        isNew: false,
+        isTrending: false,
+        isLiked: false,
+        isSaved: false
+    },
+    {
+        id: 6,
+        title: "Beef Tacos with Salsa",
+        image: "https://images.pexels.com/photos/2092507/pexels-photo-2092507.jpeg?auto=compress&cs=tinysrgb&w=400",
+        cuisine: "Mexican",
+        rating: 4.5,
+        reviews: 134,
+        cookTime: "30 min",
+        difficulty: "Easy",
+        description: "Authentic Mexican tacos with seasoned beef and fresh salsa.",
+        author: {
+            name: "Chef Carlos",
+            avatar: "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100"
+        },
+        badges: [],
+        dietary: [],
+        ingredients: ["beef", "tortillas", "tomatoes", "onions"],
+        views: 1890,
+        saves: 89,
+        isNew: false,
+        isTrending: false,
+        isLiked: false,
+        isSaved: false
+    },
+    {
+        id: 7,
+        title: "Vegan Buddha Bowl",
+        image: "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400",
+        cuisine: "Healthy",
+        rating: 4.6,
+        reviews: 92,
+        cookTime: "20 min",
+        difficulty: "Easy",
+        description: "Nutritious bowl with quinoa, roasted vegetables, and tahini dressing.",
+        author: {
+            name: "Chef Emma",
+            avatar: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100"
+        },
+        badges: ["Vegan", "Healthy"],
+        dietary: ["Vegan", "Gluten-Free"],
+        ingredients: ["quinoa", "vegetables", "tahini", "chickpeas"],
+        views: 1670,
+        saves: 78,
+        isNew: true,
+        isTrending: false,
+        isLiked: false,
+        isSaved: false
+    },
+    {
+        id: 8,
+        title: "Chocolate Lava Cake",
+        image: "https://images.pexels.com/photos/291528/pexels-photo-291528.jpeg?auto=compress&cs=tinysrgb&w=400",
+        cuisine: "French",
+        rating: 4.8,
+        reviews: 156,
+        cookTime: "25 min",
+        difficulty: "Hard",
+        description: "Decadent chocolate cake with molten center, perfect for special occasions.",
+        author: {
+            name: "Chef Pierre",
+            avatar: "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100"
+        },
+        badges: ["Chef's Pick"],
+        dietary: ["Vegetarian"],
+        ingredients: ["chocolate", "butter", "eggs", "flour"],
+        views: 2340,
+        saves: 167,
+        isNew: false,
+        isTrending: true,
+        isLiked: false,
+        isSaved: false
+    },
+    {
+        id: 9,
+        title: "Mediterranean Quinoa Bowl",
+        image: "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400",
+        cuisine: "Mediterranean",
+        rating: 4.5,
+        reviews: 89,
+        cookTime: "25 min",
+        difficulty: "Easy",
+        description: "Healthy quinoa bowl with fresh vegetables and feta cheese.",
+        author: {
+            name: "Chef Elena",
+            avatar: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100"
+        },
+        badges: ["Healthy"],
+        dietary: ["Vegetarian", "Gluten-Free"],
+        ingredients: ["quinoa", "vegetables", "feta", "olives"],
+        views: 1230,
+        saves: 56,
+        isNew: false,
+        isTrending: false,
+        isLiked: false,
+        isSaved: false
+    },
+    {
+        id: 10,
+        title: "Chicken Teriyaki Bowl",
+        image: "https://images.pexels.com/photos/2347311/pexels-photo-2347311.jpeg?auto=compress&cs=tinysrgb&w=400",
+        cuisine: "Japanese",
+        rating: 4.7,
+        reviews: 145,
+        cookTime: "30 min",
+        difficulty: "Medium",
+        description: "Tender chicken glazed with teriyaki sauce over steamed rice.",
+        author: {
+            name: "Chef Yuki",
+            avatar: "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100"
+        },
+        badges: [],
+        dietary: [],
+        ingredients: ["chicken", "teriyaki sauce", "rice", "vegetables"],
+        views: 1890,
+        saves: 98,
+        isNew: false,
+        isTrending: true,
+        isLiked: false,
+        isSaved: false
+    },
+    {
+        id: 11,
+        title: "Fish and Chips",
+        image: "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400",
+        cuisine: "British",
+        rating: 4.3,
+        reviews: 67,
+        cookTime: "35 min",
+        difficulty: "Medium",
+        description: "Classic British fish and chips with crispy batter and golden fries.",
+        author: {
+            name: "Chef Oliver",
+            avatar: "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=100"
+        },
+        badges: [],
+        dietary: [],
+        ingredients: ["fish", "potatoes", "flour", "oil"],
+        views: 1456,
+        saves: 67,
+        isNew: false,
+        isTrending: false,
+        isLiked: false,
+        isSaved: false
+    },
+    {
+        id: 12,
+        title: "Pad Thai Noodles",
+        image: "https://images.pexels.com/photos/2347311/pexels-photo-2347311.jpeg?auto=compress&cs=tinysrgb&w=400",
+        cuisine: "Thai",
+        rating: 4.6,
+        reviews: 123,
+        cookTime: "20 min",
+        difficulty: "Medium",
+        description: "Authentic Thai noodles with shrimp, tofu, and peanuts.",
+        author: {
+            name: "Chef Niran",
+            avatar: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100"
+        },
+        badges: ["Trending"],
+        dietary: [],
+        ingredients: ["rice noodles", "shrimp", "tofu", "peanuts"],
+        views: 2100,
+        saves: 112,
+        isNew: false,
+        isTrending: true,
+        isLiked: false,
+        isSaved: false
+    }
+];
     return (
         <div className="flex flex-col bg-chef-cream min-h-screen">
             {/* <!-- Header --> */}
@@ -147,6 +437,7 @@ const Explore = () => {
                     {/* <!-- Recipe Grid --> */}
                     <div id="recipeGrid" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {/* <!-- Recipe cards will be populated here --> */}
+                       {sampleRecipes.map((recipe, index) => (<div key={index}><RecipeCard recipe={recipe} isMyRecipe={false} /></div>))}
                     </div>
 
                     {/* <!-- Recipe List View --> */}

@@ -31,25 +31,24 @@ const profilePopUp = () => {
                     >
                         User Profile
                     </div>
-                    <a
-                        href="dashboard.html"
-                        id="dashboard-link"
+                    <div
+                        onClick={()=> navigate("/dashboard")}
                         className="w-full text-center py-2.5 rounded-lg font-semibold text-sm bg-[#FF6F61] text-white transition-all duration-200 hover:bg-[#E65A4D] hover:shadow-md hover:scale-[1.02] active:scale-95 block"
                     >
                         Dashboard
-                    </a>
+                    </div>
                     <button className="w-full text-center py-2.5 rounded-lg font-semibold text-sm bg-[#FF6F61] text-white transition-all duration-200 hover:bg-[#E65A4D] hover:shadow-md hover:scale-[1.02] active:scale-95">
                         Community
                     </button>
                     <button className="w-full text-center py-2.5 rounded-lg font-semibold text-sm bg-[#FF6F61] text-white transition-all duration-200 hover:bg-[#E65A4D] hover:shadow-md hover:scale-[1.02] active:scale-95">
                         Give Feedback
                     </button>
-                    <a
-                        href="subscriptions.html"
+                    <div
                         className="w-full text-center py-2.5 rounded-lg font-semibold text-sm bg-[#FF6F61] text-white transition-all duration-200 hover:bg-[#E65A4D] hover:shadow-md hover:scale-[1.02] active:scale-95 block"
+                        onClick={() => navigate("/subscription")}
                     >
                         Subscriptions
-                    </a>
+                    </div>
                 </div>
                 <div className="pt-1.5 border-t border-[#FFDAB9] mt-2">
                     <button
