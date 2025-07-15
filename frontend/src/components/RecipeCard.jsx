@@ -40,39 +40,39 @@ const RecipeCard = ({ recipe, isMyRecipe = false }) => {
                 </button>
                 <div className="absolute bottom-2 left-2 flex space-x-1">
                     <span className="cuisine-tag px-2 py-1 text-xs font-medium text-chef-orange-dark rounded-full">
-                        ${recipe.cuisine}
+                        {recipe.cuisine}
                     </span>
                     <span className="px-2 py-1 text-xs font-medium text-white rounded-full ${getDifficultyColor(recipe.difficulty)}">
-                        ${recipe.difficulty}
+                        {recipe.difficulty}
                     </span>
                 </div>
             </div>
 
             <div className="p-4">
                 <h3 className="font-bold text-lg text-gray-800 mb-2 line-clamp-2 group-hover:text-chef-orange transition-colors">
-                    ${recipe.title}
+                    {recipe.title}
                 </h3>
-                <p className="text-gray-600 text-sm mb-3 line-clamp-2">${recipe.description}</p>
+                <p className="text-gray-600 text-sm mb-3 line-clamp-2">{recipe.description}</p>
 
                 <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-1">
-                        <span className="rating-stars text-yellow-400 text-sm">${generateStars(recipe.rating)}</span>
-                        <span className="text-sm text-gray-600">${recipe.rating}</span>
-                        <span className="text-sm text-gray-400">(${recipe.reviews})</span>
+                        <span className="rating-stars text-yellow-400 text-sm">{generateStars(recipe.rating)}</span>
+                        <span className="text-sm text-gray-600">{recipe.rating}</span>
+                        <span className="text-sm text-gray-400">({recipe.reviews})</span>
                     </div>
                     <div className="flex items-center text-sm text-gray-500">
                         <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        ${recipe.cookTime}
+                        {recipe.cookTime}
                     </div>
                 </div>
 
-                ${publishInfo}
+                {publishInfo}
 
                 <div className="flex space-x-2 mt-3">
                     <button className="flex-1 bg-chef-orange text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-chef-orange-dark transition-colors">
-                        ${isMyRecipe ? 'Edit' : 'View Recipe'}
+                        {isMyRecipe ? 'Edit' : 'View Recipe'}
                     </button>
                     <button className="p-2 border border-gray-300 rounded-lg hover:border-chef-orange hover:text-chef-orange transition-colors">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
