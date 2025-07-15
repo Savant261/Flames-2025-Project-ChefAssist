@@ -8,7 +8,7 @@ import Favorite from "./pages/Favorite.jsx"
 import Explore from "./pages/Explore.jsx"
 import Profile from "./pages/Profile.jsx"
 import EditProfile from "./pages/EditProfile.jsx"
-import Subscription from "./pages/subscription/Subscription.jsx"
+import Subscription from "./pages/Subscription.jsx"
 import DashBoard from "./pages/DashBoard.jsx"
 import Feedback from "./pages/Feedback.jsx"
 
