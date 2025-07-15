@@ -1,4 +1,36 @@
+import React, { useState, useEffect } from 'react';
+
+const examplePrompts = [
+  "Eggs, spinach, and mushrooms",
+  "I have tomatoes, onions, and pasta.",
+  "Healthy recipe with lentils, kale, and carrots.",
+  "Vegan recipe with quinoa, chickpeas, and bell peppers."
+];
+
+const TYPING_SPEED = 60; // ms per character
+const PAUSE_BETWEEN = 1200; // ms between prompts
+
 const HeroSection = () => {
+  const [promptIdx, setPromptIdx] = useState(0);
+  const [charIdx, setCharIdx] = useState(0);
+  const [animatedPrompt, setAnimatedPrompt] = useState("");
+
+  useEffect(() => {
+    let timeout;
+    if (charIdx < examplePrompts[promptIdx].length) {
+      timeout = setTimeout(() => {
+        setAnimatedPrompt(examplePrompts[promptIdx].slice(0, charIdx + 1));
+        setCharIdx(charIdx + 1);
+      }, TYPING_SPEED);
+    } else {
+      timeout = setTimeout(() => {
+        setCharIdx(0);
+        setPromptIdx((promptIdx + 1) % examplePrompts.length);
+      }, PAUSE_BETWEEN);
+    }
+    return () => clearTimeout(timeout);
+  }, [charIdx, promptIdx]);
+
     return (
         <section className="w-full min-h-[80vh] bg-[#FFE6C7] flex flex-col md:flex-row justify-between items-center px-12 py-14 gap-14 md:gap-20">
             {/* Left: Text & Form */}
@@ -11,19 +43,27 @@ const HeroSection = () => {
                     Enter your ingredients, choose your preferences, and let our AI create the perfect recipe for you.
                 </p>
                 <form className="flex gap-2 mt-6">
-                    <input id="typing-input" type="text" placeholder="Egg" className="flex-1 px-6 py-4 rounded-full border border-[#FF6F61] text-base bg-white text-[#D35400] font-medium focus:outline-none" autoComplete="off" />
+                    <input
+  id="typing-input"
+  type="text"
+  placeholder={animatedPrompt}
+  className="flex-1 px-6 py-4 rounded-full border border-[#FF6F61] text-base bg-white text-[#D35400] font-medium focus:outline-none"
+  autoComplete="off"
+/>
+
                     <button type="submit" className="px-8 py-4 rounded-full font-bold text-lg bg-[#FF6F61] text-white hover:bg-[#ff8c7a] transition">Get Started</button>
                 </form>
 
                 <div className="mt-8 bg-[#D3B89A] rounded-xl p-5">
-                    <div className="font-bold text-base text-[#fff] mb-3">Example Prompts</div>
-                    <div className="flex flex-wrap gap-3">
-                        <span className="px-4 py-2 rounded-lg text-sm font-semibold bg-[#FFE6C7] text-[#FF6F61]">Eggs, spinach, and mushrooms</span>
-                        <span className="px-4 py-2 rounded-lg text-sm font-semibold bg-[#FFE6C7] text-[#FF6F61]">I have tomatoes, onions, and pasta.</span>
-                        <span className="px-4 py-2 rounded-lg text-sm font-semibold bg-[#FFE6C7] text-[#FF6F61]">Healthy recipe with lentils, kale, and carrots.</span>
-                        <span className="px-4 py-2 rounded-lg text-sm font-semibold bg-[#FFE6C7] text-[#FF6F61]">Vegan recipe with quinoa, chickpeas, and bell peppers.</span>
-                    </div>
-                </div>
+  <div className="font-bold text-base text-[#fff] mb-3">Example Prompts</div>
+  <div className="flex flex-wrap gap-3">
+    <span className="px-4 py-2 rounded-lg text-sm font-semibold bg-[#FFE6C7] text-[#FF6F61]">Eggs, spinach, and mushrooms</span>
+    <span className="px-4 py-2 rounded-lg text-sm font-semibold bg-[#FFE6C7] text-[#FF6F61]">I have tomatoes, onions, and pasta.</span>
+    <span className="px-4 py-2 rounded-lg text-sm font-semibold bg-[#FFE6C7] text-[#FF6F61]">Healthy recipe with lentils, kale, and carrots.</span>
+    <span className="px-4 py-2 rounded-lg text-sm font-semibold bg-[#FFE6C7] text-[#FF6F61]">Vegan recipe with quinoa, chickpeas, and bell peppers.</span>
+  </div>
+</div>
+
             </div>
             {/* Right: Static Image (Carousel placeholder) */}
             <div className="flex-[0.9] flex flex-col md:justify-center items-center w-full h-full">

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ProfilePopUp from './home/profilePopUp.jsx';
+import ProfilePopUp from './home/ProfilePopUp.jsx';
 import Signin from './Signin.jsx';
 const Navbar = () => {
     const navigate = useNavigate();
@@ -24,9 +24,9 @@ const Navbar = () => {
             </div>
             <div className="flex-1 flex items-center gap-6 justify-start md:justify-center min-w-0 overflow-x-auto">
                 <div className="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onClick={() => navigate("/")}>Home</div>
-                <div className="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onClick={() => navigate("/ai")}>Cook With Ai</div>
+                <div className="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onClick={() => navigate("/ai")}>Cook With AI</div>
                 <div className="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onClick={() => navigate("/explore")}>Explore Recipes</div>
-                <div className="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onClick={() => navigate("/favorite")}>Favorite Recipe</div>
+                
             </div>
             <div className="flex items-center gap-2 ml-auto">
                 <button id="dark-mode-toggle" aria-label="Toggle dark mode" className="w-10 h-10 rounded-full bg-[#FFDAB9] border border-[#E5C6B0] shadow hover:bg-[#FF6F61] transition flex items-center justify-center">
