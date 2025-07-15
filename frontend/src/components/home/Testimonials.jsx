@@ -7,7 +7,7 @@ const Testimonials = () => {
                 <div className="testimonial-card  translate-y-8 transition-all duration-700 rounded-2xl bg-white p-8 shadow-md border border-[#E5C6B0] flex flex-col items-center text-center">
                     <img src="./Images/priya.webp" alt="Priya Sharma" className="w-16 h-16 rounded-full object-cover border-2 border-[#FF6F61] mb-4 bg-[#FFDAB9] shadow" />
                     <div className="font-bold text-lg text-[#2C2C2C]">Priya Sharma</div>
-                    <div className="text-[#6B4F3A] text-base mb-3">“ChefAI made dinner so much easier! I love how quick and healthy the recipes are.”</div>
+                    <div className="text-[#6B4F3A] text-base mb-3">“ChefAssist made dinner so much easier! I love how quick and healthy the recipes are.”</div>
                     <div className="flex gap-1 justify-center mb-1">
                         <span className="text-[#FF6F61]">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
                     </div>

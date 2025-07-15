@@ -13,13 +13,13 @@ const FaqSection = () => {
                 <div className="faq-list w-full divide-y divide-[#FFDAB9]">
                     <div className="faq-item py-5 cursor-pointer">
                         <div className="faq-question flex items-center justify-between text-lg md:text-xl font-semibold" style={{ color: "#D35400" }} onClick={() => setQ1((prev) => !prev)}>
-                            How does ChefAI generate recipes?
+                            How does ChefAssist generate recipes?
                             <span className="faq-toggle text-2xl">+</span>
                         </div>
 
                     </div>
                     {q1 && (<div className="faq-answer text-[#6B4F3A] mt-2 md:text-base text-sm">
-                        ChefAI uses advanced AI models trained on thousands of recipes and culinary rules to generate creative, delicious, and personalized recipes based on your input.
+                        ChefAssist uses advanced AI models trained on thousands of recipes and culinary rules to generate creative, delicious, and personalized recipes based on your input.
                     </div>)}
                     <div className="faq-item py-5 cursor-pointer">
                         <div className="faq-question flex items-center justify-between text-lg md:text-xl font-semibold" style={{ color: "#D35400" }} onClick={() => setQ2((prev) => !prev)}>
@@ -28,17 +28,17 @@ const FaqSection = () => {
                         </div>
                     </div>
                     {q2 && (<div className="faq-answer text-[#6B4F3A] mt-2  md:text-base text-sm">
-                        Yes! You can enter dietary preferences and allergies, and ChefAI will ensure your recipes avoid those ingredients or cuisines.
+                        Yes! You can enter dietary preferences and allergies, and ChefAssist will ensure your recipes avoid those ingredients or cuisines.
                     </div>)}
                     <div className="faq-item py-5 cursor-pointer">
                         <div className="faq-question flex items-center justify-between text-lg md:text-xl font-semibold" style={{ color: "#D35400" }} onClick={() => setQ3((prev) => !prev)}>
-                            Is ChefAI free to use?
+                            Is ChefAssist free to use?
                             <span className="faq-toggle text-2xl">+</span>
                         </div>
 
                     </div>
                     {q3 && (<div className="faq-answer text-[#6B4F3A] mt-2  md:text-base text-sm">
-                        ChefAI is free for basic use. Premium features such as advanced analytics, meal planning, and shopping lists may require a subscription in the future.
+                        ChefAssist is free for basic use. Premium features such as advanced analytics, meal planning, and shopping lists may require a subscription in the future.
                     </div>)}
                     <div className="faq-item py-5 cursor-pointer">
                         <div className="faq-question flex items-center justify-between text-lg md:text-xl font-semibold" style={{ color: "#D35400" }} onClick={() => setQ4((prev) => !prev)}>
