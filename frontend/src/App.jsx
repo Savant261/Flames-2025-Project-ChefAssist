@@ -10,6 +10,7 @@ import Profile from "./pages/Profile.jsx"
 import EditProfile from "./pages/EditProfile.jsx"
 import Subscription from "./pages/subscription/Subscription.jsx"
 import DashBoard from "./pages/DashBoard.jsx"
+import Feedback from "./pages/Feedback.jsx"
 
 function App() { 
   return (
@@ -24,6 +25,7 @@ function App() {
       <Route path="/editProfile" element={<EditProfile/>}/>
       <Route path="/subscription" element={<Subscription/>}/>
       <Route path="/dashboard" element={<DashBoard/>}/>
+      <Route path="/feedback" element={<Feedback/>}/>
     </Routes>
     <Footer/>
     </div>
