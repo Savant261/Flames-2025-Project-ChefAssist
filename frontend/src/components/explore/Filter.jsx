@@ -1,6 +1,12 @@
-import React from 'react'
+import React, {useState} from 'react'
 
 const Filter = () => {
+   
+        const [Cuisine, setCuisine] = useState(false);
+        const [dietary, setDietary] = useState(true);
+        const [difficulty, setDifficulty] = useState(false);
+        const [time, setTime] = useState(false);
+         const [popular, setPopular] = useState(false);
     return (
         <>
             <div className="bg-white border-b border-chef-peach/30 sticky top-[120px] z-40">
@@ -8,13 +14,15 @@ const Filter = () => {
                     <div className="flex flex-wrap items-center gap-4">
                         {/* <!-- Cuisine Filter --> */}
                         <div className="relative">
-                            <button id="cuisineFilter" className="filter-button flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:border-chef-orange transition-colors">
+                            <button id="cuisineFilter" className="filter-button flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:border-chef-orange transition-colors" onClick={() => setCuisine((prev) => !prev)}>
+                                
                                 <span>Cuisine</span>
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </button>
-                            <div id="cuisineDropdown" className="filter-dropdown hidden absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-64 z-10">
+
+                            {Cuisine && (<div id="cuisineDropdown" className="filter-dropdown absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-64 z-10">
                                 <div className="grid grid-cols-2 gap-2">
                                     <label className="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
                                         <input type="checkbox" value="italian" className="cuisine-checkbox" />
@@ -50,17 +58,19 @@ const Filter = () => {
                                     </label>
                                 </div>
                             </div>
-                        </div>
+                       )}</div>
+                            
 
                         {/* <!-- Dietary Filter --> */}
                         <div className="relative">
-                            <button id="dietaryFilter" className="filter-button flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:border-chef-orange transition-colors">
+                            <button id="dietaryFilter" className="filter-button flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:border-chef-orange transition-colors " onClick={() => setDietary((prev) => !prev)}>
                                 <span>Dietary</span>
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </button>
-                            <div id="dietaryDropdown" className="filter-dropdown hidden absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-56 z-10">
+
+                           {dietary && ( <div id="dietaryDropdown" className="filter-dropdown absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-56 z-10">
                                 <div className="space-y-2">
                                     <label className="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
                                         <input type="checkbox" value="vegetarian" className="dietary-checkbox" />
@@ -83,17 +93,18 @@ const Filter = () => {
                                         <span>🥑 Keto</span>
                                     </label>
                                 </div>
-                            </div>
+                            </div>)}
                         </div>
 
                         <div className="relative">
-                            <button id="difficultyFilter" className="filter-button flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:border-chef-orange transition-colors">
+                            <button id="difficultyFilter" className="filter-button flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:border-chef-orange transition-colors" onClick={() => setDifficulty((prev) => !prev)}>
                                 <span>Difficulty</span>
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </button>
-                            <div id="difficultyDropdown" className="filter-dropdown hidden absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-48 z-10">
+
+                            {difficulty && (<div id="difficultyDropdown" className="filter-dropdown absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-48 z-10">
                                 <div className="space-y-2">
                                     <label className="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
                                         <input type="checkbox" value="easy" className="difficulty-checkbox" />
@@ -111,17 +122,20 @@ const Filter = () => {
                                         <span>Hard</span>
                                     </label>
                                 </div>
-                            </div>
+                            </div>)}
+                            
+                           
                         </div>
 
                         <div className="relative">
-                            <button id="timeFilter" className="filter-button flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:border-chef-orange transition-colors">
+                            <button id="timeFilter" className="filter-button flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:border-chef-orange transition-colors" onClick={() => setTime((prev) => !prev)}>
                                 <span>Time</span>
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                 </svg>
                             </button>
-                            <div id="timeDropdown" className="filter-dropdown hidden absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-48 z-10">
+
+                            {time && (<div id="timeDropdown" className="filter-dropdown absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-48 z-10">
                                 <div className="space-y-2">
                                     <label className="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
                                         <input type="checkbox" value="under-30" className="time-checkbox" />
@@ -136,7 +150,8 @@ const Filter = () => {
                                         <span>🕐 Over 60 min</span>
                                     </label>
                                 </div>
-                            </div>
+                            </div>) }
+                            
                         </div>
 
                         {/* <!-- Sort By --> */}
@@ -162,6 +177,7 @@ const Filter = () => {
             </div>
         </>
     )
+
 }
 
 export default Filter

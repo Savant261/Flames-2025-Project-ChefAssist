@@ -2,7 +2,7 @@ import React from 'react'
 
 const Footer = () => {
     return (
-        <footer id="footer-chefai" className="w-full bg-[#FFDAB9] border-t border-[#E5C6B0] py-12 px-6 md:px-16 mt-8 rounded-t-3xl shadow-inner">
+        <footer id="footer-chefai" className="z-50 w-full bg-[#FFDAB9] border-t border-[#E5C6B0] py-12 px-6 md:px-16 mt-8 rounded-t-3xl shadow-inner">
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-12 md:gap-0">
                 {/* <!-- Logo & Description --> */}
                 <div className="flex-1 min-w-[220px] mb-8 md:mb-0">

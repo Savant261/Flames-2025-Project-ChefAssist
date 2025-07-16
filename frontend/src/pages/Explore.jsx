@@ -4,6 +4,7 @@ import Filter from '../components/explore/Filter.jsx'
 import RecipeOfTheDay from '../components/explore/RecipeOfTheDay.jsx'
 import ChefPick from "../components/explore/ChefPick.jsx"
 import RecipeCard from '../components/RecipeCard.jsx'
+
 const Explore = () => {
     const navigate = useNavigate();
     const sampleRecipes = [
