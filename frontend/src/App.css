@@ -6,7 +6,7 @@
   --color-chef-orange-dark: #B45309;
   --color-chef-cream: #FEF3E2;
   --color-chef-peach: #FED7AA;
-}
+} 
 
 .blinking-cursor {
   animation: blink 1s steps(1) infinite;

@@ -220,8 +220,8 @@
 .inventory-item {
     transition: all 0.3s ease;
     border-radius: 8px;
-    padding: 12px;
-    border: 1px solid #e5e7eb;
+    padding: 12px;  
+    border: 1px solid #e5e7eb; 
 }
 
 .inventory-item:hover {
