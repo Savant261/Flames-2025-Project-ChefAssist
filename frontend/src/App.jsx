@@ -25,7 +25,7 @@ function App() {
       <Route path="/profile" element={<Profile/>}/>
       <Route path="/editProfile" element={<EditProfile/>}/>
       <Route path="/subscription" element={<Subscription/>}/>
-      <Route path="/dashboard" element={<DashBoard/>}/>
+      <Route path="/dashboard/*" element={<DashBoard/>}/>
       <Route path="/feedback" element={<Feedback/>}/>
       <Route path="/recipe" element={<Recipe/>}/>
     </Routes>

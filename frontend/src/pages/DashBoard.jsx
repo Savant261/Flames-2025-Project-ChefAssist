@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Route, Routes, useNavigate } from 'react-router-dom'
 import Settings from '../components/dashboard/Settings';
 import MyRecipe from '../components/dashboard/MyRecipe';
 import Overview from '../components/dashboard/Overview';
@@ -141,37 +141,37 @@ const DashBoard = () => {
 
                             {/* <!-- Navigation Menu --> */}
                             <nav className="space-y-2">
-                                <button className="nav-item active w-full text-left px-4 py-3 rounded-lg transition-colors" data-section="overview" onClick={() => setSideBar("overview")}>
+                                <button className="nav-item active w-full text-left px-4 py-3 rounded-lg transition-colors" data-section="overview" onClick={() => navigate("/dashboard")}>
                                     <svg className="w-5 h-5 inline mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
                                     </svg>
                                     Overview
                                 </button>
-                                <button className="nav-item w-full text-left px-4 py-3 rounded-lg transition-colors" data-section="my-recipes" onClick={() => setSideBar("myRecipes")}>
+                                <button className="nav-item w-full text-left px-4 py-3 rounded-lg transition-colors" data-section="my-recipes" onClick={() => navigate("/dashboard/myRecipes")}>
                                     <svg className="w-5 h-5 inline mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253z" />
                                     </svg>
                                     My Recipes
                                 </button>
-                                <button className="nav-item w-full text-left px-4 py-3 rounded-lg transition-colors" data-section="meal-planner" onClick={() => setSideBar("mealPlanner")}>
+                                <button className="nav-item w-full text-left px-4 py-3 rounded-lg transition-colors" data-section="meal-planner" onClick={() => navigate("/dashboard/mealPlanner")}>
                                     <svg className="w-5 h-5 inline mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
                                     Meal Planner
                                 </button>
-                                <button className="nav-item w-full text-left px-4 py-3 rounded-lg transition-colors" data-section="inventory" onClick={() => setSideBar("inventory")}>
+                                <button className="nav-item w-full text-left px-4 py-3 rounded-lg transition-colors" data-section="inventory" onClick={() => navigate("/dashboard/inventory")}>
                                     <svg className="w-5 h-5 inline mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                     </svg>
                                     Inventory
                                 </button>
-                                <button className="nav-item w-full text-left px-4 py-3 rounded-lg transition-colors" data-section="nutrition" onClick={() => setSideBar("nutrition")}>
+                                <button className="nav-item w-full text-left px-4 py-3 rounded-lg transition-colors" data-section="nutrition" onClick={() => navigate("/dashboard/nutrition")}>
                                     <svg className="w-5 h-5 inline mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                                     </svg>
                                     Nutrition
                                 </button>
-                                <button className="nav-item w-full text-left px-4 py-3 rounded-lg transition-colors" data-section="settings" onClick={() => setSideBar("settings")}>
+                                <button className="nav-item w-full text-left px-4 py-3 rounded-lg transition-colors" data-section="settings" onClick={() => navigate("/dashboard/settings")}>
                                     <svg className="w-5 h-5 inline mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -184,18 +184,14 @@ const DashBoard = () => {
 
                     {/* <!-- Main Content --> */}
                     <div className="lg:col-span-3">
-                        {sideBar == "overview" && (<Overview sampleRecipes={sampleRecipes} />)}
-
-                        {sideBar == "myRecipes" && (<MyRecipe sampleRecipes={sampleRecipes} />)}
-
-                        {sideBar == "mealPlanner" && (<MealPlanner />)}
-
-                        {sideBar == "inventory" && (<Inventory sampleRecipes={sampleRecipes} />)}
-
-                        {sideBar == "nutrition" && (<Nutrition />)}
-
-                        {sideBar == "settings" && (<Settings />)}
-
+                        <Routes>
+                            <Route index element={<Overview sampleRecipes={sampleRecipes} />} />
+                            <Route path="myRecipes" element={<MyRecipe sampleRecipes={sampleRecipes} />} />
+                            <Route path="mealPlanner" element={<MealPlanner />} />
+                            <Route path="inventory" element={<Inventory sampleRecipes={sampleRecipes} />} />
+                            <Route path="nutrition" element={<Nutrition />} />
+                            <Route path="settings" element={<Settings />} />
+                        </Routes>
                     </div>
                 </div>
             </div>
