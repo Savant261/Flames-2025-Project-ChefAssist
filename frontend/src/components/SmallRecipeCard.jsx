@@ -1,10 +1,12 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const SmallRecipeCard = ({ recipe }) => {
+    const navigate = useNavigate();
     return (
         <>
             <div className="flex items-center space-x-4">
-                <img src={recipe.image} alt="${recipe.title}" class="w-16 h-16 rounded-lg object-cover" />
+                <img src={recipe.image} alt="${recipe.title}" className="w-16 h-16 rounded-lg object-cover" />
                 <div className="flex-1">
                     <h5 className="font-bold text-chef-orange">{recipe.title}</h5>
                     <p className="text-sm text-gray-600">{recipe.description}</p>
@@ -14,7 +16,7 @@ const SmallRecipeCard = ({ recipe }) => {
                     </div>
                 </div>
             </div>
-            <button className="mt-3 w-full bg-chef-orange text-white py-2 rounded-lg hover:bg-chef-orange-dark transition-colors" onclick="viewRecipe(${recipe.id})">
+            <button className="mt-3 w-full bg-chef-orange text-white py-2 rounded-lg hover:bg-chef-orange-dark transition-colors" onClick={() => navigate("/recipe")}>
                 Cook This Recipe
             </button>
         </>

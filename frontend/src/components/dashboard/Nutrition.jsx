@@ -2,7 +2,7 @@ import React from 'react'
 
 const Nutrition = () => {
     return (
-        <div id="nutrition-section" className="dashboard-section ">
+        <div id="nutrition-section" className="dashboard-section  ">
             <h2 className="text-2xl font-bold text-chef-orange mb-6">Nutritional Insights</h2>
 
             {/* <!-- Nutrition Overview --> */}
