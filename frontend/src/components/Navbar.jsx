@@ -1,49 +1,119 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProfilePopUp from './home/ProfilePopUp.jsx';
 import Signin from './Signin.jsx';
-import { Bell } from 'lucide-react';
+import { Bell, PlusCircle, Search, Menu } from 'lucide-react';
+
 const Navbar = () => {
     const navigate = useNavigate();
+
     const [popUp, setPopUp] = useState(false);
     const [signinPopUp, setSigninPopUp] = useState(false);
     const [what, setWhat] = useState("SignIn");
-    return (
-        <nav className="navbar flex items-center justify-between px-8 py-4 bg-[#FFF8E7] shadow-md rounded-b-3xl sticky top-0 z-50" style={{ fontfamily: "Poppins,Arial,sans-serif" }}>
-            <div className="flex items-center gap-4 min-w-0">
-                <span className="inline-flex items-center justify-center h-10 w-10 rounded-full border-2 border-[#FF6F61] bg-white shadow-md mr-2">
-                    {/* <!-- Chef hat SVG icon --> */}
-                    <svg width="28" height="28" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <ellipse cx="24" cy="18" rx="12" ry="8" fill="#FFF8E7" stroke="#D35400" strokeWidth="2" />
-                        <ellipse cx="14" cy="26" rx="4" ry="3" fill="#FFF8E7" stroke="#D35400" strokeWidth="2" />
-                        <ellipse cx="34" cy="26" rx="4" ry="3" fill="#FFF8E7" stroke="#D35400" strokeWidth="2" />
-                        <rect x="18" y="26" width="12" height="8" rx="4" fill="#D35400" stroke="#D35400" strokeWidth="2" />
-                        <rect x="18" y="34" width="12" height="4" rx="2" fill="#FF6F61" />
-                    </svg>
-                </span>
-                <span className="text-2xl font-extrabold tracking-tight whitespace-nowrap" style={{ color: "#D35400" }}>ChefAssist</span>
-            </div>
-            <div className="flex-1 flex items-center gap-6 justify-start md:justify-center min-w-0 overflow-x-auto">
-                <div className="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onClick={() => navigate("/")}>Home</div>
-                <div className="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onClick={() => navigate("/ai")}>Cook With AI</div>
-                <div className="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onClick={() => navigate("/explore")}>Explore Recipes</div>
 
-            </div>
-            <div className="flex items-center gap-2 ml-auto">
-                <button id="dark-mode-toggle" aria-label="Toggle dark mode" className="w-10 h-10 rounded-full bg-[#FFDAB9] border border-[#E5C6B0] shadow hover:bg-[#FF6F61] transition flex items-center justify-center">
-                    <span id="dark-mode-icon" className="text-xl" style={{ color: "#D35400" }}>🌙</span>
-                </button>
-                <div className="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onClick={() => setSigninPopUp((prev) => !prev)}>SignIn/SignUp</div>
-                {signinPopUp && (<Signin setSigninPopUp={setSigninPopUp} what={what} setWhat={setWhat} />)}
-                <Bell />
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-plus-icon lucide-plus w-10 h-10"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
-                <div id="user-profile-preview" className="w-10 h-10 rounded-full bg-[#FFDAB9] border border-[#E5C6B0] flex items-center justify-center shadow cursor-pointer" onClick={() => setPopUp((prev) => !prev)}>
-                    <svg width="26" height="26" fill="#D35400" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M12 14c-4.418 0-8 1.79-8 4v2h16v-2c0-2.21-3.582-4-8-4z" /></svg>
-                    {popUp && (<ProfilePopUp />)}
+    const [login, setLogin] = useState(true);
+
+    const homeFunction = () => {
+        if (login) {
+            navigate("/explore"); 
+        } else {
+            navigate("/"); 
+        }
+    };
+    const handleSearch = (e) => {
+        e.preventDefault();
+        const query = e.target.elements.search.value;
+        if (query) {
+            navigate(`/search?q=${encodeURIComponent(query)}`);
+        }
+    };
+    return (
+        <nav className="sticky top-0 z-50 flex items-center justify-between gap-4 px-4 py-3 bg-[#FFF8E7] shadow-md sm:px-6" style={{ fontFamily: "Poppins, Arial, sans-serif" }}>
+            <div className="flex items-center gap-2">
+                {login && (
+                    <button className="p-2 rounded-full hover:bg-[#FFDAB9]/50">
+                        <Menu className="w-6 h-6 text-[#D35400]" />
+                    </button>
+                )}
+                <div className="flex items-center gap-2 cursor-pointer" onClick={() => homeFunction()}>
+                    <span className="inline-flex items-center justify-center w-10 h-10 bg-white border-2 border-[#FF6F61] rounded-full shadow-md">
+                        <svg width="28" height="28" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <ellipse cx="24" cy="18" rx="12" ry="8" fill="#FFF8E7" stroke="#D35400" strokeWidth="2" />
+                            <ellipse cx="14" cy="26" rx="4" ry="3" fill="#FFF8E7" stroke="#D35400" strokeWidth="2" />
+                            <ellipse cx="34" cy="26" rx="4" ry="3" fill="#FFF8E7" stroke="#D35400" strokeWidth="2" />
+                            <rect x="18" y="26" width="12" height="8" rx="4" fill="#D35400" stroke="#D35400" strokeWidth="2" />
+                            <rect x="18" y="34" width="12" height="4" rx="2" fill="#FF6F61" />
+                        </svg>
+                    </span>
+                    <span className="hidden text-2xl font-extrabold tracking-tight sm:inline-block" style={{ color: "#D35400" }}>ChefAssist</span>
                 </div>
             </div>
-        </nav>
-    )
-}
 
-export default Navbar
+            {/* Center Section: YouTube-style Search Bar */}
+            <div className="flex-1 hidden md:flex justify-center px-4">
+                <form onSubmit={handleSearch} className="flex w-full max-w-lg">
+                    <input
+                        id="search"
+                        type="text"
+                        placeholder="Search for recipes..."
+                        className="w-full px-5 py-2 text-base bg-white border border-r-0 border-gray-300 rounded-l-full focus:outline-none focus:ring-2 focus:ring-[#FF6F61] focus:border-[#FF6F61] text-[#D35400] placeholder-gray-400"
+                        autoComplete="off"
+                    />
+                    <button type="submit" className="flex items-center justify-center px-4 bg-gray-100 border border-gray-300 rounded-r-full hover:bg-gray-200">
+                        <Search className="w-5 h-5 text-gray-600" />
+                    </button>
+                    
+                </form>
+            </div>
+
+
+            {/* Right Section: Actions and Profile */}
+            <div className="flex items-center gap-2 sm:gap-4">
+                {/* Logged In State */}
+                {login && (
+                    <>
+                        {/* Search icon for mobile view */}
+                        <button className="p-2 rounded-full md:hidden hover:bg-[#FFDAB9]/50">
+                            <Search className="w-6 h-6 text-[#D35400]" />
+                        </button>
+                        <button className="hidden px-4 py-2 text-sm font-semibold text-white transition rounded-full sm:block bg-[#FF6F61] hover:bg-[#E55B4D]" onClick={() => navigate("/ai")}>
+                            Cook With AI ✨
+                        </button>
+                        <button className="p-2 rounded-full hover:bg-[#FFDAB9]/50">
+                            <PlusCircle className="w-6 h-6 text-[#D35400]" />
+                        </button>
+                        <button className="p-2 rounded-full hover:bg-[#FFDAB9]/50">
+                            <Bell className="w-6 h-6 text-[#D35400]" />
+                        </button>
+                        <div className="relative">
+                            <div id="user-profile-preview" className="flex items-center justify-center w-10 h-10 rounded-full cursor-pointer bg-[#FFDAB9] border border-[#E5C6B0] shadow" onClick={() => setPopUp((prev) => !prev)}>
+                                <svg width="26" height="26" fill="#D35400" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M12 14c-4.418 0-8 1.79-8 4v2h16v-2c0-2.21-3.582-4-8-4z" /></svg>
+                            </div>
+                            {popUp && (<ProfilePopUp setSigninPopUp={setSigninPopUp} setLogin={setLogin} />)}
+                        </div>
+                    </>
+                )}
+
+                {/* Logged Out State */}
+                {!login && (
+                    <>
+                        <button className="hidden px-4 py-2 text-sm font-semibold text-white transition rounded-full sm:block bg-[#FF6F61] hover:bg-[#E55B4D]" onClick={() => navigate("/ai")}>
+                            Cook With AI ✨
+                        </button>
+                        <button className="hidden px-4 py-2 text-sm font-semibold text-gray-700 transition rounded-full sm:block hover:bg-[#FFDAB9]/50" onClick={() => navigate("/explore")}>
+                            Explore
+                        </button>
+                        <button className="px-4 py-2 text-sm font-semibold text-white transition rounded-full bg-[#FF6F61] hover:bg-[#E55B4D]" onClick={() => setSigninPopUp(true)}>
+                            Sign In
+                        </button>
+                    </>
+                )}
+            </div>
+
+            {/* Sign In/Up Modal */}
+            {signinPopUp && (<Signin setSigninPopUp={setSigninPopUp} what={what} setWhat={setWhat} setLogin={setLogin} />)}
+        </nav>
+    );
+};
+
+export default Navbar;

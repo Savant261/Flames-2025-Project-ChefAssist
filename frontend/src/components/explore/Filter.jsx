@@ -1,183 +1,138 @@
-import React, {useState} from 'react'
-
+import React, { useState, useMemo, useRef, useEffect } from 'react'
+import { ChevronDown, X, SlidersHorizontal } from 'lucide-react';
 const Filter = () => {
-   
-        const [Cuisine, setCuisine] = useState(false);
-        const [dietary, setDietary] = useState(false);
-        const [difficulty, setDifficulty] = useState(false);
-        const [time, setTime] = useState(false);
-         const [popular, setPopular] = useState(false);
+    const filterOptions = {
+        cuisine: ["Italian", "Indian", "Chinese", "Mexican", "Thai", "Japanese", "Mediterranean", "American"],
+        dietary: ["Vegetarian", "Vegan", "Gluten-Free", "Dairy-Free", "Keto"],
+        difficulty: ["Easy", "Medium", "Hard"],
+        time: ["Under 30 min", "30-60 min", "Over 60 min"],
+        sortBy: ["Most Popular", "Highest Rated", "Newest"] // Added for the new dropdown
+    };
+    const [isFilterVisible, setIsFilterVisible] = useState(false); // State to toggle the filter bar
+    const [openDropdown, setOpenDropdown] = useState(null);
+    const [filters, setFilters] = useState({
+        cuisine: [], dietary: [], difficulty: [], time: [], sortBy: 'Most Popular'
+    });
+    const filterRef = useRef(null);
+
+    // Custom hook to close dropdown when clicking outside
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (filterRef.current && !filterRef.current.contains(event.target)) {
+                setOpenDropdown(null);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [filterRef]);
+
+
+    const handleCheckboxChange = (type, value) => {
+        setFilters(prev => {
+            const currentValues = prev[type];
+            const newValues = currentValues.includes(value)
+                ? currentValues.filter(v => v !== value)
+                : [...currentValues, value];
+            return { ...prev, [type]: newValues };
+        });
+    };
+
+    const handleSortChange = (value) => {
+        setFilters(prev => ({ ...prev, sortBy: value }));
+        setOpenDropdown(null); // Close dropdown after selection
+    };
+
+    const clearFilters = () => {
+        setFilters({ cuisine: [], dietary: [], difficulty: [], time: [], sortBy: 'Most Popular' });
+    };
+
+    const activeFilters = useMemo(() => {
+        return Object.entries(filters).flatMap(([type, values]) =>
+            type !== 'sortBy' && Array.isArray(values) ? values.map(value => ({ type, value })) : []
+        );
+    }, [filters]);
+
+    const FilterButton = ({ name, type, children }) => (
+        <div className="relative">
+            <button onClick={() => setOpenDropdown(openDropdown === type ? null : type)} className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-700 transition bg-white border border-gray-300 rounded-full hover:border-[#FF6F61] hover:bg-white">
+                {name} <ChevronDown className={`w-4 h-4 transition-transform ${openDropdown === type ? 'rotate-180' : ''}`} />
+            </button>
+            {openDropdown === type && children}
+        </div>
+    );
+
     return (
-        <>
-            <div className="bg-white border-b border-chef-peach/30 sticky top-[120px] z-40">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                    <div className="flex flex-wrap items-center gap-4">
-                        {/* <!-- Cuisine Filter --> */}
-                        <div className="relative">
-                            <button id="cuisineFilter" className="filter-button flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:border-chef-orange transition-colors" onClick={() => setCuisine((prev) => !prev)}>
-                                
-                                <span>Cuisine</span>
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-
-                            {Cuisine && (<div id="cuisineDropdown" className="filter-dropdown absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-64 z-10">
-                                <div className="grid grid-cols-2 gap-2">
-                                    <label className="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
-                                        <input type="checkbox" value="italian" className="cuisine-checkbox" />
-                                        <span>🍝 Italian</span>
-                                    </label>
-                                    <label className="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
-                                        <input type="checkbox" value="indian" className="cuisine-checkbox" />
-                                        <span>🍛 Indian</span>
-                                    </label>
-                                    <label className="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
-                                        <input type="checkbox" value="chinese" className="cuisine-checkbox" />
-                                        <span>🥢 Chinese</span>
-                                    </label>
-                                    <label className="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
-                                        <input type="checkbox" value="mexican" className="cuisine-checkbox" />
-                                        <span>🌮 Mexican</span>
-                                    </label>
-                                    <label className="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
-                                        <input type="checkbox" value="thai" className="cuisine-checkbox" />
-                                        <span>🌶️ Thai</span>
-                                    </label>
-                                    <label className="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
-                                        <input type="checkbox" value="japanese" className="cuisine-checkbox" />
-                                        <span>🍣 Japanese</span>
-                                    </label>
-                                    <label className="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
-                                        <input type="checkbox" value="mediterranean" className="cuisine-checkbox" />
-                                        <span>🫒 Mediterranean</span>
-                                    </label>
-                                    <label className="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
-                                        <input type="checkbox" value="american" className="cuisine-checkbox" />
-                                        <span>🍔 American</span>
-                                    </label>
-                                </div>
-                            </div>
-                       )}</div>
-                            
-
-                        {/* <!-- Dietary Filter --> */}
-                        <div className="relative">
-                            <button id="dietaryFilter" className="filter-button flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:border-chef-orange transition-colors " onClick={() => setDietary((prev) => !prev)}>
-                                <span>Dietary</span>
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-
-                           {dietary && ( <div id="dietaryDropdown" className="filter-dropdown absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-56 z-10">
-                                <div className="space-y-2">
-                                    <label className="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
-                                        <input type="checkbox" value="vegetarian" className="dietary-checkbox" />
-                                        <span>🥬 Vegetarian</span>
-                                    </label>
-                                    <label className="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
-                                        <input type="checkbox" value="vegan" className="dietary-checkbox" />
-                                        <span>🌱 Vegan</span>
-                                    </label>
-                                    <label className="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
-                                        <input type="checkbox" value="gluten-free" className="dietary-checkbox" />
-                                        <span>🌾 Gluten-Free</span>
-                                    </label>
-                                    <label className="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
-                                        <input type="checkbox" value="dairy-free" className="dietary-checkbox" />
-                                        <span>🥛 Dairy-Free</span>
-                                    </label>
-                                    <label className="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
-                                        <input type="checkbox" value="keto" className="dietary-checkbox" />
-                                        <span>🥑 Keto</span>
-                                    </label>
-                                </div>
-                            </div>)}
-                        </div>
-
-                        <div className="relative">
-                            <button id="difficultyFilter" className="filter-button flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:border-chef-orange transition-colors" onClick={() => setDifficulty((prev) => !prev)}>
-                                <span>Difficulty</span>
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-
-                            {difficulty && (<div id="difficultyDropdown" className="filter-dropdown absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-48 z-10">
-                                <div className="space-y-2">
-                                    <label className="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
-                                        <input type="checkbox" value="easy" className="difficulty-checkbox" />
-                                        <span className="w-3 h-3 bg-green-500 rounded-full"></span>
-                                        <span>Easy</span>
-                                    </label>
-                                    <label className="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
-                                        <input type="checkbox" value="medium" className="difficulty-checkbox" />
-                                        <span className="w-3 h-3 bg-yellow-500 rounded-full"></span>
-                                        <span>Medium</span>
-                                    </label>
-                                    <label className="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
-                                        <input type="checkbox" value="hard" className="difficulty-checkbox" />
-                                        <span className="w-3 h-3 bg-red-500 rounded-full"></span>
-                                        <span>Hard</span>
-                                    </label>
-                                </div>
-                            </div>)}
-                            
-                           
-                        </div>
-
-                        <div className="relative">
-                            <button id="timeFilter" className="filter-button flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:border-chef-orange transition-colors" onClick={() => setTime((prev) => !prev)}>
-                                <span>Time</span>
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-
-                            {time && (<div id="timeDropdown" className="filter-dropdown absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-48 z-10">
-                                <div className="space-y-2">
-                                    <label className="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
-                                        <input type="checkbox" value="under-30" className="time-checkbox" />
-                                        <span>⚡ Under 30 min</span>
-                                    </label>
-                                    <label className="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
-                                        <input type="checkbox" value="30-60" className="time-checkbox" />
-                                        <span>⏰ 30-60 min</span>
-                                    </label>
-                                    <label className="flex items-center space-x-2 cursor-pointer hover:bg-chef-cream p-2 rounded">
-                                        <input type="checkbox" value="over-60" className="time-checkbox" />
-                                        <span>🕐 Over 60 min</span>
-                                    </label>
-                                </div>
-                            </div>) }
-                            
-                        </div>
-
-                        {/* <!-- Sort By --> */}
-                        <select id="sortBy" className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent">
-                            <option value="popularity">Most Popular</option>
-                            <option value="rating">Highest Rated</option>
-                            <option value="newest">Newest</option>
-                            <option value="time">Quickest</option>
-                            <option value="alphabetical">A-Z</option>
-                        </select>
-
-                        {/* <!-- Clear Filters --> */}
-                        <button id="clearFilters" className="px-4 py-2 text-chef-orange hover:bg-chef-cream rounded-lg transition-colors">
-                            Clear All
-                        </button>
-                    </div>
-
-                    {/* <!-- Active Filters --> */}
-                    <div id="activeFilters" className=" flex flex-wrap gap-2 mt-3">
-                        {/* <!-- Active filter chips will be added here --> */}
-                    </div>
+        <div className="top-[68px] z-20 bg-white/80 backdrop-blur-sm shadow-sm" ref={filterRef}>
+            <div className="p-4 mx-auto max-w-7xl">
+                <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-bold text-gray-800">Filter & Sort</h3>
+                    <button
+                        onClick={() => setIsFilterVisible(!isFilterVisible)}
+                        className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-white transition rounded-full bg-[#FF6F61] hover:bg-[#E55B4D]"
+                    >
+                        <SlidersHorizontal className="w-4 h-4" />
+                        <span>{isFilterVisible ? 'Hide' : 'Show'}</span>
+                    </button>
                 </div>
-            </div>
-        </>
-    )
 
-}
+                {isFilterVisible && (
+                    <div className="pt-4 mt-4 border-t">
+                        <div className="flex flex-wrap items-center gap-3">
+                            <FilterButton name="Cuisine" type="cuisine">
+                                <div className="absolute left-0 w-56 p-2 mt-2 bg-white rounded-lg shadow-xl z-20">
+                                    {filterOptions.cuisine.map(option => (
+                                        <label key={option} className="flex items-center gap-3 px-3 py-2 text-sm text-gray-600 rounded-md cursor-pointer hover:bg-[#FFF8E7]"><input type="checkbox" checked={filters.cuisine.includes(option)} onChange={() => handleCheckboxChange('cuisine', option)} className="w-4 h-4 rounded text-[#FF6F61] focus:ring-[#FF6F61]" />{option}</label>
+                                    ))}
+                                </div>
+                            </FilterButton>
+                            <FilterButton name="Dietary" type="dietary">
+                                <div className="absolute left-0 w-56 p-2 mt-2 bg-white rounded-lg shadow-xl z-20">
+                                    {filterOptions.dietary.map(option => (
+                                        <label key={option} className="flex items-center gap-3 px-3 py-2 text-sm text-gray-600 rounded-md cursor-pointer hover:bg-[#FFF8E7]"><input type="checkbox" checked={filters.dietary.includes(option)} onChange={() => handleCheckboxChange('dietary', option)} className="w-4 h-4 rounded text-[#FF6F61] focus:ring-[#FF6F61]" />{option}</label>
+                                    ))}
+                                </div>
+                            </FilterButton>
+                            <FilterButton name="Difficulty" type="difficulty">
+                                <div className="absolute left-0 w-56 p-2 mt-2 bg-white rounded-lg shadow-xl z-20">
+                                    {filterOptions.difficulty.map(option => (
+                                        <label key={option} className="flex items-center gap-3 px-3 py-2 text-sm text-gray-600 rounded-md cursor-pointer hover:bg-[#FFF8E7]"><input type="checkbox" checked={filters.difficulty.includes(option)} onChange={() => handleCheckboxChange('difficulty', option)} className="w-4 h-4 rounded text-[#FF6F61] focus:ring-[#FF6F61]" />{option}</label>
+                                    ))}
+                                </div>
+                            </FilterButton>
+                            <FilterButton name="Time" type="time">
+                                <div className="absolute left-0 w-56 p-2 mt-2 bg-white rounded-lg shadow-xl z-20">
+                                    {filterOptions.time.map(option => (
+                                        <label key={option} className="flex items-center gap-3 px-3 py-2 text-sm text-gray-600 rounded-md cursor-pointer hover:bg-[#FFF8E7]"><input type="checkbox" checked={filters.time.includes(option)} onChange={() => handleCheckboxChange('time', option)} className="w-4 h-4 rounded text-[#FF6F61] focus:ring-[#FF6F61]" />{option}</label>
+                                    ))}
+                                </div>
+                            </FilterButton>
+                            <div className="flex-grow"></div>
+                            <FilterButton name={`Sort By: ${filters.sortBy}`} type="sortBy">
+                                <div className="absolute right-0 w-56 p-2 mt-2 bg-white rounded-lg shadow-xl z-20">
+                                    {filterOptions.sortBy.map(option => (
+                                        <button key={option} onClick={() => handleSortChange(option)} className={`w-full text-left flex items-center gap-3 px-3 py-2 text-sm rounded-md cursor-pointer hover:bg-[#FFF8E7] ${filters.sortBy === option ? 'font-bold text-[#D35400]' : 'text-gray-600'}`}>
+                                            {option}
+                                        </button>
+                                    ))}
+                                </div>
+                            </FilterButton>
+                        </div>
+                        {activeFilters.length > 0 && (
+                            <div className="flex flex-wrap items-center gap-2 pt-4 mt-3 border-t border-gray-200">
+                                {activeFilters.map(({ type, value }) => (
+                                    <div key={value} className="flex items-center gap-1 px-2 py-1 text-xs font-semibold text-white bg-[#FF6F61] rounded-full">
+                                        {value}
+                                        <button onClick={() => handleCheckboxChange(type, value)}><X className="w-3 h-3" /></button>
+                                    </div>
+                                ))}
+                                <button onClick={clearFilters} className="px-3 py-1 text-xs font-semibold text-gray-600 transition hover:text-red-500">Clear All</button>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
 
 export default Filter

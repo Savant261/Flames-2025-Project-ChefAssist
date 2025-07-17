@@ -1,7 +1,14 @@
 import React, { useEffect } from 'react'
 import signin from "/Images/signin.jpg"
-const Signin = ({ setSigninPopUp, what, setWhat }) => {
+import { useNavigate } from 'react-router-dom'
+const Signin = ({ setSigninPopUp, what, setWhat, setLogin }) => {
+    const navigate = useNavigate();
     // useEffect(()=>{},[what,setWhat])
+    const loginFun = () => {
+        setLogin(true);
+        setSigninPopUp(false);
+        navigate("/explore")
+    }
     return (
         <div
             id="auth-modal"
@@ -30,11 +37,11 @@ const Signin = ({ setSigninPopUp, what, setWhat }) => {
                                 <input type="checkbox" id="remember-me" className="accent-[#FF6F61] mr-2" />
                                 <label htmlFor="remember-me" className="text-[#B35C00] text-sm">Remember me</label>
                             </div>
-                            <button type="submit" className="bg-[#D35400] text-white font-bold rounded-lg py-3">Sign In</button>
-                            <button type="button" className="flex items-center justify-center gap-2 border border-[#FFDAB9] bg-white text-[#D35400] font-semibold rounded-lg py-3" id="google-signin-btn">
+                            <button type="submit" className="bg-[#D35400] text-white font-bold rounded-lg py-3" onClick={() => loginFun()}>Sign In</button>
+                            <button type="button" className="flex items-center justify-center gap-2 border border-[#FFDAB9] bg-white text-[#D35400] font-semibold rounded-lg py-3" id="google-signin-btn" onClick={() => loginFun()}>
                                 <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="Google" /> Sign in with Google
                             </button>
-                            <div className="text-center text-sm mt-2 text-[#6B4F3A]">Don't have an account? <span href="#" id="switch-to-signup" className="text-[#FF6F61] font-bold" onClick={()=> setWhat("SignUp")}>Sign Up</span></div>
+                            <div className="text-center text-sm mt-2 text-[#6B4F3A]">Don't have an account? <span href="#" id="switch-to-signup" className="text-[#FF6F61] font-bold" onClick={() => setWhat("SignUp")}>Sign Up</span></div>
                         </form></>)}
                     {what == "SignUp" && (<>
                         <div className="flex items-center gap-2 mb-6">
@@ -47,11 +54,11 @@ const Signin = ({ setSigninPopUp, what, setWhat }) => {
                             <input type="text" placeholder="Username" className="rounded-lg border border-[#FFDAB9] px-4 py-3 bg-[#FFF8E7] text-[#D35400] focus:outline-none focus:ring-2 focus:ring-[#FF6F61]" required />
                             <input type="password" placeholder="Password" className="rounded-lg border border-[#FFDAB9] px-4 py-3 bg-[#FFF8E7] text-[#D35400] focus:outline-none focus:ring-2 focus:ring-[#FF6F61]" required />
                             <input type="password" placeholder="Confirm Password" className="rounded-lg border border-[#FFDAB9] px-4 py-3 bg-[#FFF8E7] text-[#D35400] focus:outline-none focus:ring-2 focus:ring-[#FF6F61]" required />
-                            <button type="submit" className="bg-[#D35400] text-white font-bold rounded-lg py-3">Sign Up</button>
-                            <button type="button" className="flex items-center justify-center gap-2 border border-[#FFDAB9] bg-white text-[#D35400] font-semibold rounded-lg py-3" id="google-signup-btn">
+                            <button type="submit" className="bg-[#D35400] text-white font-bold rounded-lg py-3" onClick={() => loginFun()}>Sign Up</button>
+                            <button type="button" className="flex items-center justify-center gap-2 border border-[#FFDAB9] bg-white text-[#D35400] font-semibold rounded-lg py-3" id="google-signup-btn" onClick={() => loginFun()}>
                                 <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="Google" /> Sign up with Google
                             </button>
-                            <div className="text-center text-sm mt-2 text-[#6B4F3A]" >Already have an account? <span href="#" id="switch-to-signin" className="text-[#FF6F61] font-bold" onClick={()=> setWhat("SignIn")}>Sign In</span></div>
+                            <div className="text-center text-sm mt-2 text-[#6B4F3A]" >Already have an account? <span href="#" id="switch-to-signin" className="text-[#FF6F61] font-bold" onClick={() => setWhat("SignIn")}>Sign In</span></div>
                         </form></>)}
 
                 </div>

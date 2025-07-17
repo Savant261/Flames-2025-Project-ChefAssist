@@ -300,7 +300,7 @@ const Explore = () => {
     return (
         <div className="flex flex-col bg-chef-cream min-h-screen">
             {/* <!-- Header --> */}
-            <div className="bg-white shadow-sm border-b border-chef-peach/30 sticky top-0 z-50">
+            {/* <div className="bg-white shadow-sm border-b border-chef-peach/30 sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center space-x-3">
@@ -332,7 +332,6 @@ const Explore = () => {
                         </div>
                     </div>
 
-                    {/* <!-- Search Bar --> */}
                     <div className="relative mb-4">
                         <input type="text" id="mainSearch" placeholder="Search recipes, ingredients, or cuisines..." 
                             className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chef-orange focus:border-transparent text-lg" />
@@ -342,7 +341,6 @@ const Explore = () => {
                         <div id="searchSuggestions" className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg mt-1 hidden z-10"></div>
                     </div>
 
-                    {/* <!-- Ingredient Search --> */}
                     <div className="relative mb-4">
                         <input type="text" id="ingredientSearch" placeholder="What can I cook with... (e.g., chicken, tomatoes)"
                             className="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent" />
@@ -351,7 +349,7 @@ const Explore = () => {
                         </svg>
                     </div>
                 </div>
-            </div>
+            </div> */}
 
             {/* <!-- Filters Section --> */}
             <Filter/>
@@ -480,21 +478,6 @@ const Explore = () => {
                         </div>
                     </div>
                 </div>
-            </div>
-
-
-            {/* <!-- Floating Action Buttons --> */}
-            <div className="fixed bottom-6 right-6 flex flex-col space-y-3">
-                <button id="submitRecipeBtn" className="bg-chef-orange text-white p-4 rounded-full shadow-lg hover:bg-chef-orange-dark transition-all hover:scale-110">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                </button>
-                <button id="scrollToTop" className="bg-gray-600 text-white p-4 rounded-full shadow-lg hover:bg-gray-700 transition-all hover:scale-110 opacity-0">
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                    </svg>
-                </button>
             </div>
         </div>
     )
