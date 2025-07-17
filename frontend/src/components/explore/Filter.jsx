@@ -3,7 +3,7 @@ import React, {useState} from 'react'
 const Filter = () => {
    
         const [Cuisine, setCuisine] = useState(false);
-        const [dietary, setDietary] = useState(true);
+        const [dietary, setDietary] = useState(false);
         const [difficulty, setDifficulty] = useState(false);
         const [time, setTime] = useState(false);
          const [popular, setPopular] = useState(false);

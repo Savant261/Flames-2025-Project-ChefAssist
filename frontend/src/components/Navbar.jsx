@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProfilePopUp from './home/ProfilePopUp.jsx';
 import Signin from './Signin.jsx';
+import { Bell } from 'lucide-react';
 const Navbar = () => {
     const navigate = useNavigate();
     const [popUp, setPopUp] = useState(false);
@@ -26,17 +27,19 @@ const Navbar = () => {
                 <div className="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onClick={() => navigate("/")}>Home</div>
                 <div className="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onClick={() => navigate("/ai")}>Cook With AI</div>
                 <div className="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onClick={() => navigate("/explore")}>Explore Recipes</div>
-                
+
             </div>
             <div className="flex items-center gap-2 ml-auto">
                 <button id="dark-mode-toggle" aria-label="Toggle dark mode" className="w-10 h-10 rounded-full bg-[#FFDAB9] border border-[#E5C6B0] shadow hover:bg-[#FF6F61] transition flex items-center justify-center">
                     <span id="dark-mode-icon" className="text-xl" style={{ color: "#D35400" }}>🌙</span>
                 </button>
-                <div className="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap"  onClick={()=> setSigninPopUp((prev)=> !prev)}>SignIn/SignUp</div>
-                {signinPopUp && (<Signin setSigninPopUp={setSigninPopUp} what={what} setWhat={setWhat}/>)}
+                <div className="nav-link text-lg font-medium text-[#2C2C2C] hover:text-[#D35400] transition whitespace-nowrap" onClick={() => setSigninPopUp((prev) => !prev)}>SignIn/SignUp</div>
+                {signinPopUp && (<Signin setSigninPopUp={setSigninPopUp} what={what} setWhat={setWhat} />)}
+                <Bell />
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-plus-icon lucide-plus w-10 h-10"><path d="M5 12h14" /><path d="M12 5v14" /></svg>
                 <div id="user-profile-preview" className="w-10 h-10 rounded-full bg-[#FFDAB9] border border-[#E5C6B0] flex items-center justify-center shadow cursor-pointer" onClick={() => setPopUp((prev) => !prev)}>
                     <svg width="26" height="26" fill="#D35400" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M12 14c-4.418 0-8 1.79-8 4v2h16v-2c0-2.21-3.582-4-8-4z" /></svg>
-                    {popUp && (<ProfilePopUp/>)}
+                    {popUp && (<ProfilePopUp />)}
                 </div>
             </div>
         </nav>

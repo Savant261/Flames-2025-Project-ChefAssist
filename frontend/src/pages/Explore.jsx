@@ -334,7 +334,7 @@ const Explore = () => {
 
                     {/* <!-- Search Bar --> */}
                     <div className="relative mb-4">
-                        <input type="text" id="mainSearch" placeholder="Search recipes, ingredients, or cuisines..."
+                        <input type="text" id="mainSearch" placeholder="Search recipes, ingredients, or cuisines..." 
                             className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-chef-orange focus:border-transparent text-lg" />
                         <svg className="absolute left-4 top-3.5 w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />

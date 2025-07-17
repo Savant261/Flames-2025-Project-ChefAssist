@@ -47,7 +47,7 @@ const FlowUsage = () => {
                         <span className="font-semibold text-lg text-[#FF6F61]">Re-Generate</span>
                         <button className="text-[#FF6F61] font-bold text-lg">⟳</button>
                     </div>
-                    <img src="images/image3.jpg" alt="Dish" className="rounded-2xl w-32 h-24 object-cover mx-auto mb-3 shadow" />
+                    <img src="./Images/image3.jpg" alt="Dish" className="rounded-2xl w-32 h-24 object-cover mx-auto mb-3 shadow" />
                     <h3 className="mt-6 text-lg font-bold text-[#D35400]">4. Cook, Save, or Share</h3>
                     <p className="mt-2 text-[#B35C00] text-sm">Get cooking, save your AI recipe, or share it with friends and family at the touch of a button!</p>
                 </div>

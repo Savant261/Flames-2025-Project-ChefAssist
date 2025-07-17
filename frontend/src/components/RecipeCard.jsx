@@ -19,9 +19,6 @@ const RecipeCard = ({ recipe, isMyRecipe = false }) =>  {
 
         return stars;
     }
-    const statusBadge = isMyRecipe && recipe.status === 'Draft'
-        ? `<span className="absolute top-2 left-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded-full">Draft</span>`
-        : '';
 
     const publishInfo = isMyRecipe
         ? `<div className="flex items-center justify-between text-xs text-gray-500 mt-2">
@@ -33,7 +30,7 @@ const RecipeCard = ({ recipe, isMyRecipe = false }) =>  {
     return (
         <div className="recipe-card bg-white rounded-xl shadow-lg overflow-hidden border border-chef-peach/20 hover-lift card-hover group" >
             <div className="relative overflow-hidden">
-                {/* ${statusBadge} */}
+               {recipe.status &&  (<span className="absolute top-2 left-2 bg-yellow-500 text-white text-xs font-semibold px-2 py-1 rounded-full">{recipe.status.toUpperCase()}</span>)}
                 <img src={`${recipe.image}`} alt="${recipe.title}"
                     className="recipe-image w-full h-48 object-cover" />
                 {/* <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div> */}
