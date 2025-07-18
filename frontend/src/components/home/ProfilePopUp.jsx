@@ -1,86 +1,57 @@
-import { DivideCircleIcon } from 'lucide-react';
-import React from 'react'
 import { useNavigate } from 'react-router-dom';
-
-const profilePopUp = ({ setLogin, setSigninPopUp }) => {
+import { Link } from 'react-router-dom';
+import { Settings, User, LayoutDashboard, LogOut, Star, Sun, Moon } from 'lucide-react';
+const profilePopUp = ({ setLogin, theme, setTheme }) => {
     const navigate = useNavigate();
     const logout = () => {
-        setSigninPopUp(false);
         setLogin(false);
-    }
-    return (
-        <>
-            <div
-                id="profile-dropdown"
-                className=" absolute right-0 top-full mt-1 w-64 bg-[#23201d] rounded-xl shadow-lg z-50 border border-[#FFDAB9] p-3"
-            >
-                <div className="flex flex-col items-center gap-2 mb-3">
-                    <div
-                        className="w-12 h-12 rounded-full border-2 border-[#FF6F61] flex items-center justify-center text-2xl bg-[#FFDAB9]"
-                        style={{ color: '#ff6f61' }}
-                    >
-                        🍳
-                    </div>
-                    <div className="font-bold text-base" style={{ color: '#ffdab9' }}>
-                        ChefAssist User
-                    </div>
-                    <div className="text-xs opacity-80 mb-1" style={{ color: '#fff' }}>
-                        user@email.com
-                    </div>
-                </div>
-                <div className="flex flex-col gap-1.5 mb-2">
-                    <div
-                        onClick={() => navigate("/profile")}
-                        className="w-full text-center py-2.5 rounded-lg font-semibold text-sm bg-[#FF6F61] text-white transition-all duration-200 hover:bg-[#E65A4D] hover:shadow-md hover:scale-[1.02] active:scale-95 block"
-                    >
-                        View Public Profile
-                    </div>
-                    <div
-                        onClick={() => navigate("/dashboard")}
-                        className="w-full text-center py-2.5 rounded-lg font-semibold text-sm bg-[#FF6F61] text-white transition-all duration-200 hover:bg-[#E65A4D] hover:shadow-md hover:scale-[1.02] active:scale-95 block"
-                    >
-                        Dashboard
-                    </div>
-                    {/* <button className="w-full text-center py-2.5 rounded-lg font-semibold text-sm bg-[#FF6F61] text-white transition-all duration-200 hover:bg-[#E65A4D] hover:shadow-md hover:scale-[1.02] active:scale-95">
-                        Community
-                    </button> */}
-                    <div
-                        className="w-full text-center py-2.5 rounded-lg font-semibold text-sm bg-[#FF6F61] text-white transition-all duration-200 hover:bg-[#E65A4D] hover:shadow-md hover:scale-[1.02] active:scale-95 block"
-                        onClick={() => navigate("/subscription")}
-                    >
-                        Subscriptions
-                    </div>
-                    <div className="w-full text-center py-2.5 rounded-lg font-semibold text-sm bg-[#FF6F61] text-white transition-all duration-200 hover:bg-[#E65A4D] hover:shadow-md hover:scale-[1.02] active:scale-95 block">
-                        Appearance:  Light theme
-                        {/* <button id="dark-mode-toggle" aria-label="Toggle dark mode" className="w-10 h-8 rounded-full bg-[#FFDAB9] border border-[#E5C6B0] shadow hover:bg-[#FF6F61] transition flex items-center justify-center">
-                        <span id="dark-mode-icon" className="text-xl" style={{ color: "#D35400" }}>🌙</span>
-                        </button> */}
-                    </div>
-                    <div className="w-full text-center py-2.5 rounded-lg font-semibold text-sm bg-[#FF6F61] text-white transition-all duration-200 hover:bg-[#E65A4D] hover:shadow-md hover:scale-[1.02] active:scale-95 block">
-                        Language:  English
-                    </div>
-                    <div
-                        className="w-full text-center py-2.5 rounded-lg font-semibold text-sm bg-[#FF6F61] text-white transition-all duration-200 hover:bg-[#E65A4D] hover:shadow-md hover:scale-[1.02] active:scale-95 block"
-                        onClick={() => navigate("/settings")}
-                    >
-                        Settings
-                    </div>
-                    <button className="w-full text-center py-2.5 rounded-lg font-semibold text-sm bg-[#FF6F61] text-white transition-all duration-200 hover:bg-[#E65A4D] hover:shadow-md hover:scale-[1.02] active:scale-95"
-                        onClick={() => navigate("/feedback")}>
+        navigate('/');
+    };
 
-                        Give Feedback
-                    </button>
-                </div>
-                <div className="pt-1.5 border-t border-[#FFDAB9] mt-2">
-                    <button
-                        id="auth-action"
-                        className="w-full text-center py-2.5 rounded-lg font-bold text-sm bg-[#3a291b] text-[#FFDAB9] transition-all duration-200 hover:bg-[#4a3a2b] hover:shadow-md hover:scale-[1.02] active:scale-95"
-                        onClick={() => logout()}
-                    >Logout </button>
+    const MenuItem = ({ to, icon: Icon, children }) => (
+        <Link to={to} className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-[#FFDAB9]">
+            <Icon className="w-5 h-5 text-gray-500" />
+            <span>{children}</span>
+        </Link>
+    );
+    const ThemeToggle = () => (
+        <div className="flex items-center justify-between gap-3 px-3 py-2 text-sm text-gray-700 rounded-md dark:text-gray-300">
+            <div className="flex items-center gap-3">
+                {theme === 'light' ? (<Sun className="w-5 h-5 text-gray-500 dark:text-gray-400" />) : (<Moon className="w-5 h-5 text-gray-500 dark:text-gray-400" />)}
+                <span>Appearance</span>
+            </div>
+            <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="relative inline-flex items-center h-6 rounded-full w-11 transition-colors bg-gray-200 dark:bg-gray-600">
+                <span className={`inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${theme === 'dark' ? 'translate-x-6' : 'translate-x-1'}`} />
+            </button>
+        </div>
+    );
+
+    return (
+        <div className="absolute right-0 w-60 top-full mt-2 bg-chef-cream dark:bg-gray-800 rounded-xl shadow-lg z-50 border border-gray-200 dark:border-gray-700 p-2">
+            <div className="flex items-center gap-3 p-2 mb-2 border-b dark:border-gray-700">
+                <div className="w-10 h-10 rounded-full bg-[#FFDAB9] dark:bg-gray-700 flex items-center justify-center text-xl">🍳</div>
+                <div>
+                    <div className="font-bold text-sm text-gray-800 dark:text-gray-100">ChefAssist User</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">user@email.com</div>
                 </div>
             </div>
-        </>
-    )
+            <div className="flex flex-col gap-1">
+                <MenuItem to="/profile" icon={User}>View Public Profile</MenuItem>
+                <MenuItem to="/dashboard" icon={LayoutDashboard}>Dashboard</MenuItem>
+                <MenuItem to="/subscription" icon={Star}>Subscription</MenuItem>
+                <MenuItem to="/settings" icon={Settings}>Settings</MenuItem>
+            </div>
+            <div className="pt-2 mt-2 border-t dark:border-gray-700">
+                <ThemeToggle />
+            </div>
+            <div className="pt-2 mt-2 border-t dark:border-gray-700">
+                <button onClick={logout} className="flex items-center w-full gap-3 px-3 py-2 text-sm text-red-600 rounded-md hover:bg-[#FFDAB9] dark:hover:bg-red-500/10 dark:text-red-500">
+                    <LogOut className="w-5 h-5" />
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+    );
 }
 
 export default profilePopUp;

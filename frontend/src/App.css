@@ -8,6 +8,8 @@
   --color-chef-peach: #FED7AA;
 } 
 
+@custom-variant dark (&:where(.dark, .dark *)); 
+
 .blinking-cursor {
   animation: blink 1s steps(1) infinite;
 }

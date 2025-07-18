@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Ai from "./pages/Ai.jsx"
 import './App.css'
 import Footer from './components/Footer.jsx'
@@ -14,13 +14,30 @@ import DashBoard from "./pages/DashBoard.jsx"
 import Feedback from "./pages/Feedback.jsx"
 import Recipe from "./pages/Recipe.jsx"
 import SideBar from "./components/SideBar.jsx"
+import Search from "./pages/Search.jsx"
+import Trending from "./pages/Trending.jsx"
+import MyFeed from "./pages/MyFeed.jsx"
+import SavedRecipes from "./pages/SavedRecipes.jsx"
+import Settings from "./pages/Settings.jsx"
 
 function App() {
   const [isSidebarExpanded, setIsSideBarExpanded] = useState(false);
   const [login, setLogin] = useState(true);
+  const [theme, setTheme] = useState('light');
+
+  useEffect(() => {
+    console.log(theme)
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    console.log(theme)
+  }, [theme]);
+
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar setIsSideBarExpanded={setIsSideBarExpanded} login={login} setLogin={setLogin} />
+      <Navbar setIsSideBarExpanded={setIsSideBarExpanded} login={login} setLogin={setLogin} theme={theme} setTheme={setTheme} />
       <div className="flex flex-1 overflow-hidden">
         <SideBar isSidebarExpanded={isSidebarExpanded} login={login} />
         <div className="flex-1 relative">
@@ -36,6 +53,11 @@ function App() {
               <Route path="/dashboard/*" element={<DashBoard />} />
               <Route path="/feedback" element={<Feedback />} />
               <Route path="/recipe" element={<Recipe />} />
+              <Route path="/search" element={<Search />} />
+              <Route path="/trending" element={<Trending />} />
+              <Route path="/myFeed" element={<MyFeed />} />
+              <Route path="/savedRecipes" element={<SavedRecipes />} />
+              <Route path="/settings/*" element={<Settings />} />
             </Routes>
             <Footer />
           </main>
