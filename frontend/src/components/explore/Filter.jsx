@@ -62,7 +62,7 @@ const Filter = () => {
     );
 
     return (
-        <div className="top-[68px] z-20 bg-white/80 backdrop-blur-sm shadow-sm" ref={filterRef}>
+        <div className="top-[68px] z-20 bg-chef-cream/80 backdrop-blur-sm " ref={filterRef}>
             <div className="p-4 mx-auto max-w-7xl">
                 <div className="flex items-center justify-between">
                     <h3 className="text-lg font-bold text-gray-800">Filter & Sort</h3>

@@ -3,21 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import ProfilePopUp from './home/ProfilePopUp.jsx';
 import Signin from './Signin.jsx';
 import { Bell, PlusCircle, Search, Menu } from 'lucide-react';
+import SideBar from './SideBar.jsx';
 
-const Navbar = () => {
+const Navbar = ({login,setLogin,setIsSideBarExpanded}) => {
     const navigate = useNavigate();
 
     const [popUp, setPopUp] = useState(false);
     const [signinPopUp, setSigninPopUp] = useState(false);
     const [what, setWhat] = useState("SignIn");
 
-    const [login, setLogin] = useState(true);
-
     const homeFunction = () => {
         if (login) {
-            navigate("/explore"); 
+            navigate("/explore");
         } else {
-            navigate("/"); 
+            navigate("/");
         }
     };
     const handleSearch = (e) => {
@@ -31,7 +30,7 @@ const Navbar = () => {
         <nav className="sticky top-0 z-50 flex items-center justify-between gap-4 px-4 py-3 bg-[#FFF8E7] shadow-md sm:px-6" style={{ fontFamily: "Poppins, Arial, sans-serif" }}>
             <div className="flex items-center gap-2">
                 {login && (
-                    <button className="p-2 rounded-full hover:bg-[#FFDAB9]/50">
+                    <button className="p-2 rounded-full hover:bg-[#FFDAB9]/50" onClick={() => setIsSideBarExpanded((prev) => !prev)}>
                         <Menu className="w-6 h-6 text-[#D35400]" />
                     </button>
                 )}
@@ -62,7 +61,7 @@ const Navbar = () => {
                     <button type="submit" className="flex items-center justify-center px-4 bg-gray-100 border border-gray-300 rounded-r-full hover:bg-gray-200">
                         <Search className="w-5 h-5 text-gray-600" />
                     </button>
-                    
+
                 </form>
             </div>
 
