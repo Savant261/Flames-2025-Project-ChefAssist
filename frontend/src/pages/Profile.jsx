@@ -1,4 +1,4 @@
-import React from 'react'
+import React,{useEffect} from 'react'
 import { useNavigate } from 'react-router-dom';
 import RecipeCard from '../components/RecipeCard';
 const Profile = () => {
@@ -144,6 +144,9 @@ const Profile = () => {
             cuisine: "Italian"
         }
     ];
+    useEffect(() => {
+        document.title = 'Profile / ChefAssit';
+    }, []);
     return (
         <>
             <div className="flex flex-col bg-chef-cream min-h-screen">
@@ -290,10 +293,10 @@ const Profile = () => {
                 {/* <!-- Main Content --> */}
                 <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
                     {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-8"> */}
-                        {/* <!-- Left Sidebar --> */}
-                        {/* <div className="lg:col-span-1 space-y-6"> */}
-                            {/* <!-- Subscription Card --> */}
-                            {/* <div className="bg-white rounded-xl shadow-lg p-6 border border-chef-peach/30">
+                    {/* <!-- Left Sidebar --> */}
+                    {/* <div className="lg:col-span-1 space-y-6"> */}
+                    {/* <!-- Subscription Card --> */}
+                    {/* <div className="bg-white rounded-xl shadow-lg p-6 border border-chef-peach/30">
                                 <div className="flex items-center justify-between mb-4">
                                     <h3 className="text-xl font-bold text-chef-orange">Subscription</h3>
                                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -328,8 +331,8 @@ const Profile = () => {
                                 </div>
                             </div> */}
 
-                            {/* <!-- Recent Activity --> */}
-                            {/* <div className="bg-white rounded-xl shadow-lg p-6 border border-chef-peach/30">
+                    {/* <!-- Recent Activity --> */}
+                    {/* <div className="bg-white rounded-xl shadow-lg p-6 border border-chef-peach/30">
                                 <h3 className="text-xl font-bold text-chef-orange mb-4">Recent Activity</h3>
                                 <div className="space-y-4">
                                     <div className="flex items-start space-x-3">
@@ -356,8 +359,8 @@ const Profile = () => {
                                 </div>
                             </div> */}
 
-                            {/* <!-- Cooking Calendar --> */}
-                            {/* <div className="bg-white rounded-xl shadow-lg p-6 border border-chef-peach/30">
+                    {/* <!-- Cooking Calendar --> */}
+                    {/* <div className="bg-white rounded-xl shadow-lg p-6 border border-chef-peach/30">
                                 <h3 className="text-xl font-bold text-chef-orange mb-4">This Week's Plan</h3>
                                 <div className="space-y-2">
                                     <div className="flex justify-between items-center p-2 bg-chef-cream rounded-lg">
@@ -374,80 +377,80 @@ const Profile = () => {
                                     </div>
                                 </div>
                             </div> */}
-                        {/* </div> */}
+                    {/* </div> */}
 
-                        {/* <!-- Main Content Area --> */}
-                        {/* <div className="lg:col-span-2"> */}
-                            {/* <!-- Navigation Tabs --> */}
-                            <div className="bg-white rounded-xl shadow-lg mb-6 border border-chef-peach/30">
-                                <div className="flex flex-wrap border-b border-gray-200">
-                                    <button className="tab-button active px-6 py-4 text-sm font-medium border-b-2 border-chef-orange text-chef-orange" data-tab="favorites">
-                                        Favorites
-                                    </button>
-                                    <button className="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-chef-orange hover:border-chef-orange/50 transition-colors" data-tab="reviews">
-                                        All Recipe
-                                    </button>
-                                    {/* <button className="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-chef-orange hover:border-chef-orange/50 transition-colors" data-tab="activity">
+                    {/* <!-- Main Content Area --> */}
+                    {/* <div className="lg:col-span-2"> */}
+                    {/* <!-- Navigation Tabs --> */}
+                    <div className="bg-white rounded-xl shadow-lg mb-6 border border-chef-peach/30">
+                        <div className="flex flex-wrap border-b border-gray-200">
+                            <button className="tab-button active px-6 py-4 text-sm font-medium border-b-2 border-chef-orange text-chef-orange" data-tab="favorites">
+                                Favorites
+                            </button>
+                            <button className="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-chef-orange hover:border-chef-orange/50 transition-colors" data-tab="reviews">
+                                All Recipe
+                            </button>
+                            {/* <button className="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-chef-orange hover:border-chef-orange/50 transition-colors" data-tab="activity">
                                         Activity Feed
                                     </button>
                                     <button className="tab-button px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-chef-orange hover:border-chef-orange/50 transition-colors" data-tab="collections">
                                         Collections
                                     </button> */}
-                                </div>
+                        </div>
 
-                                {/* <!-- Search and Filter --> */}
-                                <div className="p-4 border-b border-gray-200">
-                                    <div className="flex flex-col sm:flex-row gap-4">
-                                        <div className="flex-1 relative">
-                                            <input type="text" id="recipe-search" placeholder="Search recipes..."
-                                                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent" />
-                                            <svg className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroklinecap="round" strokeinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        {/* <!-- Search and Filter --> */}
+                        <div className="p-4 border-b border-gray-200">
+                            <div className="flex flex-col sm:flex-row gap-4">
+                                <div className="flex-1 relative">
+                                    <input type="text" id="recipe-search" placeholder="Search recipes..."
+                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent" />
+                                    <svg className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroklinecap="round" strokeinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    </svg>
+                                </div>
+                                <select className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent">
+                                    <option>All Cuisines</option>
+                                    <option>Italian</option>
+                                    <option>Asian</option>
+                                    <option>Mexican</option>
+                                    <option>Indian</option>
+                                </select>
+                                <select className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent">
+                                    <option>All Difficulty</option>
+                                    <option>Easy</option>
+                                    <option>Medium</option>
+                                    <option>Hard</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        {/* <!-- Tab Content --> */}
+                        <div className="p-6">
+                            {/* <!-- Favorites Tab --> */}
+                            <div id="favorites-content" className="tab-content">
+                                <div className="flex items-center justify-between mb-6">
+                                    <h2 className="text-2xl font-bold text-chef-orange">Your Favorite Recipes</h2>
+                                    <div className="flex items-center space-x-2">
+                                        <button className="p-2 text-gray-400 hover:text-chef-orange transition-colors" title="Grid View">
+                                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M3 3h7v7H3V3zm0 11h7v7H3v-7zm11-11h7v7h-7V3zm0 11h7v7h-7v-7z" />
                                             </svg>
-                                        </div>
-                                        <select className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent">
-                                            <option>All Cuisines</option>
-                                            <option>Italian</option>
-                                            <option>Asian</option>
-                                            <option>Mexican</option>
-                                            <option>Indian</option>
-                                        </select>
-                                        <select className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent">
-                                            <option>All Difficulty</option>
-                                            <option>Easy</option>
-                                            <option>Medium</option>
-                                            <option>Hard</option>
-                                        </select>
+                                        </button>
+                                        <button className="p-2 text-gray-400 hover:text-chef-orange transition-colors" title="List View">
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroklinecap="round" strokeinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                                            </svg>
+                                        </button>
                                     </div>
                                 </div>
 
-                                {/* <!-- Tab Content --> */}
-                                <div className="p-6">
-                                    {/* <!-- Favorites Tab --> */}
-                                    <div id="favorites-content" className="tab-content">
-                                        <div className="flex items-center justify-between mb-6">
-                                            <h2 className="text-2xl font-bold text-chef-orange">Your Favorite Recipes</h2>
-                                            <div className="flex items-center space-x-2">
-                                                <button className="p-2 text-gray-400 hover:text-chef-orange transition-colors" title="Grid View">
-                                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                                        <path d="M3 3h7v7H3V3zm0 11h7v7H3v-7zm11-11h7v7h-7V3zm0 11h7v7h-7v-7z" />
-                                                    </svg>
-                                                </button>
-                                                <button className="p-2 text-gray-400 hover:text-chef-orange transition-colors" title="List View">
-                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroklinecap="round" strokeinejoin="round" strokeWidth="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6" id="recipe-grid">
+                                    {/* <!-- Recipe cards will be populated by JavaScript --> */}
+                                    {favoriteRecipes.map((recipe, index) => (<div key={index}><RecipeCard recipe={recipe} isMyRecipe={false} /></div>))}
+                                </div>
+                            </div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6" id="recipe-grid">
-                                            {/* <!-- Recipe cards will be populated by JavaScript --> */}
-                                             {favoriteRecipes.map((recipe, index) => (<div key={index}><RecipeCard recipe={recipe} isMyRecipe={false} /></div>))}
-                                        </div>
-                                    </div>
-
-                                    {/* <div id="reviews-content" className="tab-content hidden">
+                            {/* <div id="reviews-content" className="tab-content hidden">
                                         <h2 className="text-2xl font-bold text-chef-orange mb-6">Recipe Reviews</h2>
                                         <div className="space-y-4">
                                             <div className="border border-gray-200 rounded-lg p-4">
@@ -499,30 +502,30 @@ const Profile = () => {
                                             </div>
                                         </div>
                                     </div> */}
-                                </div>
+                        </div>
+                    </div>
+
+                    {/* <!-- My Recipes Section --> */}
+                    <div className="bg-white rounded-xl shadow-lg border border-chef-peach/30">
+                        <div className="p-6 border-b border-gray-200">
+                            <div className="flex items-center justify-between">
+                                <h2 className="text-2xl font-bold text-chef-orange">My Recipes</h2>
+                                <button className="bg-chef-orange text-white px-4 py-2 rounded-lg hover:bg-chef-orange-dark transition-colors">
+                                    + Add Recipe
+                                </button>
                             </div>
+                        </div>
 
-                            {/* <!-- My Recipes Section --> */}
-                            <div className="bg-white rounded-xl shadow-lg border border-chef-peach/30">
-                                <div className="p-6 border-b border-gray-200">
-                                    <div className="flex items-center justify-between">
-                                        <h2 className="text-2xl font-bold text-chef-orange">My Recipes</h2>
-                                        <button className="bg-chef-orange text-white px-4 py-2 rounded-lg hover:bg-chef-orange-dark transition-colors">
-                                            + Add Recipe
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="p-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="my-recipes-grid">
-                                        {/* <!-- My recipe cards will be populated by JavaScript --> */}
-                                        {myRecipes.map((recipe, index) => (<div key={index}><RecipeCard recipe={recipe} isMyRecipe={false} /></div>))}
-                                    </div>
-                                </div>
+                        <div className="p-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="my-recipes-grid">
+                                {/* <!-- My recipe cards will be populated by JavaScript --> */}
+                                {myRecipes.map((recipe, index) => (<div key={index}><RecipeCard recipe={recipe} isMyRecipe={false} /></div>))}
                             </div>
+                        </div>
+                    </div>
 
-                            {/* <!-- Recommended Section --> */}
-                            {/* <div className="bg-white rounded-xl shadow-lg mt-6 border border-chef-peach/30">
+                    {/* <!-- Recommended Section --> */}
+                    {/* <div className="bg-white rounded-xl shadow-lg mt-6 border border-chef-peach/30">
                                 <div className="p-6 border-b border-gray-200">
                                     <h2 className="text-2xl font-bold text-chef-orange">Recommended For You</h2>
                                     <p className="text-gray-600 mt-1">Based on your cooking preferences and activity</p>
@@ -534,7 +537,7 @@ const Profile = () => {
                                     </div>
                                 </div>
                             </div> */}
-                        {/* </div> */}
+                    {/* </div> */}
                     {/* </div> */}
                 </div>
 

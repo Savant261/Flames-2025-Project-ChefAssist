@@ -1,4 +1,4 @@
-
+import { useEffect } from 'react';
 import { Routes, Route, NavLink } from 'react-router-dom';
 import { User, Heart, KeyRound, Bell, Star } from 'lucide-react';
 
@@ -9,7 +9,6 @@ import NotificationsSettings from '../components/settings/NotificationsSettings.
 import SubscriptionSettings from '../components/settings/SubscriptionSettings.jsx';
 
 const Settings = () => {
-
   const SettingsNavLink = ({ to, icon: Icon, children, end = false }) => {
     return (
       <NavLink
@@ -27,7 +26,9 @@ const Settings = () => {
       </NavLink>
     );
   };
-
+  useEffect(() => {
+    document.title = 'Settings / ChefAssit';
+  }, []);
   return (
     <div className="bg-[var(--color-chef-cream)] dark:bg-gray-900 min-h-full">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

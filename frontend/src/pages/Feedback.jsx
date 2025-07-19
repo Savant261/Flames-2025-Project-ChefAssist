@@ -1,6 +1,9 @@
-import React from 'react';
+import React,{useEffect} from 'react';
 
 function Feedback() {
+    useEffect(() => {
+      document.title = 'Feedback / ChefAssit';
+    }, []);
   return (
     <div className="flex items-center justify-center min-h-screen bg-[var(--color-chef-cream)] p-4">
   <div className="w-full max-w-md p-6 rounded-2xl shadow-xl bg-white border border-[var(--color-chef-peach)] space-y-5">

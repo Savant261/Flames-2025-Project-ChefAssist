@@ -7,7 +7,7 @@ const Settings = () => {
 
             <div className="space-y-8">
                 {/* <!-- Dietary Preferences --> */}
-                <div className="bg-white rounded-xl shadow-lg p-6 border border-chef-peach/30">
+                {/* <div className="bg-white rounded-xl shadow-lg p-6 border border-chef-peach/30">
                     <h3 className="text-xl font-bold text-chef-orange mb-4">Dietary Preferences</h3>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         <label className="flex items-center space-x-2 cursor-pointer">
@@ -35,7 +35,7 @@ const Settings = () => {
                             <span>🦴 Paleo</span>
                         </label>
                     </div>
-                </div>
+                </div> */}
 
                 {/* <!-- Allergies & Restrictions --> */}
                 <div className="bg-white rounded-xl shadow-lg p-6 border border-chef-peach/30">

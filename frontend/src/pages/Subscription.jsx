@@ -1,6 +1,9 @@
-import React from 'react'
+import React,{useEffect} from 'react'
 
 const Subscription = () => {
+   useEffect(() => {
+      document.title = 'Subscription / ChefAssit';
+    }, []);
     return (
         <>
                   <section className="bg-gradient-to-br from-orange-600 to-orange-300 min-h-[60vh] flex items-center relative overflow-hidden animate-section-fade-in">

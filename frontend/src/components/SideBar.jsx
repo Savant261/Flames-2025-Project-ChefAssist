@@ -22,7 +22,7 @@ const SideBar = ({ isSidebarExpanded, login }) => {
     );
 
     return (
-        <aside className={`bg-[#FFF8E7] border-r border-gray-200/50 flex-shrink-0 transition-all duration-300 ease-in-out ${isSidebarExpanded ? 'w-64' : 'w-20'}`}>
+        <aside className={`bg-[#FFF8E7] border-r border-gray-200/50 flex-shrink-0 transition-all duration-300 ease-in-out ${isSidebarExpanded ? 'w-56' : 'w-20'}`}>
             <div className="flex flex-col h-full p-3">
                 <SectionTitle>Discovery</SectionTitle>
                 <NavLink to="/explore" icon={Home}>Home</NavLink>

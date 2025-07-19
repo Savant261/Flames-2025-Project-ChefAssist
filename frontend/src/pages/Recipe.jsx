@@ -1,23 +1,23 @@
-import React, {useState} from 'react'
+import React, { useState ,useEffect} from 'react'
 
 const Recipe = () => {
-    const [showComments, setShowComments] = useState(false)
+  const [showComments, setShowComments] = useState(false)
+  useEffect(() => {
+    document.title = 'Recipe / ChefAssit';
+  }, []);
   return (
-    
-  
     <div className="min-h-screen bg-[var(--color-chef-cream)] flex flex-col">
       {/* Main content excluding navbar/footer */}
       <div className="flex flex-1 overflow-hidden">
-        
+
         {/* RECIPE CONTENT */}
         <div
-          className={`transition-all duration-300 ease-in-out w-full max-w-3xl mx-auto px-4 py-6 ${
-            showComments ? "md:mr-[400px]" : ""
-          }`}
+          className={`transition-all duration-300 ease-in-out w-full max-w-3xl mx-auto px-4 py-6 ${showComments ? "md:mr-[400px]" : ""
+            }`}
         >
           {/* Recipe Card */}
           <div className="bg-white rounded-3xl shadow-lg overflow-hidden relative">
-            
+
             {/* Image with buttons */}
             <div className="relative">
               <img
@@ -107,9 +107,8 @@ const Recipe = () => {
 
         {/* COMMENT PANEL (Instagram Reels style) */}
         <div
-          className={`rounded-xl fixed top-[97px] bottom-[56px] right-2 w-full md:w-[400px] bg-white shadow-lg border-l transition-transform duration-300 ease-in-out z-40 ${
-            showComments ? "translate-x-0" : "translate-x-full"
-          }`}
+          className={`rounded-xl fixed top-[97px] bottom-[56px] right-2 w-full md:w-[400px] bg-white shadow-lg border-l transition-transform duration-300 ease-in-out z-40 ${showComments ? "translate-x-0" : "translate-x-full"
+            }`}
         >
           <div className="p-4 border-b flex justify-between items-center">
             <h3 className="text-lg font-semibold text-[var(--color-chef-orange-dark)]">Comments</h3>
@@ -142,7 +141,7 @@ const Recipe = () => {
 };
 
 
-  
+
 
 
 export default Recipe
