@@ -1,399 +1,332 @@
-import React, { useState, useEffect } from 'react';
-import {
-    ChefHat, Leaf, WheatOff, Nut, MilkOff, Droplets, Info, XCircle, Copy, Loader2, FishOff, EggOff, Shell, Ban, Carrot, Scale, HeartPulse, LogOut, Lightbulb, Check
-} from 'lucide-react';
+import React, { useState } from 'react';
+import { ChefHat, Leaf, WheatOff, Nut, MilkOff, Droplets, FishOff, EggOff, Shell, Ban, Carrot, Scale, HeartPulse, Lightbulb, Loader2 } from 'lucide-react';
 
-const ai = () => {
-    const [recipeInput, setRecipeInput] = useState('');
-    const [selectedRestrictions, setSelectedRestrictions] = useState([]);
-    const [processedRecipe, setProcessedRecipe] = useState('');
-    const [explanation, setExplanation] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [message, setMessage] = useState({ text: '', type: '' });
+const restrictionsList = [
+  { id: 'vegan', label: 'Vegan', icon: Leaf },
+  { id: 'gluten-free', label: 'Gluten-Free', icon: WheatOff },
+  { id: 'nut-allergy', label: 'Nut-Allergy', icon: Nut },
+  { id: 'lactose-free', label: 'Lactose-Free', icon: MilkOff },
+  { id: 'diabetic-safe', label: 'Diabetic-Safe', icon: Droplets },
+  { id: 'pescatarian', label: 'Pescatarian', icon: FishOff },
+  { id: 'egg-free', label: 'Egg-Free', icon: EggOff },
+  { id: 'soy-free', label: 'Soy-Free', icon: Ban },
+  { id: 'shellfish-free', label: 'Shellfish-Free', icon: Shell },
+  { id: 'low-carb', label: 'Low-Carb', icon: Carrot },
+  { id: 'low-sodium', label: 'Low-Sodium', icon: Scale },
+  { id: 'heart-healthy', label: 'Heart-Healthy', icon: HeartPulse },
+];
 
-    // Firebase related states
-    const [user, setUser] = useState(null);
-    const [userId, setUserId] = useState(null);
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [username, setUsername] = useState(''); // New state for username
-    const [confirmPassword, setConfirmPassword] = useState(''); // New state for confirm password
-    const [isSignupMode, setIsSignupMode] = useState(false); // To toggle between login/signup forms
-    const [history, setHistory] = useState([]);
-    const [isAuthAttempted, setIsAuthAttempted] = useState(false); // To track if initial auth attempt is done
+const modes = [
+  { id: 'idea', label: 'Generate Recipe Idea', icon: 'lightbulb' },
+  { id: 'ingredients', label: 'Generate Recipe Based on Ingredients', icon: 'chefhat' },
+];
 
-    // New state for Recipe Idea Generator
-    const [recipeIdeaKeywords, setRecipeIdeaKeywords] = useState('');
-    const [mealType, setMealType] = useState('');
-    const [generatedRecipeIdea, setGeneratedRecipeIdea] = useState('');
-    const [isGeneratingIdea, setIsGeneratingIdea] = useState(false);
-    const [ideaMessage, setIdeaMessage] = useState({ text: '', type: '' });
+const Ai = () => {
+  // Speech recognition state
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = React.useRef(null);
+  const handleMicClick = () => {
+    if (!('webkitSpeechRecognition' in window)) {
+      alert('Speech recognition is not supported in this browser.');
+      return;
+    }
+    if (!recognitionRef.current) {
+      const SpeechRecognition = window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setInput(transcript);
+        setIsListening(false);
+      };
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+      recognition.onerror = () => {
+        setIsListening(false);
+      };
+      recognitionRef.current = recognition;
+    }
+    if (!isListening) {
+      setIsListening(true);
+      recognitionRef.current.start();
+    } else {
+      setIsListening(false);
+      recognitionRef.current.stop();
+    }
+  };
+  // Image upload state
+  const [uploadedImage, setUploadedImage] = useState(null);
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setUploadedImage(file);
+      // You can add preview or upload logic here
+    }
+  };
+  // Copy to clipboard for history
+  const [copiedIdx, setCopiedIdx] = useState(null);
+  const handleCopyHistory = (text, idx) => {
+    navigator.clipboard.writeText(text);
+    setCopiedIdx(idx);
+    setTimeout(() => setCopiedIdx(null), 1200);
+  };
+  const [input, setInput] = useState('');
+  const [selectedMode, setSelectedMode] = useState('idea');
+  const [selectedRestrictions, setSelectedRestrictions] = useState([]);
+  const [output, setOutput] = useState('');
+  const [history, setHistory] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-    // Add state for expanded history cards and loading overlay
-    const [expandedHistory, setExpandedHistory] = useState({});
-    const [showOverlay, setShowOverlay] = useState(false);
+  // Dropdown for restrictions
+  const [showDropdown, setShowDropdown] = useState(false);
 
-    // Add state for favorites and scroll-to-top
-    const [favorites, setFavorites] = useState([]);
-    const [showScrollTop, setShowScrollTop] = useState(false);
+  // Handle input change (do not clear output when input is cleared)
+  const handleInputChange = (e) => {
+    setInput(e.target.value);
+    // Do NOT clear output here
+  };
 
-    // Toggle expand/collapse for history card
-    const toggleHistoryCard = (idx) => {
-        setExpandedHistory((prev) => ({ ...prev, [idx]: !prev[idx] }));
-    };
+  // Handle mode toggle
+  const handleModeChange = (e) => {
+    setSelectedMode(e.target.value);
+    setOutput('');
+  };
 
-    // Clear history handler
-    const clearHistory = () => {
-        setHistory([]);
-        setMessage({ text: 'Recipe history cleared!', type: 'success' });
-    };
+  // Handle restriction selection
+  const handleRestrictionToggle = (id) => {
+    setSelectedRestrictions((prev) =>
+      prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]
+    );
+  };
 
-    // Show overlay when loading/generating
-    useEffect(() => {
-        setShowOverlay(isLoading || isGeneratingIdea);
-    }, [isLoading, isGeneratingIdea]);
+  // Simulate output generation
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setTimeout(() => {
+      const newOutput =
+        selectedMode === 'idea'
+          ? `✨ Recipe Idea for: ${input || '...'}\nRestrictions: ${selectedRestrictions.map(r => restrictionsList.find(x => x.id === r)?.label).join(', ') || 'None'}`
+          : `🍳 Recipe based on ingredients: ${input || '...'}\nRestrictions: ${selectedRestrictions.map(r => restrictionsList.find(x => x.id === r)?.label).join(', ') || 'None'}`;
+      setOutput(newOutput);
+      setHistory((prev) => [{
+        input,
+        restrictions: selectedRestrictions.map(r => restrictionsList.find(x => x.id === r)?.label).join(', ') || 'None',
+        mode: selectedMode,
+        output: newOutput,
+        timestamp: new Date().toLocaleString()
+      }, ...prev]);
+      setIsLoading(false);
+    }, 1200);
+  };
 
-    // Show scroll-to-top button on scroll
-    useEffect(() => {
-        const onScroll = () => {
-            setShowScrollTop(window.scrollY > 300);
-        };
-        window.addEventListener('scroll', onScroll);
-        return () => window.removeEventListener('scroll', onScroll);
-    }, []);
+  // Simulate user name from props or context (replace with actual user logic)
+  const userName = window.localStorage.getItem('userName') || 'User';
 
-    // Define available dietary restrictions with their labels and icons
-    const restrictions = [
-        { id: 'vegan', label: 'Vegan', icon: Leaf },
-        { id: 'gluten-free', label: 'Gluten-Free', icon: WheatOff },
-        { id: 'nut-allergy', label: 'Nut-Allergy', icon: Nut },
-        { id: 'lactose-free', label: 'Lactose-Free', icon: MilkOff },
-        { id: 'diabetic-safe', label: 'Diabetic-Safe', icon: Droplets },
-        { id: 'pescatarian', label: 'Pescatarian', icon: FishOff },
-        { id: 'egg-free', label: 'Egg-Free', icon: EggOff },
-        { id: 'soy-free', label: 'Soy-Free', icon: Ban },
-        { id: 'shellfish-free', label: 'Shellish-Free', icon: Shell },
-        { id: 'low-carb', label: 'Low-Carb', icon: Carrot },
-        { id: 'low-sodium', label: 'Low-Sodium', icon: Scale },
-        { id: 'heart-healthy', label: 'Heart-Healthy', icon: HeartPulse },
-    ];
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#FFF6E9] via-[#FFDCA9] to-[#FF7F3F] px-4 pt-10 pb-40">
+      {/* Greeting hidden when output is shown */}
+      {!output && (
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <h1
+            className="text-5xl font-extrabold mb-2 animate-slide-in-top animate-fade-in-scale flex items-center"
+            style={{
+              background: 'linear-gradient(90deg, #FFB86C 0%, #FF7F3F 50%, #FFDCA9 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              color: 'transparent',
+              textShadow: 'none',
+              letterSpacing: '2px',
+            }}
+          >
+            <span
+              className="inline-block animate-bounce-slow"
+              style={{
+                fontSize: '3.5rem',
+                marginRight: '12px',
+                textShadow: '0 2px 6px rgba(0,0,0,0.18)',
+                verticalAlign: 'middle',
+                transition: 'transform 0.3s',
+              }}
+            >
+              👨‍🍳
+            </span>
+            Hello, {userName}
+          </h1>
+        </div>
+      )}
 
-    const mealTypes = ['Breakfast', 'Lunch', 'Dinner', 'Dessert', 'Snack', 'Appetizer'];
-    // Helper function for email validation
-    const isValidEmail = (email) => {
-        // Basic regex for email validation
-        return /\S+@\S+\.\S+/.test(email);
-    };
+      <div className="w-full max-w-6xl mx-auto flex flex-col items-center justify-center gap-8 mt-8">
+        {/* Restrictions dropdown menu at top left with ChefAssist colors */}
+        <div className="w-full flex flex-row items-center justify-start pt-2 pb-4 px-2" style={{ position: 'absolute', top: 0, left: 0, zIndex: 50 }}>
+          <div className="relative">
+            <button
+              type="button"
+              className="flex items-center gap-2 px-6 py-3 rounded-full font-semibold shadow bg-gradient-to-r from-[#FF7F3F] to-[#FFDCA9] text-white hover:from-[#FFDCA9] hover:to-[#FF7F3F] transition-all duration-200 border-2 border-[#FFDCA9]"
+              onClick={() => setShowDropdown((prev) => !prev)}
+              style={{ minWidth: '140px', boxShadow: '0 4px 16px #FF7F3F55' }}
+            >
+              <span className="font-bold">Restrictions</span>
+              <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            {showDropdown && (
+              <div className="absolute left-0 mt-2 w-max bg-white rounded-2xl shadow-2xl border border-[#FFDCA9] z-50 animate-fade-in-scale" style={{ minWidth: '220px' }}>
+                <div className="flex flex-col gap-1 p-4">
+                  {restrictionsList.map(({ id, label, icon: Icon }, idx) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => handleRestrictionToggle(id)}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium shadow transition-all duration-200 border text-sm mb-1
+                        ${selectedRestrictions.includes(id)
+                          ? 'bg-gradient-to-r from-[#FF7F3F] to-[#FFDCA9] text-white border-[#FFDCA9]'
+                          : 'bg-white text-[#FF7F3F] border-[#FFDCA9] hover:bg-[#FFF6E9]'}
+                      animate-fade-in-item`}
+                      style={{ animationDelay: `${idx * 0.03}s`, boxShadow: selectedRestrictions.includes(id) ? '0 2px 8px #FF7F3F55' : '0 1px 4px #FFDCA955', opacity: 1 }}
+                    >
+                      <Icon className="w-4 h-4" />
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
 
-    // Handler for changes in the recipe input textarea
-    const handleRecipeInputChange = (event) => {
-        setRecipeInput(event.target.value);
-        setMessage({ text: '', type: '' });
-    };
-
-    // Handler for checkbox changes for dietary restrictions
-    const handleRestrictionChange = (event) => {
-        const { id, checked } = event.target;
-        setSelectedRestrictions((prev) =>
-            checked ? [...prev, id] : prev.filter((restriction) => restriction !== id)
-        );
-        setMessage({ text: '', type: '' });
-        setIdeaMessage({ text: '', type: '' }); // Clear idea message too
-    };
-
-    // Function to clear the recipe input
-    const clearRecipeInput = () => {
-        setRecipeInput('');
-        setProcessedRecipe('');
-        setExplanation('');
-        setMessage({ text: 'Recipe input cleared!', type: 'success' });
-    };
-
-    // Function to copy the processed recipe to clipboard
-    const copyProcessedRecipe = () => {
-        if (processedRecipe) {
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = processedRecipe.replace(/<br\/>/g, '\n').replace(/\*\*(.*?)\*\*/g, '$1');
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            try {
-                document.execCommand('copy');
-                setMessage({ text: 'Recipe copied to clipboard!', type: 'success' });
-            } catch (err) {
-                setMessage({ text: 'Failed to copy recipe.', type: 'error' });
-                console.error('Failed to copy text: ', err);
-            }
-            document.body.removeChild(tempTextArea);
-        }
-    };
-
-    // Add to favorites
-    const addToFavorites = (recipe) => {
-        setFavorites((prev) => [...prev, recipe]);
-        setMessage({ text: 'Recipe added to favorites!', type: 'success' });
-    };
-
-    // Share recipe
-    const shareRecipe = (recipe) => {
-        navigator.clipboard.writeText(recipe);
-        setMessage({ text: 'Recipe copied for sharing!', type: 'success' });
-    };
-
-    // Scroll to top handler
-    const handleScrollTop = () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    return (
-        <>
-            <div className="min-h-screen flex flex-col bg-gradient-to-br from-pink-200 via-yellow-100 to-blue-200 md:flex-row justify-between items-center px-8 py-12 gap-16 flex-1">
-                <main className="w-full max-w-4xl mx-auto justify-between items-center bg-white/80 p-8 rounded-2xl shadow-2xl flex flex-col gap-10 border-4 border-pink-200 relative z-10 animate-fade-in-scale">
-                    {/* Top Row: Paste Recipe & Select Restrictions */}
-                    <div className="flex flex-col md:flex-row gap-8">
-                        <section className="bg-white/90 p-8 rounded-2xl shadow-2xl border-4 border-pink-300 animate-slide-in-section md:w-1/2 transition-all duration-300 focus-within:ring-4 focus-within:ring-pink-400 hover:shadow-3xl hover:border-pink-400" style={{ animationDelay: '0.3s' }}>
-                            <h2 className="text-2xl font-extrabold text-pink-700 mb-6 pb-2 flex items-center border-b-4 border-pink-300 bg-gradient-to-r from-pink-100 to-yellow-100 rounded-t-2xl px-4">
-                                Paste Your Recipe
-                                <button
-                                    onClick={clearRecipeInput}
-                                    className="ml-auto text-sm text-red-500 hover:text-red-700 flex items-center transition-colors duration-200 transform hover:scale-105 animate-pulse-on-hover bg-white/80 px-3 py-2 rounded shadow"
-                                    title="Clear Recipe Input"
-                                >
-                                    <XCircle className="w-4 h-4 mr-1" /> Clear
-                                </button>
-                            </h2>
-                            <textarea
-                                className="w-full h-56 p-5 border-2 border-pink-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-pink-400 bg-white text-gray-800 resize-y shadow-inner transition-all duration-300 placeholder-pink-400 text-lg"
-                                placeholder="Paste your recipe here..."
-                                value={recipeInput}
-                                onChange={handleRecipeInputChange}
-                            ></textarea>
-                        </section>
-
-                        <section className="bg-white/90 p-8 rounded-2xl shadow-2xl border-4 border-blue-300 animate-slide-in-section md:w-1/2 transition-all duration-300 focus-within:ring-4 focus-within:ring-blue-400 hover:shadow-3xl hover:border-blue-400" style={{ animationDelay: '0.6s' }}>
-                            <h2 className="text-2xl font-extrabold text-blue-700 mb-6 pb-2 border-b-4 border-blue-300 bg-gradient-to-r from-blue-100 to-pink-100 rounded-t-2xl px-4">
-                                Select Restrictions
-                            </h2>
-                            <div className="grid grid-cols-3 gap-5">
-                                {restrictions.map((restriction) => {
-                                    const Icon = restriction.icon;
-                                    const isSelected = selectedRestrictions.includes(restriction.id);
-                                    return (
-                                        <label
-                                            key={restriction.id}
-                                            className={`flex items-center justify-center p-3 rounded-xl cursor-pointer transition-all duration-200 ease-in-out border-2 text-center min-h-[80px] min-w-[80px] shadow-lg bg-gradient-to-br from-white via-pink-50 to-yellow-50 hover:from-pink-100 hover:to-yellow-100 ${isSelected ? 'bg-gradient-to-br from-green-400 via-green-200 to-green-100 border-green-600 shadow-xl transform scale-105' : 'border-blue-200 text-blue-700'} animate-fade-in-item`}
-                                            style={{ animationDelay: `${0.6 + (restrictions.indexOf(restriction) * 0.05)}s` }}
-                                        >
-                                            <input
-                                                type="checkbox"
-                                                id={restriction.id}
-                                                checked={isSelected}
-                                                onChange={handleRestrictionChange}
-                                                className="sr-only"
-                                            />
-                                            <div className="flex flex-col items-center justify-center">
-                                                <Icon className={`w-7 h-7 mb-1 ${isSelected ? 'text-green-900 drop-shadow' : 'text-blue-700'}`} />
-                                                <span className={`font-semibold text-base ${isSelected ? 'text-green-900' : 'text-blue-700'}`}>{restriction.label}</span>
-                                            </div>
-                                        </label>
-                                    );
-                                })}
-                            </div>
-
-                            <button
-                                // onClick={processRecipe}
-                                disabled={isLoading}
-                                className={`mt-8 w-full py-3 px-6 rounded-xl text-white font-bold text-lg transition-all duration-300 ease-in-out flex items-center justify-center shadow-xl bg-blue-600 ${isLoading ? 'bg-gray-400 cursor-not-allowed' : 'hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-400 animate-pulse-on-hover'}`}
-                            >
-                                {isLoading ? (
-                                    <>
-                                        <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Processing...
-                                    </>
-                                ) : (
-                                    'Process Recipe'
-                                )}
-                            </button>
-
-                            {message.text && (
-                                <div className={`mt-4 p-3 rounded-xl text-center font-semibold flex items-center justify-center animate-fade-in ${message.type === 'success' ? 'bg-green-100 text-green-700 border-2 border-green-300' : message.type === 'error' ? 'bg-red-100 text-red-700 border-2 border-red-300' : 'bg-blue-100 text-blue-700 border-2 border-blue-300'}`}
-                                >
-                                    {message.text}
-                                </div>
-                            )}
-                        </section>
-                    </div>
-
-                    {/* Middle Row: Rewritten Recipe & Recipe Idea Generator */}
-                    <div className="flex flex-col md:flex-row gap-8">
-                        <section className="bg-gradient-to-br from-pink-100 via-yellow-100 to-blue-100 p-6 rounded-xl shadow-lg border-2 border-yellow-300 animate-slide-in-section md:w-1/2" style={{ animationDelay: '0.9s' }}>
-                            <h2 className="text-2xl font-extrabold text-yellow-700 mb-4 pb-2 flex items-center border-b-4 border-yellow-300 bg-gradient-to-r from-yellow-100 to-pink-100 rounded-t-xl px-2">
-                                Rewritten Recipe
-                                {processedRecipe && (
-                                    <button
-                                        onClick={copyProcessedRecipe}
-                                        className="ml-auto text-sm text-blue-500 hover:text-blue-700 flex items-center transition-colors duration-200 transform hover:scale-105 animate-pulse-on-hover bg-white/80 px-2 py-1 rounded shadow"
-                                        title="Copy Recipe to Clipboard"
-                                    >
-                                        <Copy className="w-4 h-4 mr-1" /> Copy
-                                    </button>
-                                )}
-                            </h2>
-                            {processedRecipe ? (
-                                <div className="text-gray-900 bg-white/90 p-4 rounded-xl border-2 border-yellow-200 shadow-md animate-fade-in text-base leading-relaxed">
-                                    <div dangerouslySetInnerHTML={{ __html: processedRecipe.replace(/\n/g, '<br/>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
-                                    <h3 className="text-lg font-bold text-yellow-900 mt-6 mb-3 flex items-center">
-                                        <Info className="w-5 h-5 mr-2 text-blue-500" />
-                                        Why These Replacements?
-                                    </h3>
-                                    <div dangerouslySetInnerHTML={{ __html: explanation.replace(/\n/g, '<br/>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
-                                </div>
-                            ) : (
-                                <p className="text-gray-500 italic text-center py-10">
-                                    Processed recipe will appear here.
-                                </p>
-                            )}
-                        </section>
-
-                        <section className="bg-white/90 p-8 rounded-2xl shadow-2xl border-4 border-pink-300 animate-slide-in-section md:w-1/2 transition-all duration-300 focus-within:ring-4 focus-within:ring-pink-400 hover:shadow-3xl hover:border-pink-400" style={{ animationDelay: '1.2s' }}>
-                            <h2 className="text-2xl font-extrabold text-pink-700 mb-6 pb-2 flex items-center border-b-4 border-pink-300 bg-gradient-to-r from-pink-100 to-yellow-100 rounded-t-2xl px-4">
-                                Generate Recipe Idea ✨
-                                <Lightbulb className="w-5 h-5 ml-2 text-yellow-600" />
-                            </h2>
-                            <div className="space-y-6">
-                                <div>
-                                    <label htmlFor="keywords" className="block text-pink-700 text-base font-semibold mb-1">Keywords (e.g., chicken, spicy, quick):</label>
-                                    <input
-                                        type="text"
-                                        id="keywords"
-                                        className="w-full p-3 border-2 border-pink-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-yellow-500 bg-white text-gray-800 placeholder-pink-400 text-lg"
-                                        value={recipeIdeaKeywords}
-                                        onChange={(e) => { setRecipeIdeaKeywords(e.target.value); setIdeaMessage({ text: '', type: '' }); }}
-                                        placeholder="e.g., pasta, vegetarian, easy"
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="mealType" className="block text-pink-700 text-base font-semibold mb-1">Meal Type:</label>
-                                    <select
-                                        id="mealType"
-                                        className="w-full p-3 border-2 border-pink-300 rounded-xl focus:outline-none focus:ring-4 focus:ring-yellow-500 bg-white text-gray-800 text-lg"
-                                        value={mealType}
-                                        onChange={(e) => { setMealType(e.target.value); setIdeaMessage({ text: '', type: '' }); }}
-                                    >
-                                        <option value="">Any</option>
-                                        {mealTypes.map(type => (
-                                            <option key={type} value={type}>{type}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <p className="text-pink-600 text-base italic">
-                                    Note: Dietary restrictions selected above will also apply to the generated idea.
-                                </p>
-                                <button
-                                    //   onClick={generateRecipeIdea}
-                                    disabled={isGeneratingIdea}
-                                    className={`w-full py-3 px-6 rounded-xl text-white font-bold text-lg transition-all duration-300 ease-in-out flex items-center justify-center shadow-xl bg-pink-600 ${isGeneratingIdea ? 'bg-gray-400 cursor-not-allowed' : 'hover:bg-pink-700 focus:outline-none focus:ring-4 focus:ring-pink-400 animate-pulse-on-hover'}`}
-                                >
-                                    {isGeneratingIdea ? (
-                                        <>
-                                            <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Generating...
-                                        </>
-                                    ) : (
-                                        'Generate Idea ✨'
-                                    )}
-                                </button>
-                            </div>
-                            {ideaMessage.text && (
-                                <div className={`mt-4 p-3 rounded-xl text-center font-semibold flex items-center justify-center animate-fade-in ${ideaMessage.type === 'success' ? 'bg-green-100 text-green-700 border-2 border-green-300' : ideaMessage.type === 'error' ? 'bg-red-100 text-red-700 border-2 border-red-300' : 'bg-blue-100 text-blue-700 border-2 border-blue-300'}`}
-                                >
-                                    {ideaMessage.text}
-                                </div>
-                            )}
-                            {generatedRecipeIdea && (
-                                <div className="mt-6 text-gray-900 bg-white/90 p-4 rounded-xl border-2 border-pink-200 shadow-md animate-fade-in text-base leading-relaxed">
-                                    <h3 className="text-lg font-bold text-pink-900 mb-3 flex items-center">
-                                        <Lightbulb className="w-5 h-5 mr-2 text-yellow-600" /> Your Recipe Idea:
-                                    </h3>
-                                    <div dangerouslySetInnerHTML={{ __html: generatedRecipeIdea.replace(/\n/g, '<br/>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
-                                </div>
-                            )}
-                        </section>
-                    </div>
-
-                    {/* History Section (remains full width) */}
-                    <section className="bg-gradient-to-br from-blue-100 via-pink-100 to-yellow-100 p-6 rounded-2xl shadow-xl border-4 border-blue-200 animate-slide-in-section" style={{ animationDelay: '1.5s' }}>
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-2xl font-extrabold text-blue-700 pb-2 border-b-4 border-blue-300 bg-gradient-to-r from-blue-100 to-pink-100 rounded-t-xl px-2">
-                                Your Recipe History
-                            </h2>
-                            {history.length > 0 && (
-                                <button
-                                    onClick={clearHistory}
-                                    className="ml-4 px-3 py-1 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                                    title="Clear Recipe History"
-                                >
-                                    Clear All
-                                </button>
-                            )}
-                        </div>
-                        {history.length === 0 ? (
-                            <p className="text-gray-500 italic text-center py-5">No previous recipes found. Process a recipe to save it here!</p>
-                        ) : (
-                            <div className="space-y-4 max-h-96 overflow-y-auto p-2 pr-4 custom-scrollbar">
-                                {history.map((h, index) => {
-                                    const expanded = expandedHistory[index];
-                                    return (
-                                        <div
-                                            key={h.id || index}
-                                            className={`border-2 border-pink-200 rounded-xl p-4 shadow-lg bg-white/90 animate-fade-in-item transition-all duration-300 hover:shadow-2xl cursor-pointer ${expanded ? 'ring-2 ring-pink-400 animate-expand-card' : 'animate-collapse-card'}`}
-                                            style={{ animationDelay: `${1.5 + (index * 0.05)}s` }}
-                                            onClick={() => toggleHistoryCard(index)}
-                                            title={expanded ? 'Click to collapse' : 'Click to expand'}
-                                            tabIndex={0}
-                                            onKeyPress={(e) => { if (e.key === 'Enter') toggleHistoryCard(index); }}
-                                        >
-                                            <div className="flex justify-between items-center">
-                                                <p className="text-xs text-blue-600 mb-2">Processed on: {h.timestamp ? new Date(h.timestamp.seconds * 1000).toLocaleString() : 'N/A'}</p>
-                                                <div className="flex gap-2">
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); addToFavorites(h); }}
-                                                        className="px-2 py-1 rounded bg-pink-200 text-pink-700 font-bold hover:bg-pink-300 transition-all duration-200 animate-favorite-btn"
-                                                        title="Add to Favorites"
-                                                    >❤</button>
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); shareRecipe(h.originalRecipe); }}
-                                                        className="px-2 py-1 rounded bg-blue-200 text-blue-700 font-bold hover:bg-blue-300 transition-all duration-200 animate-share-btn"
-                                                        title="Share Recipe"
-                                                    >🔗</button>
-                                                </div>
-                                            </div>
-                                            <h3 className="font-semibold text-pink-700 mb-1">Original Recipe:</h3>
-                                            <pre className="whitespace-pre-wrap text-base text-blue-700 bg-blue-50 p-2 rounded-md border border-blue-200">{h.originalRecipe}</pre>
-                                            {expanded && (
-                                                <>
-                                                    <h3 className="font-semibold text-yellow-700 mt-3 mb-1">Rewritten Recipe:</h3>
-                                                    <pre className="whitespace-pre-wrap text-base text-yellow-800 bg-yellow-50 p-2 rounded-md border border-yellow-200">{h.rewrittenRecipe.replace(/\*\*(.*?)\*\*/g, '$1')}</pre>
-                                                    <h3 className="font-semibold text-green-700 mt-3 mb-1">Explanation:</h3>
-                                                    <pre className="whitespace-pre-wrap text-base text-green-800 bg-green-50 p-2 rounded-md border border-green-200">{h.explanation.replace(/\*\*(.*?)\*\*/g, '$1')}</pre>
-                                                </>
-                                            )}
-                                            <div className="mt-2 text-xs text-gray-500 text-right">{expanded ? 'Click to collapse' : 'Click to expand'}</div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        )}
-                    </section>
-                    {/* Scroll to Top Floating Button */}
-                    {showScrollTop && (
-                        <button
-                            onClick={handleScrollTop}
-                            className="fixed bottom-8 right-8 z-50 bg-blue-600 text-white rounded-full p-4 shadow-lg hover:bg-blue-700 transition-all animate-bounce"
-                            title="Scroll to Top"
-                        >↑</button>
-                    )}
-                </main>
+        {/* Output Area - Gemini style: centered, visually distinct */}
+        <div className="flex-1 flex flex-col items-center justify-center w-full">
+          {output && (
+            <div className="flex flex-col items-center w-full max-w-xl mx-auto animate-fade-in-scale animate-expand-card">
+              {/* User query pill on the right */}
+              <div className="w-full flex justify-end mb-4">
+                <div className="bg-[#A5A6B2] text-white px-6 py-3 rounded-full text-lg font-semibold shadow-lg max-w-xs text-right animate-fade-in-item" style={{ boxShadow: '0 2px 12px #A5A6B255' }}>
+                  {input}
+                </div>
+              </div>
+              {/* AI response card centered */}
+              <div className="bg-white/90 rounded-3xl shadow-2xl p-10 border border-[#FFDCA9] w-full backdrop-blur-lg" style={{ boxShadow: '0 8px 32px #FFDCA9AA' }}>
+                <div className="text-[#181A1B] whitespace-pre-line text-xl font-semibold tracking-wide mb-2">
+                  {output}
+                </div>
+                {/* Action buttons row (like Gemini) */}
+                <div className="flex gap-6 mt-8">
+                  <button className="text-[#FF7F3F] bg-white/80 hover:bg-[#FFDCA9] rounded-full px-4 py-2 font-semibold transition shadow animate-pulse-on-hover scale-100 hover:scale-110" style={{ transition: 'transform 0.2s' }}>👍</button>
+                  <button className="text-[#FF7F3F] bg-white/80 hover:bg-[#FFDCA9] rounded-full px-4 py-2 font-semibold transition shadow animate-pulse-on-hover scale-100 hover:scale-110" style={{ transition: 'transform 0.2s' }}>👎</button>
+                  <button className="text-[#FF7F3F] bg-white/80 hover:bg-[#FFDCA9] rounded-full px-4 py-2 font-semibold transition shadow animate-pulse-on-hover scale-100 hover:scale-110" style={{ transition: 'transform 0.2s' }}>🔗</button>
+                  <button className="text-[#FF7F3F] bg-white/80 hover:bg-[#FFDCA9] rounded-full px-4 py-2 font-semibold transition shadow animate-pulse-on-hover scale-100 hover:scale-110" style={{ transition: 'transform 0.2s' }}>📋</button>
+                </div>
+              </div>
             </div>
-            <style>
-                {`
+          )}
+          {/* History Section */}
+          {history.length > 0 && (
+            <div className="w-full max-w-2xl mx-auto mt-12 animate-fade-in-scale">
+              <h2 className="text-2xl font-bold text-[#FF7F3F] mb-4">History</h2>
+              <div className="flex flex-col gap-6 custom-scrollbar max-h-96 overflow-y-auto">
+                {history.map((item, idx) => (
+                  <div key={idx} className="bg-white/80 rounded-2xl shadow-lg p-6 border border-[#FFDCA9]">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-[#A5A6B2] text-sm font-semibold">{item.timestamp}</span>
+                      <span className="text-[#FF7F3F] text-xs font-bold px-3 py-1 rounded-full bg-[#FFDCA9]/60">{item.mode === 'idea' ? 'Idea' : 'Ingredients'}</span>
+                    </div>
+                    <div className="text-lg font-semibold text-[#181A1B] mb-1">{item.input}</div>
+                    <div className="text-sm text-[#FF7F3F] mb-2">Restrictions: {item.restrictions}</div>
+                    <div className="whitespace-pre-line text-[#181A1B] mb-2">{item.output}</div>
+                    <div className="flex gap-2 mt-2">
+                      <button
+                        className={`text-[#FF7F3F] bg-white/80 hover:bg-[#FFF6E9] rounded-full px-4 py-2 font-semibold transition shadow animate-pulse-on-hover border border-[#FFDCA9] flex items-center gap-2`}
+                        onClick={() => handleCopyHistory(item.output, idx)}
+                      >
+                        📋 {copiedIdx === idx ? <span className="text-xs text-[#A5A6B2]">Copied!</span> : <span className="text-xs">Copy</span>}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {/* Centered, smaller search bar below output */}
+          <div className={`w-full flex flex-col items-center justify-center ${output ? 'mt-32' : 'mt-16'} transition-all duration-700`}>
+            <div className="w-full max-w-3xl mx-auto bg-gradient-to-br from-white/80 via-[#FFDCA9]/80 to-[#FF7F3F]/30 backdrop-blur-lg shadow-2xl p-6 flex flex-col items-center gap-6 rounded-3xl transition-all duration-300 border border-[#FFDCA9]" style={{ boxShadow: '0 8px 32px #FFDCA9AA' }}>
+              {/* Mode toggle pills */}
+              <div className="flex flex-row gap-4 mb-2">
+                {modes.map(({ id, label }, idx) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setSelectedMode(id)}
+                    className={`px-6 py-3 rounded-full font-semibold text-lg shadow border-2 transition-all duration-200
+                      ${selectedMode === id
+                        ? 'bg-gradient-to-r from-[#FF7F3F] to-[#FFDCA9] text-white border-[#FFDCA9] scale-105'
+                        : 'bg-white/80 text-[#FF7F3F] border-[#FFDCA9] hover:bg-[#FFF6E9]'}
+                    animate-fade-in-item`}
+                    style={{ animationDelay: `${idx * 0.05}s`, boxShadow: selectedMode === id ? '0 4px 16px #FF7F3F55' : '0 2px 8px #FFDCA955' }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <form className="w-full flex flex-row items-center gap-4" onSubmit={handleSubmit}>
+                <div className="relative flex-1 flex items-center">
+                  <input
+                    type="text"
+                    value={input}
+                    onChange={handleInputChange}
+                    placeholder={selectedMode === 'idea' ? 'Search for recipes, ideas, or ingredients...' : 'Enter ingredients (e.g. chicken, tomato, cheese)'}
+                    className="w-full rounded-full bg-white/90 text-[#FF7F3F] text-xl px-12 py-3 shadow focus:outline-none focus:ring-4 focus:ring-[#FF7F3F] placeholder:text-[#FF7F3F] border-2 border-[#FFDCA9] transition-all duration-200 font-semibold pr-24 animate-slide-in-section"
+                    style={{ boxShadow: '0 2px 12px #FFDCA955', minWidth: '350px', maxWidth: '100%' }}
+                  />
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-4">
+                    <button
+                      type="button"
+                      onClick={handleMicClick}
+                      className={`bg-white shadow-lg border border-[#FFDCA9] rounded-full p-2 flex items-center justify-center focus:outline-none transition-all duration-200 hover:bg-[#FFF6E9] ${isListening ? 'animate-pulse' : ''}`}
+                      style={{ boxShadow: '0 2px 8px #FFDCA955' }}
+                      title="Speak"
+                    >
+                      <svg width="22" height="22" fill="none" stroke="#FF7F3F" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 3v10m0 0a4 4 0 0 0 4-4V7a4 4 0 0 0-8 0v2a4 4 0 0 0 4 4zm0 0v4m-4 0h8"/></svg>
+                    </button>
+                    <label htmlFor="image-upload" className="cursor-pointer flex items-center justify-center">
+                      <span className="bg-white shadow-lg border border-[#FFDCA9] rounded-full p-2 flex items-center justify-center transition-all duration-200 hover:bg-[#FFF6E9]" title="Upload Image" style={{ boxShadow: '0 2px 8px #FFDCA955' }}>
+                        <svg width="24" height="24" fill="none" stroke="#FF7F3F" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                      </span>
+                      <input
+                        id="image-upload"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                </div>
+                <button
+                  type="submit"
+                  disabled={isLoading || input.trim().length === 0}
+                  className={`rounded-full px-8 py-3 text-xl font-bold shadow-xl bg-gradient-to-r from-[#A5A6B2] to-[#FFDCA9] text-white transition-all duration-300 ${isLoading || input.trim().length === 0 ? 'bg-gray-400 cursor-not-allowed' : 'hover:scale-105 hover:bg-[#FF7F3F] focus:outline-none focus:ring-4 focus:ring-[#FF7F3F] animate-pulse-on-hover'}`}
+                  style={{ boxShadow: '0 2px 16px #A5A6B255', transition: 'transform 0.2s' }}
+                >
+                  {isLoading ? <Loader2 className="w-6 h-6 mr-2 animate-spin inline" /> : selectedMode === 'idea' ? 'Ask ChefAI' : 'Generate Recipe'}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {isLoading && (
+        <div className="fixed left-0 right-0 bottom-0 flex items-end justify-center z-50 pointer-events-none">
+          <div className="bg-white rounded-3xl shadow-2xl p-8 mb-12 max-w-xl w-full animate-fade-in-scale border border-[#FFDCA9] pointer-events-auto flex items-center justify-center transition-all duration-300">
+            <Loader2 className="w-6 h-6 mr-2 animate-spin text-[#FF7F3F]" /> <span className="text-[#FF7F3F] text-lg font-semibold">Generating...</span>
+          </div>
+        </div>
+      )}
+      <style>{`
         /* Background Blob Animations */
         @keyframes blob-animation-1 {
           0%, 100% { transform: translate(0, 0) scale(1); }
@@ -541,8 +474,7 @@ const ai = () => {
         }
         `}
             </style>
-        </>
-    )
+        </div>
+    );
 }
-
-export default ai
+export default Ai;

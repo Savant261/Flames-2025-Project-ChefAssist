@@ -214,7 +214,7 @@ const EditProfile = () => {
                                     Phone Number
                                 </label>
                                 <div className="flex">
-                                    <select
+                                    <select 
                                         id="countryCode"
                                         name="countryCode"
                                         className="px-3 py-3 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent"
