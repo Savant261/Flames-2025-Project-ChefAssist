@@ -1,4 +1,5 @@
 import RecipeCarousel from "../components/RecipeCarousel.jsx";
+import { useEffect } from "react";
 
 const Explore = () => {
   const sampleRecipes = [
@@ -137,7 +138,9 @@ const Explore = () => {
     r.badges.includes("Chef's Pick")
   );
   const fromFollowing = sampleRecipes.slice(0, 5); // Placeholder
-
+  useEffect(() => {
+      document.title = 'Home / ChefAssit';
+  }, []);
   return (
     <div className="bg-[var(--color-chef-cream)] dark:bg-gray-900 min-h-screen">
         {/* <Filter/> */}
