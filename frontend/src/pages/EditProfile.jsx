@@ -66,7 +66,7 @@ const EditProfile = () => {
                             <div className="relative group">
                                 <img
                                     id="profileImage"
-                                    src="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400"
+                                    src="Images/meera.webp"
                                     alt="Profile Picture"
                                     className="w-32 h-32 rounded-full border-4 border-chef-peach object-cover"
                                 />

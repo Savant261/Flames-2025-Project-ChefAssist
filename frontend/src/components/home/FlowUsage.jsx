@@ -8,7 +8,7 @@ const FlowUsage = () => {
                 <div className="flow-card  transform -translate-x-16 transition-all duration-700 bg-[#FFF8E7] rounded-3xl shadow-xl p-8 flex flex-col items-center text-center">
                     <div className="flex justify-between items-center w-full mb-4">
                         <span className="font-semibold text-lg text-[#FF6F61]">Prompt</span>
-                        <button className="text-[#FF6F61] font-bold text-lg">×</button>
+                        <button className="text-[#FF6F61] font-bold text-lg">X</button>
                     </div>
                     <textarea className="w-full rounded-xl border-2 border-[#FFDAB9] p-3 mb-3 text-[#D35400] bg-white resize-none" placeholder="Enter your ingredients.." rows="2"></textarea>
                     <button className="w-full py-3 rounded-xl bg-[#D35400] text-[#FFF8E7] font-bold shadow">Generate</button>
@@ -47,7 +47,7 @@ const FlowUsage = () => {
                         <span className="font-semibold text-lg text-[#FF6F61]">Re-Generate</span>
                         <button className="text-[#FF6F61] font-bold text-lg">⟳</button>
                     </div>
-                    <img src="./Images/image3.jpg" alt="Dish" className="rounded-2xl w-32 h-24 object-cover mx-auto mb-3 shadow" />
+                    <img src="../Images/image3.jpg" alt="Dish" className="rounded-2xl w-32 h-24 object-cover mx-auto mb-3 shadow" />
                     <h3 className="mt-6 text-lg font-bold text-[#D35400]">4. Cook, Save, or Share</h3>
                     <p className="mt-2 text-[#B35C00] text-sm">Get cooking, save your AI recipe, or share it with friends and family at the touch of a button!</p>
                 </div>

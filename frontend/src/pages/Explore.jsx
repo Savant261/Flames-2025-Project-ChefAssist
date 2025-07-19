@@ -12,7 +12,7 @@ const Explore = () => {
       rating: 4.8,
       reviews: 124,
       cookTime: "25 min",
-      difficulty: "Easy",
+      difficulty: "Medium",
       author: {
         name: "Chef Maria",
         avatar:
