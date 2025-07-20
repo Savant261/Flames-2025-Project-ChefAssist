@@ -1175,7 +1175,7 @@ const MyFeed = () => {
               alt={item.title}
               className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
             />
-            <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+            <div className="absolute inset-0  bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
               <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 space-x-4">
                 <button
                   onClick={() => handleLike(item.id, 'recipe')}
@@ -1358,7 +1358,8 @@ const MyFeed = () => {
             </button>
 
             {/* Individual Chef Cards */}
-            {mockChefs.map((chef) => (
+            {mockChefs.map((chef) => 
+            (
               <button
                 key={chef.id}
                 onClick={() => setSelectedChef(chef)}
@@ -1395,20 +1396,7 @@ const MyFeed = () => {
       <div className="sticky top-0 z-40 bg-white border-b border-orange-100 shadow-sm">
         <div className="px-6 py-4">
           <div className="flex items-center space-x-8">
-            <button
-              onClick={() => handleTabChange('all')}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 ${
-                activeTab === 'all'
-                  ? 'text-white shadow-lg'
-                  : 'text-gray-600 hover:text-orange-600 hover:bg-orange-50'
-              }`}
-              style={{ 
-                backgroundColor: activeTab === 'all' ? '#D97706' : 'transparent'
-              }}
-            >
-              <Grid3X3 size={20} />
-              <span>All Content</span>
-            </button>
+            
             
             <button
               onClick={() => handleTabChange('recipes')}
