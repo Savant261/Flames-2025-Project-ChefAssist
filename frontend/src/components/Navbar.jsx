@@ -78,7 +78,7 @@ const Navbar = ({ login, setLogin, setIsSideBarExpanded, theme, setTheme }) => {
                         <button className="hidden px-4 py-2 text-sm font-semibold text-white transition rounded-full sm:block bg-[#FF6F61] hover:bg-[#E55B4D]" onClick={() => navigate("/ai")}>
                             Cook With AI ✨
                         </button>
-                        <button className="p-2 rounded-full hover:bg-[#FFDAB9]/50">
+                        <button className="p-2 rounded-full hover:bg-[#FFDAB9]/50" onClick={()=> navigate("/recipe/create")}>
                             <PlusCircle className="w-6 h-6 text-[#D35400]" />
                         </button>
                         <button className="p-2 rounded-full hover:bg-[#FFDAB9]/50">
