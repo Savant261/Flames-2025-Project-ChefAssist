@@ -2,7 +2,7 @@ import React,{useEffect} from 'react';
 
 function Feedback() {
     useEffect(() => {
-      document.title = 'Feedback / ChefAssit';
+      document.title = 'Feedback / ChefAssist';
     }, []);
   return (
     <div className="flex items-center justify-center min-h-screen bg-[var(--color-chef-cream)] p-4">

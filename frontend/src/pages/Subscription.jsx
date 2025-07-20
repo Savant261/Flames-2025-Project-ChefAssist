@@ -2,7 +2,7 @@ import React,{useEffect} from 'react'
 
 const Subscription = () => {
    useEffect(() => {
-      document.title = 'Subscription / ChefAssit';
+      document.title = 'Subscription / ChefAssist';
     }, []);
     return (
         <>

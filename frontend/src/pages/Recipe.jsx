@@ -3,7 +3,7 @@ import React, { useState ,useEffect} from 'react'
 const Recipe = () => {
   const [showComments, setShowComments] = useState(false)
   useEffect(() => {
-    document.title = 'Recipe / ChefAssit';
+    document.title = 'Recipe / ChefAssist';
   }, []);
   return (
     <div className="min-h-screen bg-[var(--color-chef-cream)] flex flex-col">

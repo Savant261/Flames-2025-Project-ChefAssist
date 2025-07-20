@@ -393,7 +393,127 @@ const Explore = () => {
       reviews: 165,
       views: 27890,
       cookTime: '25 min'
+    },
+  
+    {
+      id: 25,
+      title: 'Truffle & Saffron Biryani',
+      image: 'https://images.unsplash.com/photo-1631515243349-e0cb75fb8d3a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      cuisine: 'Royal Indian',
+      author: {
+        name: 'Vikram Singh',
+        avatar: 'https://randomuser.me/api/portraits/men/66.jpg',
+        followers: 31200
+      },
+      badges: ['Luxury', 'Gourmet'],
+      isNew: true,
+      isTrending: true,
+      rating: 4.9,
+      reviews: 289,
+      views: 41200,
+      cookTime: '1 hr 15 min',
+      difficulty: 'Hard',
+      description: 'An opulent take on the classic biryani with black truffle shavings and premium saffron'
+    },
+    {
+      id: 26,
+      title: 'Foie Gras Samosa with Gold Leaf',
+      image: 'https://tse4.mm.bing.net/th/id/OIP.FQoAktiHgF9sgNiJ72HVbAHaE7?r=0&w=800&h=533&rs=1&pid=ImgDetMain&o=7&rm=3',
+      cuisine: 'Fusion',
+      author: {
+        name: 'Aisha Kapoor',
+        avatar: 'https://randomuser.me/api/portraits/women/68.jpg',
+        followers: 28700
+      },
+      badges: ["Gourmet","Chef's Pick"],
+      isNew: true,
+      isTrending: false,
+      rating: 4.9,
+      reviews: 312,
+      views: 38900,
+      cookTime: '45 min',
+      difficulty: 'Hard',
+      description: 'Deconstructed samosa with foie gras mousse, edible gold leaf, and truffle oil drizzle'
+    },
+    {
+      id: 27,
+      title: 'Wagyu Beef Vindaloo',
+      image: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      cuisine: 'Indo-Japanese',
+      author: {
+        name: 'Kenji Tanaka',
+        avatar: 'https://randomuser.me/api/portraits/men/72.jpg',
+        followers: 34200
+      },
+      badges: ['Luxury', 'Spicy'],
+      isNew: true,
+      isTrending: true,
+      rating: 4.9,
+      reviews: 298,
+      views: 42500,
+      cookTime: '2 hrs',
+      difficulty: 'Medium',
+      description: 'A5 Japanese Wagyu prepared with Goan vindaloo spices and aged vinegar'
+    },
+    {
+      id: 28,
+      title: 'Rogan Josh',
+      image: 'https://hips.hearstapps.com/hmg-prod/images/rogan-josh-main-1572547756.jpg?crop=1.00xw:0.670xh;0,0.163xh&resize=1120:*',
+      cuisine: 'Kashmiri',
+      author: {
+        name: 'Aarav Khan',
+        avatar: 'https://randomuser.me/api/portraits/men/75.jpg',
+        followers: 19800
+      },
+      badges: ["Spicy","Chef's Pick"],
+      isNew: true,
+      isTrending: false,
+      rating: 4.8,
+      reviews: 234,
+      views: 31200,
+      cookTime: '1 hr 30 min',
+      difficulty: 'Hard'
+    },
+    {
+      id: 29,
+      title: 'Truffle & Gold Leaf Kulfi',
+      image: 'https://img.freepik.com/premium-photo/truffle-topped-with-gold-leaf-delicious-truffle-dishes-photography_1295756-80275.jpg',
+      cuisine: 'Indian Dessert',
+      author: {
+        name: 'Zara Mehta',
+        avatar: 'https://randomuser.me/api/portraits/women/79.jpg',
+        followers: 26700
+      },
+      badges: ['Dessert', 'Luxury'],
+      isNew: true,
+      isTrending: true,
+      rating: 4.9,
+      reviews: 321,
+      views: 41200,
+      cookTime: '6 hrs',
+      difficulty: 'Medium',
+      description: 'Creamy saffron and cardamom kulfi with white truffle honey and 24k gold leaf'
+    },
+    {
+      id: 30,
+      title: 'Spanish Seafood Paella',
+      image: 'https://images.unsplash.com/photo-1559314809-0d155014e29e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
+      cuisine: 'Spanish',
+      author: {
+        name: 'Carlos Mendez',
+        avatar: 'https://randomuser.me/api/portraits/men/82.jpg',
+        followers: 22300
+      },
+      badges: ['Special Occasion', 'Seafood'],
+      isNew: true,
+      isTrending: true,
+      rating: 4.9,
+      reviews: 312,
+      views: 38900,
+      cookTime: '1 hr 20 min',
+      difficulty: 'Hard'
     }
+    
   ];
 
   const trendingRecipes = sampleRecipes.filter((r) => r.isTrending);
