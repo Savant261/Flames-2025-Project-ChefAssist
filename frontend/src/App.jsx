@@ -19,6 +19,7 @@ import MyFeed from "./pages/MyFeed.jsx";
 import SavedRecipes from "./pages/SavedRecipes.jsx";
 import Settings from "./pages/Settings.jsx";
 import CreateRecipe from "./pages/CreateRecipe.jsx";
+ 
 
 function App() {
   const [isSidebarExpanded, setIsSideBarExpanded] = useState(false);
@@ -64,6 +65,7 @@ function App() {
               <Route path="/myFeed" element={<MyFeed />} />
               <Route path="/savedRecipes" element={<SavedRecipes />} />
               <Route path="/settings/*" element={<Settings />} />
+              <Route path="/trending/*" element={<Trending />} />
             </Routes>
             <Footer />
           </main>
