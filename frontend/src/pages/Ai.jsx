@@ -216,7 +216,7 @@ const Ai = () => {
               <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
             </button>
             {showDropdown && (
-              <div className="absolute left-0 mt-2 w-max bg-white rounded-2xl shadow-2xl border border-[#FFDCA9] z-50 animate-fade-in-scale" style={{ minWidth: '220px' }}>
+              <div className="absolute left-0 mt-2 w-max bg-white rounded-2xl shadow-2xl border border-[#FFDCA9] z-50 animate-dropdown-fade-in-scale" style={{ minWidth: '220px' }}>
                 <div className="flex flex-col gap-1 p-4">
                   {restrictionsList.map(({ id, label, icon: Icon }, idx) => (
                     <button
@@ -487,6 +487,9 @@ const Ai = () => {
           to { opacity: 1; transform: scale(1); }
         }
         .animate-fade-in-scale { animation: fadeInScale 1.1s cubic-bezier(0.4,0,0.2,1) forwards; animation-delay: 0.1s; }
+        .animate-dropdown-fade-in-scale {
+          animation: dropdownFadeInScale 0.5s cubic-bezier(0.4,0,0.2,1) forwards;
+        }
 
         /* Section Entrance */
         @keyframes slideInSection {
