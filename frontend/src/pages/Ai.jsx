@@ -22,6 +22,40 @@ const modes = [
 ];
 
 const Ai = () => {
+  // Store all selected chats for scrollable middle section
+  const [activeChats, setActiveChats] = useState([]);
+
+  // When a history chat is selected, add it to activeChats
+  const handleSelectHistory = (idx) => {
+    const item = history[idx];
+    if (!item) return;
+    setInput(item.input);
+    setSelectedMode(item.mode);
+    setOutput(item.output);
+    setSelectedHistoryIdx(idx);
+    setShowHistory(false);
+    // Restrictions: convert label string back to ids
+    const restrictionLabels = item.restrictions.split(',').map(l => l.trim());
+    const restrictionIds = restrictionsList.filter(r => restrictionLabels.includes(r.label)).map(r => r.id);
+    setSelectedRestrictions(restrictionIds);
+    setActiveChats((prev) => {
+      // Avoid duplicates
+      if (prev.find(c => c.timestamp === item.timestamp)) return prev;
+      return [...prev, item];
+    });
+  };
+  // Helper to group history by day
+  const getHistoryByDay = () => {
+    const groups = {};
+    history.forEach((item, idx) => {
+      const date = new Date(item.timestamp);
+      const day = date.toLocaleDateString();
+      if (!groups[day]) groups[day] = [];
+      groups[day].push({ ...item, idx });
+    });
+    // Sort days descending (most recent first)
+    return Object.entries(groups).sort((a, b) => new Date(b[0]) - new Date(a[0]));
+  };
   // Speech recognition state
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = React.useRef(null);
@@ -79,6 +113,11 @@ const Ai = () => {
   const [output, setOutput] = useState('');
   const [history, setHistory] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  // Show/hide history side panel
+  const [showHistory, setShowHistory] = useState(false);
+  // Track selected history index for Gemini-style display
+  const [selectedHistoryIdx, setSelectedHistoryIdx] = useState(null);
+
 
   // Dropdown for restrictions
   const [showDropdown, setShowDropdown] = useState(false);
@@ -111,15 +150,18 @@ const Ai = () => {
         selectedMode === 'idea'
           ? `✨ Recipe Idea for: ${input || '...'}\nRestrictions: ${selectedRestrictions.map(r => restrictionsList.find(x => x.id === r)?.label).join(', ') || 'None'}`
           : `🍳 Recipe based on ingredients: ${input || '...'}\nRestrictions: ${selectedRestrictions.map(r => restrictionsList.find(x => x.id === r)?.label).join(', ') || 'None'}`;
-      setOutput(newOutput);
-      setHistory((prev) => [{
+      const newChat = {
         input,
         restrictions: selectedRestrictions.map(r => restrictionsList.find(x => x.id === r)?.label).join(', ') || 'None',
         mode: selectedMode,
         output: newOutput,
         timestamp: new Date().toLocaleString()
-      }, ...prev]);
+      };
+      setOutput(newOutput);
+      setHistory((prev) => [newChat, ...prev]);
+      setActiveChats((prev) => [...prev, newChat]);
       setIsLoading(false);
+      setInput(''); // Reset input after output
     }, 1200);
   };
 
@@ -132,15 +174,13 @@ const Ai = () => {
       {!output && (
         <div className="flex-1 flex flex-col items-center justify-center">
           <h1
-            className="text-5xl font-extrabold mb-2 animate-slide-in-top animate-fade-in-scale flex items-center"
+            className="text-5xl font-extrabold mb-2 animate-slide-in-top animate-fade-in-scale flex items-center justify-center w-full text-center"
             style={{
-              background: 'linear-gradient(90deg, #FFB86C 0%, #FF7F3F 50%, #FFDCA9 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              color: 'transparent',
-              textShadow: 'none',
+              color: '#C75C1F', // Darker orange for better visibility
+              textShadow: '0 2px 8px #FFDCA9',
               letterSpacing: '2px',
+              background: 'none',
+              marginTop: '56px',
             }}
           >
             <span
@@ -151,6 +191,7 @@ const Ai = () => {
                 textShadow: '0 2px 6px rgba(0,0,0,0.18)',
                 verticalAlign: 'middle',
                 transition: 'transform 0.3s',
+                color: '#C75C1F',
               }}
             >
               👨‍🍳
@@ -161,8 +202,9 @@ const Ai = () => {
       )}
 
       <div className="w-full max-w-6xl mx-auto flex flex-col items-center justify-center gap-8 mt-8">
-        {/* Restrictions dropdown menu at top left with ChefAssist colors */}
-        <div className="w-full flex flex-row items-center justify-start pt-2 pb-4 px-2" style={{ position: 'absolute', top: 0, left: 0, zIndex: 50 }}>
+        {/* Top bar with Restrictions icon (left) and History icon (right) */}
+        <div className="w-full flex flex-row items-center justify-between pt-2 pb-4 px-2" style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 50 }}>
+          {/* Restrictions Dropdown (left) */}
           <div className="relative">
             <button
               type="button"
@@ -196,62 +238,75 @@ const Ai = () => {
               </div>
             )}
           </div>
+          {/* History Icon (right) */}
+          <div className="relative">
+            <button
+              type="button"
+              className="flex items-center gap-2 px-6 py-3 rounded-full font-semibold shadow bg-gradient-to-r from-[#FF7F3F] to-[#FFDCA9] text-white hover:from-[#FFDCA9] hover:to-[#FF7F3F] transition-all duration-200 border-2 border-[#FFDCA9]"
+              title="History"
+              style={{ minWidth: '140px', boxShadow: '0 4px 16px #A5A6B255' }}
+              onClick={() => setShowHistory(true)}
+            >
+              <svg width="22" height="22" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 1 9 9"/><path d="M12 7v5l3 3"/></svg>
+              <span className="font-bold">History</span>
+            </button>
+          </div>
         </div>
 
-        {/* Output Area - Gemini style: centered, visually distinct */}
-        <div className="flex-1 flex flex-col items-center justify-center w-full">
-          {output && (
-            <div className="flex flex-col items-center w-full max-w-xl mx-auto animate-fade-in-scale animate-expand-card">
-              {/* User query pill on the right */}
-              <div className="w-full flex justify-end mb-4">
-                <div className="bg-[#A5A6B2] text-white px-6 py-3 rounded-full text-lg font-semibold shadow-lg max-w-xs text-right animate-fade-in-item" style={{ boxShadow: '0 2px 12px #A5A6B255' }}>
-                  {input}
-                </div>
-              </div>
-              {/* AI response card centered */}
-              <div className="bg-white/90 rounded-3xl shadow-2xl p-10 border border-[#FFDCA9] w-full backdrop-blur-lg" style={{ boxShadow: '0 8px 32px #FFDCA9AA' }}>
-                <div className="text-[#181A1B] whitespace-pre-line text-xl font-semibold tracking-wide mb-2">
-                  {output}
-                </div>
-                {/* Action buttons row (like Gemini) */}
-                <div className="flex gap-6 mt-8">
-                  <button className="text-[#FF7F3F] bg-white/80 hover:bg-[#FFDCA9] rounded-full px-4 py-2 font-semibold transition shadow animate-pulse-on-hover scale-100 hover:scale-110" style={{ transition: 'transform 0.2s' }}>👍</button>
-                  <button className="text-[#FF7F3F] bg-white/80 hover:bg-[#FFDCA9] rounded-full px-4 py-2 font-semibold transition shadow animate-pulse-on-hover scale-100 hover:scale-110" style={{ transition: 'transform 0.2s' }}>👎</button>
-                  <button className="text-[#FF7F3F] bg-white/80 hover:bg-[#FFDCA9] rounded-full px-4 py-2 font-semibold transition shadow animate-pulse-on-hover scale-100 hover:scale-110" style={{ transition: 'transform 0.2s' }}>🔗</button>
-                  <button className="text-[#FF7F3F] bg-white/80 hover:bg-[#FFDCA9] rounded-full px-4 py-2 font-semibold transition shadow animate-pulse-on-hover scale-100 hover:scale-110" style={{ transition: 'transform 0.2s' }}>📋</button>
-                </div>
-              </div>
-            </div>
-          )}
-          {/* History Section */}
-          {history.length > 0 && (
-            <div className="w-full max-w-2xl mx-auto mt-12 animate-fade-in-scale">
-              <h2 className="text-2xl font-bold text-[#FF7F3F] mb-4">History</h2>
-              <div className="flex flex-col gap-6 custom-scrollbar max-h-96 overflow-y-auto">
-                {history.map((item, idx) => (
-                  <div key={idx} className="bg-white/80 rounded-2xl shadow-lg p-6 border border-[#FFDCA9]">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-[#A5A6B2] text-sm font-semibold">{item.timestamp}</span>
-                      <span className="text-[#FF7F3F] text-xs font-bold px-3 py-1 rounded-full bg-[#FFDCA9]/60">{item.mode === 'idea' ? 'Idea' : 'Ingredients'}</span>
-                    </div>
-                    <div className="text-lg font-semibold text-[#181A1B] mb-1">{item.input}</div>
-                    <div className="text-sm text-[#FF7F3F] mb-2">Restrictions: {item.restrictions}</div>
-                    <div className="whitespace-pre-line text-[#181A1B] mb-2">{item.output}</div>
-                    <div className="flex gap-2 mt-2">
-                      <button
-                        className={`text-[#FF7F3F] bg-white/80 hover:bg-[#FFF6E9] rounded-full px-4 py-2 font-semibold transition shadow animate-pulse-on-hover border border-[#FFDCA9] flex items-center gap-2`}
-                        onClick={() => handleCopyHistory(item.output, idx)}
-                      >
-                        📋 {copiedIdx === idx ? <span className="text-xs text-[#A5A6B2]">Copied!</span> : <span className="text-xs">Copy</span>}
-                      </button>
+        {/* Output Area - Gemini style: centered, visually distinct - moved higher up and sized for marked area */}
+        <div className="w-full flex flex-col items-center justify-center" style={{ marginTop: '16px', marginBottom: '0', minHeight: '180px', height: '180px' }}>
+          <div className="w-full max-w-xl mx-auto flex flex-col gap-8" style={{ height: '100%', minHeight: '120px', display: 'flex', justifyContent: 'flex-end' }}>
+            <div className="flex-1 overflow-y-auto flex flex-col gap-8 custom-scrollbar" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
+              {/* Render all active chats in scrollable middle section */}
+              {activeChats.map((chat, idx) => (
+                <div key={chat.timestamp} className="flex flex-col items-center w-full animate-fade-in-scale animate-expand-card">
+                  {/* User query pill on the right */}
+                  <div className="w-full flex justify-end mb-4">
+                    <div className="bg-[#A5A6B2] text-white px-6 py-3 rounded-full text-lg font-semibold shadow-lg max-w-xs text-right animate-fade-in-item" style={{ boxShadow: '0 2px 12px #A5A6B255' }}>
+                      {chat.input}
                     </div>
                   </div>
-                ))}
-              </div>
+                  {/* AI response card centered */}
+                  <div className={`bg-white/90 rounded-3xl shadow-2xl p-10 border border-[#FFDCA9] w-full backdrop-blur-lg`} style={{ boxShadow: '0 8px 32px #FFDCA9AA', transition: 'transform 0.2s' }}>
+                    <div className="text-[#181A1B] whitespace-pre-line text-xl font-semibold tracking-wide mb-2">
+                      {chat.output}
+                    </div>
+                    {/* Action buttons row (like Gemini) */}
+                    <div className="flex gap-6 mt-8">
+                      <button className="text-[#FF7F3F] bg-white/80 hover:bg-[#FFDCA9] rounded-full px-4 py-2 font-semibold transition shadow animate-pulse-on-hover scale-100 hover:scale-110" style={{ transition: 'transform 0.2s' }}>👍</button>
+                      <button className="text-[#FF7F3F] bg-white/80 hover:bg-[#FFDCA9] rounded-full px-4 py-2 font-semibold transition shadow animate-pulse-on-hover scale-100 hover:scale-110" style={{ transition: 'transform 0.2s' }}>👎</button>
+                      <button className="text-[#FF7F3F] bg-white/80 hover:bg-[#FFDCA9] rounded-full px-4 py-2 font-semibold transition shadow animate-pulse-on-hover scale-100 hover:scale-110" style={{ transition: 'transform 0.2s' }}>🔗</button>
+                      <button className="text-[#FF7F3F] bg-white/80 hover:bg-[#FFDCA9] rounded-full px-4 py-2 font-semibold transition shadow animate-pulse-on-hover scale-100 hover:scale-110" style={{ transition: 'transform 0.2s' }}>📋</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {/* If no active chats, show current output as default */}
+              {activeChats.length === 0 && output && (
+                <div className="flex flex-col items-center w-full animate-fade-in-scale animate-expand-card">
+                  <div className="w-full flex justify-end mb-4">
+                    <div className="bg-[#A5A6B2] text-white px-6 py-3 rounded-full text-lg font-semibold shadow-lg max-w-xs text-right animate-fade-in-item" style={{ boxShadow: '0 2px 12px #A5A6B255' }}>
+                      {input}
+                    </div>
+                  </div>
+                  <div className={`bg-white/90 rounded-3xl shadow-2xl p-10 border border-[#FFDCA9] w-full backdrop-blur-lg`} style={{ boxShadow: '0 8px 32px #FFDCA9AA', transition: 'transform 0.2s' }}>
+                    <div className="text-[#181A1B] whitespace-pre-line text-xl font-semibold tracking-wide mb-2">
+                      {output}
+                    </div>
+                    <div className="flex gap-6 mt-8">
+                      <button className="text-[#FF7F3F] bg-white/80 hover:bg-[#FFDCA9] rounded-full px-4 py-2 font-semibold transition shadow animate-pulse-on-hover scale-100 hover:scale-110" style={{ transition: 'transform 0.2s' }}>👍</button>
+                      <button className="text-[#FF7F3F] bg-white/80 hover:bg-[#FFDCA9] rounded-full px-4 py-2 font-semibold transition shadow animate-pulse-on-hover scale-100 hover:scale-110" style={{ transition: 'transform 0.2s' }}>👎</button>
+                      <button className="text-[#FF7F3F] bg-white/80 hover:bg-[#FFDCA9] rounded-full px-4 py-2 font-semibold transition shadow animate-pulse-on-hover scale-100 hover:scale-110" style={{ transition: 'transform 0.2s' }}>🔗</button>
+                      <button className="text-[#FF7F3F] bg-white/80 hover:bg-[#FFDCA9] rounded-full px-4 py-2 font-semibold transition shadow animate-pulse-on-hover scale-100 hover:scale-110" style={{ transition: 'transform 0.2s' }}>📋</button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
+          </div>
+          {/* History Section removed as per request */}
           {/* Centered, smaller search bar below output */}
-          <div className={`w-full flex flex-col items-center justify-center ${output ? 'mt-32' : 'mt-16'} transition-all duration-700`}>
+          <div className={`w-full flex flex-col items-center justify-center mt-4 transition-all duration-700`}>
             <div className="w-full max-w-3xl mx-auto bg-gradient-to-br from-white/80 via-[#FFDCA9]/80 to-[#FF7F3F]/30 backdrop-blur-lg shadow-2xl p-6 flex flex-col items-center gap-6 rounded-3xl transition-all duration-300 border border-[#FFDCA9]" style={{ boxShadow: '0 8px 32px #FFDCA9AA' }}>
               {/* Mode toggle pills */}
               <div className="flex flex-row gap-4 mb-2">
@@ -317,6 +372,7 @@ const Ai = () => {
             </div>
           </div>
         </div>
+
       </div>
 
       {isLoading && (
@@ -326,7 +382,71 @@ const Ai = () => {
           </div>
         </div>
       )}
+      {/* History Side Panel */}
+      {showHistory && (
+        <div className="fixed top-0 right-0 h-full w-[420px] bg-white shadow-2xl border-l border-[#FFDCA9] z-[100] animate-slide-in-right flex flex-col" style={{ boxShadow: '0 0 32px #FFDCA9AA', transition: 'transform 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.5s cubic-bezier(0.4,0,0.2,1)' }}>
+          <div className="flex items-center justify-between px-6 py-5 border-b border-[#FFDCA9] bg-gradient-to-r from-[#FFDCA9] to-[#FFF6E9]">
+            <span className="text-2xl font-bold text-[#FF7F3F]">History</span>
+            <button
+              className="text-[#FF7F3F] bg-white rounded-full p-2 shadow hover:bg-[#FFDCA9] transition"
+              title="Close"
+              onClick={() => setShowHistory(false)}
+            >
+              <svg width="24" height="24" fill="none" stroke="#FF7F3F" strokeWidth="2" viewBox="0 0 24 24"><path d="M6 6l12 12M6 18L18 6"/></svg>
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto custom-scrollbar px-6 py-4">
+            {history.length === 0 ? (
+              <div className="text-[#A5A6B2] text-lg font-semibold mt-12 text-center">No history yet.</div>
+            ) : (
+              <div className="flex flex-col gap-8">
+                {getHistoryByDay().map(([day, items]) => (
+                  <div key={day}>
+                    <div className="text-lg font-bold text-[#A5A6B2] mb-2">{day === new Date().toLocaleDateString() ? 'Today' : day}</div>
+                    <div className="flex flex-col gap-4">
+                      {items.map((item, i) => (
+                        <div
+                          key={item.idx}
+                          className={`bg-[#FFF6E9] border border-[#FFDCA9] rounded-2xl shadow p-4 animate-fade-in-item cursor-pointer ${selectedHistoryIdx === item.idx ? 'ring-4 ring-[#FF7F3F] scale-105' : ''}`}
+                          style={{ animationDelay: `${i * 0.03}s` }}
+                          onClick={() => handleSelectHistory(item.idx)}
+                          title="Show this chat"
+                        >
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-[#FF7F3F] font-bold">{item.mode === 'idea' ? 'Recipe Idea' : 'Recipe'}</span>
+                            <span className="text-xs text-[#A5A6B2]">{item.timestamp}</span>
+                          </div>
+                          <div className="text-[#181A1B] font-semibold mb-1">{item.input}</div>
+                          <div className="text-sm text-[#A5A6B2] mb-2">Restrictions: {item.restrictions}</div>
+                          <div className="bg-white rounded-xl p-3 text-[#181A1B] whitespace-pre-line text-base mb-2 border border-[#FFDCA9]">{item.output}</div>
+                          <div className="flex gap-2">
+                            <button
+                              className={`text-[#FF7F3F] bg-white rounded-full px-3 py-1 font-semibold shadow hover:bg-[#FFDCA9] transition ${copiedIdx === item.idx ? 'animate-pulse' : ''}`}
+                              onClick={(e) => { e.stopPropagation(); handleCopyHistory(item.output, item.idx); }}
+                              title="Copy to clipboard"
+                            >
+                              {copiedIdx === item.idx ? 'Copied!' : '📋 Copy'}
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
       <style>{`
+        /* Slide-in animation for history side panel */
+        @keyframes slideInRight {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        .animate-slide-in-right {
+          animation: slideInRight 0.5s cubic-bezier(0.4,0,0.2,1) forwards;
+        }
         /* Background Blob Animations */
         @keyframes blob-animation-1 {
           0%, 100% { transform: translate(0, 0) scale(1); }
@@ -366,7 +486,7 @@ const Ai = () => {
           from { opacity: 0; transform: scale(0.98); }
           to { opacity: 1; transform: scale(1); }
         }
-        .animate-fade-in-scale { animation: fadeInScale 0.7s ease-out forwards; animation-delay: 0.2s; }
+        .animate-fade-in-scale { animation: fadeInScale 1.1s cubic-bezier(0.4,0,0.2,1) forwards; animation-delay: 0.1s; }
 
         /* Section Entrance */
         @keyframes slideInSection {
@@ -377,10 +497,11 @@ const Ai = () => {
 
         /* Item Fade In (for checkboxes and history items) */
         @keyframes fadeInItem {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
+          0% { opacity: 0; transform: translateY(18px); }
+          60% { opacity: 0.7; transform: translateY(4px); }
+          100% { opacity: 1; transform: translateY(0); }
         }
-        .animate-fade-in-item { animation: fadeInItem 0.4s ease-out forwards; opacity: 0; }
+        .animate-fade-in-item { animation: fadeInItem 0.7s cubic-bezier(0.4,0,0.2,1) forwards; opacity: 0; }
 
         /* Footer Entrance */
         @keyframes slideInFromBottom {
@@ -415,6 +536,9 @@ const Ai = () => {
         }
 
         /* Custom Scrollbar for History */
+        .custom-scrollbar {
+          scroll-behavior: smooth;
+        }
         .custom-scrollbar::-webkit-scrollbar {
           width: 8px;
         }
@@ -425,6 +549,7 @@ const Ai = () => {
         .custom-scrollbar::-webkit-scrollbar-thumb {
           background: #bdbdbd; /* Lighter thumb */
           border-radius: 10px;
+          transition: background 0.3s;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: #9e9e9e; /* Darker thumb on hover */
@@ -455,8 +580,9 @@ const Ai = () => {
         .animate-expand-card { animation: expandCard 0.4s ease-in; }
         .animate-collapse-card { animation: collapseCard 0.4s ease-out; }
         @keyframes expandCard {
-          from { transform: scale(0.98); opacity: 0.7; }
-          to { transform: scale(1); opacity: 1; }
+          0% { transform: scale(0.98) translateY(20px); opacity: 0.7; }
+          60% { transform: scale(1.01) translateY(0); opacity: 0.95; }
+          100% { transform: scale(1) translateY(0); opacity: 1; }
         }
         @keyframes collapseCard {
           from { transform: scale(1); opacity: 1; }
