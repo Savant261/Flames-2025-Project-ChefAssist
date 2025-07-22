@@ -201,7 +201,127 @@ const Ai = () => {
         </div>
       )}
 
-      <div className="w-full max-w-6xl mx-auto flex flex-col items-center justify-center gap-8 mt-8">
+      {/* Output Area above Input Bar */}
+      <div className="w-full flex flex-col items-center justify-end flex-1" style={{ minHeight: 'calc(100vh - 220px)' }}>
+        {/* Output Area - Gemini style: centered, visually distinct - larger for 2+ outputs */}
+        <div className="w-full max-w-xl mx-auto flex flex-col gap-8 justify-end" style={{ width: '100%', display: 'flex', justifyContent: 'flex-end', paddingTop: '12px', paddingBottom: '12px', minHeight: '320px', maxHeight: '420px', overflowY: 'auto' }}>
+          <div className="flex-1 flex flex-col gap-8 custom-scrollbar" style={{ maxHeight: '380px' }}>
+            {/* Render all active chats in scrollable middle section */}
+            {activeChats.map((chat, idx) => (
+              <div key={chat.timestamp} className="flex flex-col items-center w-full animate-fade-in-scale animate-expand-card">
+                {/* User query pill on the right */}
+                <div className="w-full flex justify-end mb-4">
+                  <div className="bg-[#A5A6B2] text-white px-6 py-3 rounded-full text-lg font-semibold shadow-lg max-w-xs text-right animate-fade-in-item" style={{ boxShadow: '0 2px 12px #A5A6B255' }}>
+                    {chat.input}
+                  </div>
+                </div>
+                {/* AI response card centered */}
+                <div className={`bg-white/90 rounded-3xl shadow-2xl p-10 border border-[#FFDCA9] w-full backdrop-blur-lg`} style={{ boxShadow: '0 8px 32px #FFDCA9AA', transition: 'transform 0.2s' }}>
+                  <div className="text-[#181A1B] whitespace-pre-line text-xl font-semibold tracking-wide mb-2">
+                    {chat.output}
+                  </div>
+                  {/* Action buttons row (like Gemini) */}
+                  <div className="flex gap-6 mt-8">
+                    <button className="text-[#FF7F3F] bg-white/80 hover:bg-[#FFDCA9] rounded-full px-4 py-2 font-semibold transition shadow animate-pulse-on-hover scale-100 hover:scale-110" style={{ transition: 'transform 0.2s' }}>👍</button>
+                    <button className="text-[#FF7F3F] bg-white/80 hover:bg-[#FFDCA9] rounded-full px-4 py-2 font-semibold transition shadow animate-pulse-on-hover scale-100 hover:scale-110" style={{ transition: 'transform 0.2s' }}>👎</button>
+                    <button className="text-[#FF7F3F] bg-white/80 hover:bg-[#FFDCA9] rounded-full px-4 py-2 font-semibold transition shadow animate-pulse-on-hover scale-100 hover:scale-110" style={{ transition: 'transform 0.2s' }}>🔗</button>
+                    <button className="text-[#FF7F3F] bg-white/80 hover:bg-[#FFDCA9] rounded-full px-4 py-2 font-semibold transition shadow animate-pulse-on-hover scale-100 hover:scale-110" style={{ transition: 'transform 0.2s' }}>📋</button>
+                  </div>
+                </div>
+              </div>
+            ))}
+            {/* If no active chats, show current output as default */}
+            {activeChats.length === 0 && output && (
+              <div className="flex flex-col items-center w-full animate-fade-in-scale animate-expand-card">
+                <div className="w-full flex justify-end mb-4">
+                  <div className="bg-[#A5A6B2] text-white px-6 py-3 rounded-full text-lg font-semibold shadow-lg max-w-xs text-right animate-fade-in-item" style={{ boxShadow: '0 2px 12px #A5A6B255' }}>
+                    {input}
+                  </div>
+                </div>
+                <div className={`bg-white/90 rounded-3xl shadow-2xl p-10 border border-[#FFDCA9] w-full backdrop-blur-lg`} style={{ boxShadow: '0 8px 32px #FFDCA9AA', transition: 'transform 0.2s' }}>
+                  <div className="text-[#181A1B] whitespace-pre-line text-xl font-semibold tracking-wide mb-2">
+                    {output}
+                  </div>
+                  <div className="flex gap-6 mt-8">
+                    <button className="text-[#FF7F3F] bg-white/80 hover:bg-[#FFDCA9] rounded-full px-4 py-2 font-semibold transition shadow animate-pulse-on-hover scale-100 hover:scale-110" style={{ transition: 'transform 0.2s' }}>👍</button>
+                    <button className="text-[#FF7F3F] bg-white/80 hover:bg-[#FFDCA9] rounded-full px-4 py-2 font-semibold transition shadow animate-pulse-on-hover scale-100 hover:scale-110" style={{ transition: 'transform 0.2s' }}>👎</button>
+                    <button className="text-[#FF7F3F] bg-white/80 hover:bg-[#FFDCA9] rounded-full px-4 py-2 font-semibold transition shadow animate-pulse-on-hover scale-100 hover:scale-110" style={{ transition: 'transform 0.2s' }}>🔗</button>
+                    <button className="text-[#FF7F3F] bg-white/80 hover:bg-[#FFDCA9] rounded-full px-4 py-2 font-semibold transition shadow animate-pulse-on-hover scale-100 hover:scale-110" style={{ transition: 'transform 0.2s' }}>📋</button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+        {/* Input Bar at the bottom of the main content */}
+        <div className="w-full flex flex-col items-center justify-center z-30 mt-4 mb-0" style={{ paddingBottom: '0' }}>
+          <div className="w-full max-w-3xl mx-auto bg-gradient-to-br from-white/80 via-[#FFDCA9]/80 to-[#FF7F3F]/30 backdrop-blur-lg shadow-2xl p-6 flex flex-col items-center gap-6 rounded-3xl transition-all duration-300 border border-[#FFDCA9]" style={{ boxShadow: '0 8px 32px #FFDCA9AA' }}>
+            {/* Mode toggle pills */}
+            <div className="flex flex-row gap-4 mb-2">
+              {modes.map(({ id, label }, idx) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setSelectedMode(id)}
+                  className={`px-6 py-3 rounded-full font-semibold text-lg shadow border-2 transition-all duration-200
+                    ${selectedMode === id
+                      ? 'bg-gradient-to-r from-[#FF7F3F] to-[#FFDCA9] text-white border-[#FFDCA9] scale-105'
+                      : 'bg-white/80 text-[#FF7F3F] border-[#FFDCA9] hover:bg-[#FFF6E9]'}
+                  animate-fade-in-item`}
+                  style={{ animationDelay: `${idx * 0.05}s`, boxShadow: selectedMode === id ? '0 4px 16px #FF7F3F55' : '0 2px 8px #FFDCA955' }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+            <form className="w-full flex flex-row items-center gap-4" onSubmit={handleSubmit}>
+              <div className="relative flex-1 flex items-center">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={handleInputChange}
+                  placeholder={selectedMode === 'idea' ? 'Search for recipes, ideas, or ingredients...' : 'Enter ingredients (e.g. chicken, tomato, cheese)'}
+                  className="w-full rounded-full bg-white/90 text-[#FF7F3F] text-xl px-12 py-3 shadow focus:outline-none focus:ring-4 focus:ring-[#FF7F3F] placeholder:text-[#FF7F3F] border-2 border-[#FFDCA9] transition-all duration-200 font-semibold pr-24 animate-slide-in-section"
+                  style={{ boxShadow: '0 2px 12px #FFDCA955', minWidth: '350px', maxWidth: '100%' }}
+                />
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-4">
+                  <button
+                    type="button"
+                    onClick={handleMicClick}
+                    className={`bg-white shadow-lg border border-[#FFDCA9] rounded-full p-2 flex items-center justify-center focus:outline-none transition-all duration-200 hover:bg-[#FFF6E9] ${isListening ? 'animate-pulse' : ''}`}
+                    style={{ boxShadow: '0 2px 8px #FFDCA955' }}
+                    title="Speak"
+                  >
+                    <svg width="22" height="22" fill="none" stroke="#FF7F3F" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 3v10m0 0a4 4 0 0 0 4-4V7a4 4 0 0 0-8 0v2a4 4 0 0 0 4 4zm0 0v4m-4 0h8"/></svg>
+                  </button>
+                  <label htmlFor="image-upload" className="cursor-pointer flex items-center justify-center">
+                    <span className="bg-white shadow-lg border border-[#FFDCA9] rounded-full p-2 flex items-center justify-center transition-all duration-200 hover:bg-[#FFF6E9]" title="Upload Image" style={{ boxShadow: '0 2px 8px #FFDCA955' }}>
+                      <svg width="24" height="24" fill="none" stroke="#FF7F3F" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                    </span>
+                    <input
+                      id="image-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+              </div>
+              <button
+                type="submit"
+                disabled={isLoading || input.trim().length === 0}
+                className={`rounded-full px-8 py-3 text-xl font-bold shadow-xl bg-gradient-to-r from-[#A5A6B2] to-[#FFDCA9] text-white transition-all duration-300 ${isLoading || input.trim().length === 0 ? 'bg-gray-400 cursor-not-allowed' : 'hover:scale-105 hover:bg-[#FF7F3F] focus:outline-none focus:ring-4 focus:ring-[#FF7F3F] animate-pulse-on-hover'}`}
+                style={{ boxShadow: '0 2px 16px #A5A6B255', transition: 'transform 0.2s' }}
+              >
+                {isLoading ? <Loader2 className="w-6 h-6 mr-2 animate-spin inline" /> : selectedMode === 'idea' ? 'Ask ChefAI' : 'Generate Recipe'}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div className="w-full max-w-6xl mx-auto flex flex-col items-center justify-center gap-8 mt-8 flex-1" style={{ minHeight: 'calc(100vh - 220px)' }}>
         {/* Top bar with Restrictions icon (left) and History icon (right) */}
         <div className="w-full flex flex-row items-center justify-between pt-2 pb-4 px-2" style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 50 }}>
           {/* Restrictions Dropdown (left) */}
@@ -253,10 +373,10 @@ const Ai = () => {
           </div>
         </div>
 
-        {/* Output Area - Gemini style: centered, visually distinct - moved higher up and sized for marked area */}
-        <div className="w-full flex flex-col items-center justify-center" style={{ marginTop: '16px', marginBottom: '0', minHeight: '180px', height: '180px' }}>
-          <div className="w-full max-w-xl mx-auto flex flex-col gap-8" style={{ height: '100%', minHeight: '120px', display: 'flex', justifyContent: 'flex-end' }}>
-            <div className="flex-1 overflow-y-auto flex flex-col gap-8 custom-scrollbar" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
+        {/* Output Area - Gemini style: centered, visually distinct - larger for 2+ outputs */}
+        <div className="w-full flex flex-col items-center justify-center flex-1" style={{ marginTop: '16px', marginBottom: '0', minHeight: '320px', height: '420px', justifyContent: 'center' }}>
+          <div className="w-full max-w-xl mx-auto flex flex-col gap-8 justify-center" style={{ width: '100%', display: 'flex', justifyContent: 'center', paddingTop: '12px', paddingBottom: '12px', height: '400px', minHeight: '320px' }}>
+            <div className="flex-1 overflow-y-auto flex flex-col gap-8 custom-scrollbar" style={{ maxHeight: '380px' }}>
               {/* Render all active chats in scrollable middle section */}
               {activeChats.map((chat, idx) => (
                 <div key={chat.timestamp} className="flex flex-col items-center w-full animate-fade-in-scale animate-expand-card">
@@ -305,72 +425,6 @@ const Ai = () => {
             </div>
           </div>
           {/* History Section removed as per request */}
-          {/* Centered, smaller search bar below output */}
-          <div className={`w-full flex flex-col items-center justify-center mt-4 transition-all duration-700`}>
-            <div className="w-full max-w-3xl mx-auto bg-gradient-to-br from-white/80 via-[#FFDCA9]/80 to-[#FF7F3F]/30 backdrop-blur-lg shadow-2xl p-6 flex flex-col items-center gap-6 rounded-3xl transition-all duration-300 border border-[#FFDCA9]" style={{ boxShadow: '0 8px 32px #FFDCA9AA' }}>
-              {/* Mode toggle pills */}
-              <div className="flex flex-row gap-4 mb-2">
-                {modes.map(({ id, label }, idx) => (
-                  <button
-                    key={id}
-                    type="button"
-                    onClick={() => setSelectedMode(id)}
-                    className={`px-6 py-3 rounded-full font-semibold text-lg shadow border-2 transition-all duration-200
-                      ${selectedMode === id
-                        ? 'bg-gradient-to-r from-[#FF7F3F] to-[#FFDCA9] text-white border-[#FFDCA9] scale-105'
-                        : 'bg-white/80 text-[#FF7F3F] border-[#FFDCA9] hover:bg-[#FFF6E9]'}
-                    animate-fade-in-item`}
-                    style={{ animationDelay: `${idx * 0.05}s`, boxShadow: selectedMode === id ? '0 4px 16px #FF7F3F55' : '0 2px 8px #FFDCA955' }}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-              <form className="w-full flex flex-row items-center gap-4" onSubmit={handleSubmit}>
-                <div className="relative flex-1 flex items-center">
-                  <input
-                    type="text"
-                    value={input}
-                    onChange={handleInputChange}
-                    placeholder={selectedMode === 'idea' ? 'Search for recipes, ideas, or ingredients...' : 'Enter ingredients (e.g. chicken, tomato, cheese)'}
-                    className="w-full rounded-full bg-white/90 text-[#FF7F3F] text-xl px-12 py-3 shadow focus:outline-none focus:ring-4 focus:ring-[#FF7F3F] placeholder:text-[#FF7F3F] border-2 border-[#FFDCA9] transition-all duration-200 font-semibold pr-24 animate-slide-in-section"
-                    style={{ boxShadow: '0 2px 12px #FFDCA955', minWidth: '350px', maxWidth: '100%' }}
-                  />
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-4">
-                    <button
-                      type="button"
-                      onClick={handleMicClick}
-                      className={`bg-white shadow-lg border border-[#FFDCA9] rounded-full p-2 flex items-center justify-center focus:outline-none transition-all duration-200 hover:bg-[#FFF6E9] ${isListening ? 'animate-pulse' : ''}`}
-                      style={{ boxShadow: '0 2px 8px #FFDCA955' }}
-                      title="Speak"
-                    >
-                      <svg width="22" height="22" fill="none" stroke="#FF7F3F" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 3v10m0 0a4 4 0 0 0 4-4V7a4 4 0 0 0-8 0v2a4 4 0 0 0 4 4zm0 0v4m-4 0h8"/></svg>
-                    </button>
-                    <label htmlFor="image-upload" className="cursor-pointer flex items-center justify-center">
-                      <span className="bg-white shadow-lg border border-[#FFDCA9] rounded-full p-2 flex items-center justify-center transition-all duration-200 hover:bg-[#FFF6E9]" title="Upload Image" style={{ boxShadow: '0 2px 8px #FFDCA955' }}>
-                        <svg width="24" height="24" fill="none" stroke="#FF7F3F" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-                      </span>
-                      <input
-                        id="image-upload"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="hidden"
-                      />
-                    </label>
-                  </div>
-                </div>
-                <button
-                  type="submit"
-                  disabled={isLoading || input.trim().length === 0}
-                  className={`rounded-full px-8 py-3 text-xl font-bold shadow-xl bg-gradient-to-r from-[#A5A6B2] to-[#FFDCA9] text-white transition-all duration-300 ${isLoading || input.trim().length === 0 ? 'bg-gray-400 cursor-not-allowed' : 'hover:scale-105 hover:bg-[#FF7F3F] focus:outline-none focus:ring-4 focus:ring-[#FF7F3F] animate-pulse-on-hover'}`}
-                  style={{ boxShadow: '0 2px 16px #A5A6B255', transition: 'transform 0.2s' }}
-                >
-                  {isLoading ? <Loader2 className="w-6 h-6 mr-2 animate-spin inline" /> : selectedMode === 'idea' ? 'Ask ChefAI' : 'Generate Recipe'}
-                </button>
-              </form>
-            </div>
-          </div>
         </div>
 
       </div>
