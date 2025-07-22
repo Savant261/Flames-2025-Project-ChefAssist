@@ -84,7 +84,7 @@ const mockRecipes = [
     type: 'recipe',
     chef: mockChefs[0],
     title: 'Perfect Beef Wellington',
-    image: 'https://images.unsplash.com/photo-1600891964098-1c7a17f342c3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+    image: 'https://i.pinimg.com/originals/13/ad/c9/13adc9200e47b425ad80a426ecb2bfab.jpg',
     cookingTime: '2h 30m',
     difficulty: 'Expert',
     likes: 1847,
@@ -309,7 +309,7 @@ const mockRecipes = [
     type: 'recipe',
     chef: mockChefs[0],
     title: 'Gordon\'s Scrambled Eggs',
-    image: 'https://images.pexels.com/photos/1721932/pexels-photo-1721932.jpeg?auto=compress&cs=tinysrgb&w=800',
+    image: 'https://pixel.nymag.com/imgs/daily/grub/2017/08/03/03-gordon-ramsay-scrambled-eggs.jpg',
     cookingTime: '10m',
     difficulty: 'Beginner',
     likes: 4567,
@@ -429,7 +429,7 @@ const mockRecipes = [
     type: 'recipe',
     chef: mockChefs[0],
     title: 'Gordon\'s Fish Tacos',
-    image: 'https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=800',
+    image: 'https://img.freepik.com/free-photo/delicious-tacos-table_23-2150770547.jpg',
     cookingTime: '30m',
     difficulty: 'Intermediate',
     likes: 2234,
@@ -1173,7 +1173,7 @@ const MyFeed = () => {
             <img
               src={item.image}
               alt={item.title}
-              className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+              className="w-full  h-48 object-cover transition-transform duration-300 group-hover:scale-105"
             />
             <div className="absolute inset-0  bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
               <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 space-x-4">
