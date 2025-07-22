@@ -19,12 +19,17 @@ import MyFeed from "./pages/MyFeed.jsx";
 import SavedRecipes from "./pages/SavedRecipes.jsx";
 import Settings from "./pages/Settings.jsx";
 import CreateRecipe from "./pages/CreateRecipe.jsx";
- 
+import api from "./api/axiosInstance.js"
 
 function App() {
   const [isSidebarExpanded, setIsSideBarExpanded] = useState(false);
-  const [login, setLogin] = useState(true);
+  const [login, setLogin] = useState(false);
   const [theme, setTheme] = useState("light");
+  const [userData,setUserData] = useState({
+    avatar:"",
+    username:"",
+    email:"",
+  });
 
   useEffect(() => {
     if (theme === "dark") {
@@ -32,9 +37,22 @@ function App() {
     } else {
       document.documentElement.classList.remove("dark");
     }
-    console.log(theme);
   }, [theme]);
-
+  useEffect(() => {
+    const check = async ()=>{
+      try {
+        const response = await api.get("/auth/check");
+        if(response){
+          setLogin(true)
+          setUserData(response.data)
+        } 
+        else setLogin(false);
+      } catch (error) {
+        console.log("Error in check Function in app.jsx",error)
+      }
+    }
+    check();
+  }, []);
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar
@@ -43,6 +61,7 @@ function App() {
         setLogin={setLogin}
         theme={theme}
         setTheme={setTheme}
+        userData={userData}
       />
       <div className="flex flex-1 overflow-hidden">
         <SideBar isSidebarExpanded={isSidebarExpanded} login={login} />

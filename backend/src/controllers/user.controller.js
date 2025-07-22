@@ -1,4 +1,4 @@
-import { User } from "../models/user.models.js";
+import { User } from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../utils/utils.js";
 
@@ -76,4 +76,13 @@ const logout = async (req, res) => {
   }
 };
 
-export { signup, singin, logout };
+const chechAuth = async (req, res) => {
+  try {
+    return res.status(200).json(req.user);
+  } catch (error) {
+    console.log("Error in checkAuth controller", error.message);
+    return res.status(200).json({ message: "Internal Server Error" });
+  }
+};
+
+export { signup, singin, logout, chechAuth };

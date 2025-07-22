@@ -1,11 +1,17 @@
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { Settings, User, LayoutDashboard, LogOut, Star, Sun, Moon } from 'lucide-react';
-const profilePopUp = ({ setLogin, theme, setTheme }) => {
+import api from "../api/axiosInstance.js"
+const profilePopUp = ({ setLogin, theme, setTheme,userData }) => {
     const navigate = useNavigate();
-    const logout = () => {
-        setLogin(false);
-        navigate('/');
+    const logout = async () => {
+        try {
+            await api.post("/auth/logout")
+            setLogin(false);
+            navigate('/');
+        } catch (error) {
+            console.log("Error in Logout function",error)
+        }
     };
 
     const MenuItem = ({ to, icon: Icon, children }) => (
@@ -25,14 +31,13 @@ const profilePopUp = ({ setLogin, theme, setTheme }) => {
             </button>
         </div>
     );
-
     return (
         <div className="absolute right-0 w-60 top-full mt-2 bg-chef-cream dark:bg-gray-800 rounded-xl shadow-lg z-50 border border-gray-200 dark:border-gray-700 p-2">
             <div className="flex items-center gap-3 p-2 mb-2 border-b dark:border-gray-700">
                 <div className="w-10 h-10 rounded-full bg-[#FFDAB9] dark:bg-gray-700 flex items-center justify-center text-xl">🍳</div>
                 <div>
-                    <div className="font-bold text-sm text-gray-800 dark:text-gray-100">ChefAssist User</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">user@email.com</div>
+                    <div className="font-bold text-sm text-gray-800 dark:text-gray-100">{userData.username=="" ? "ChefAssist User" : userData.username}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">{userData.email=="" ? "user@email.com" : userData.email}</div>
                 </div>
             </div>
             <div className="flex flex-col gap-1">
@@ -45,7 +50,7 @@ const profilePopUp = ({ setLogin, theme, setTheme }) => {
                 <ThemeToggle />
             </div>
             <div className="pt-2 mt-2 border-t dark:border-gray-700">
-                <button onClick={logout} className="flex items-center w-full gap-3 px-3 py-2 text-sm text-red-600 rounded-md hover:bg-[#FFDAB9] dark:hover:bg-red-500/10 dark:text-red-500">
+                <button onClick={()=>logout()} className="flex items-center w-full gap-3 px-3 py-2 text-sm text-red-600 rounded-md hover:bg-[#FFDAB9] dark:hover:bg-red-500/10 dark:text-red-500">
                     <LogOut className="w-5 h-5" />
                     <span>Logout</span>
                 </button>
