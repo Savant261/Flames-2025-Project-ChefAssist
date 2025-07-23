@@ -10,7 +10,15 @@ const SideBar = ({ isSidebarExpanded, login }) => {
     const NavLink = ({ to, icon: Icon, children }) => {
         const isActive = location.pathname === to;
         return (
-            <Link to={to} title={children} className={`flex items-center gap-4 p-3 rounded-lg transition-colors ${isActive ? 'bg-chef-orange text-white shadow-md' : 'text-gray-600 hover:bg-[#FFDAB9]/50 hover:text-[#D35400]'}`}>
+            <Link
+                to={to}
+                title={children}
+                className={`flex items-center gap-4 p-3 rounded-lg transition-colors
+                  ${isActive
+                    ? 'bg-chef-orange text-white shadow-md dark:bg-orange-400 dark:text-gray-900'
+                    : 'text-gray-600 dark:text-orange-200 hover:bg-[#FFDAB9]/50 dark:hover:bg-gray-800 hover:text-[#D35400] dark:hover:text-orange-400'}
+                `}
+            >
                 <Icon className="w-6 h-6 flex-shrink-0" />
                 <span className={`font-semibold whitespace-nowrap transition-opacity duration-200 ${isSidebarExpanded ? 'opacity-100' : 'opacity-0'}`}>{children}</span>
             </Link>
@@ -18,11 +26,11 @@ const SideBar = ({ isSidebarExpanded, login }) => {
     };
 
     const SectionTitle = ({ children }) => (
-        <h3 className={`px-4 mt-6 mb-2 text-xs font-bold tracking-wider text-gray-400 uppercase whitespace-nowrap transition-opacity duration-200 ${isSidebarExpanded ? 'opacity-100' : 'opacity-0'}`}>{children}</h3>
+        <h3 className={`px-4 mt-6 mb-2 text-xs font-bold tracking-wider text-gray-400 dark:text-orange-300 uppercase whitespace-nowrap transition-opacity duration-200 ${isSidebarExpanded ? 'opacity-100' : 'opacity-0'}`}>{children}</h3>
     );
 
     return (
-        <aside className={`bg-[#FFF8E7] border-r border-gray-200/50 flex-shrink-0 transition-all duration-300 ease-in-out ${isSidebarExpanded ? 'w-56' : 'w-20'}`}>
+        <aside className={`bg-[#FFF8E7] dark:bg-gray-900 border-r border-gray-200/50 dark:border-gray-800 flex-shrink-0 transition-all duration-300 ease-in-out ${isSidebarExpanded ? 'w-56' : 'w-20'}`}>
             <div className="flex flex-col h-full p-3">
                 <SectionTitle>Discovery</SectionTitle>
                 <NavLink to="/explore" icon={Home}>Home</NavLink>
