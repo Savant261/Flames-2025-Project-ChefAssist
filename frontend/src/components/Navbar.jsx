@@ -5,11 +5,9 @@ import Signin from './Signin.jsx';
 import { Bell, PlusCircle, Search, Menu } from 'lucide-react';
 import SideBar from './SideBar.jsx';
 
-const Navbar = ({ login, setLogin, setIsSideBarExpanded, theme, setTheme,userData,setUserData }) => {
+const Navbar = ({ login, setLogin, setIsSideBarExpanded, theme, setTheme,setPopUp,popUp,userData,setUserData,handleSucessAuth,setSigninPopUp,signinPopUp }) => {
     const navigate = useNavigate();
-
-    const [popUp, setPopUp] = useState(false);
-    const [signinPopUp, setSigninPopUp] = useState(false);
+   
     const [what, setWhat] = useState("SignIn");
 
     const homeFunction = () => {
@@ -74,16 +72,16 @@ const Navbar = ({ login, setLogin, setIsSideBarExpanded, theme, setTheme,userDat
                         <button className="p-2 rounded-full md:hidden hover:bg-[#FFDAB9]/50 dark:hover:bg-gray-800">
                             <Search className="w-6 h-6 text-[#D35400] dark:text-orange-400" />
                         </button>
-                        <button className="hidden px-4 py-2 text-sm font-semibold text-white transition rounded-full sm:block bg-[#FF6F61] hover:bg-[#E55B4D] dark:bg-orange-400 dark:hover:bg-orange-500" onClick={() => navigate("/ai")}>\
+                        <button className="hidden px-4 py-2 text-sm font-semibold text-white transition rounded-full sm:block bg-[#FF6F61] hover:bg-[#E55B4D] dark:bg-orange-400 dark:hover:bg-orange-500" onClick={() => navigate("/ai")}>
                             Cook With AI ✨
                         </button>
-                        <button className="p-2 rounded-full hover:bg-[#FFDAB9]/50 dark:hover:bg-gray-800" onClick={()=> navigate("/recipe/create")}>\
+                        <button className="p-2 rounded-full hover:bg-[#FFDAB9]/50 dark:hover:bg-gray-800" onClick={()=> navigate("/recipe/create")}>
                             <PlusCircle className="w-6 h-6 text-[#D35400] dark:text-orange-400" />
                         </button>
-                        <button className="p-2 rounded-full hover:bg-[#FFDAB9]/50 dark:hover:bg-gray-800">\
+                        <button className="p-2 rounded-full hover:bg-[#FFDAB9]/50 dark:hover:bg-gray-800">
                             <Bell className="w-6 h-6 text-[#D35400] dark:text-orange-400" />
                         </button>
-                        <div className="relative">\
+                        <div className="relative">
                             <div id="user-profile-preview" className="flex items-center justify-center w-10 h-10 rounded-full cursor-pointer bg-[#FFDAB9] dark:bg-gray-800 border border-[#E5C6B0] dark:border-orange-400 shadow" onClick={() => setPopUp((prev) => !prev)}>
                                 <svg width="26" height="26" fill="#D35400" className="dark:fill-orange-400" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M12 14c-4.418 0-8 1.79-8 4v2h16v-2c0-2.21-3.582-4-8-4z" /></svg>
                             </div>
@@ -95,10 +93,10 @@ const Navbar = ({ login, setLogin, setIsSideBarExpanded, theme, setTheme,userDat
                 {/* Logged Out State */}
                 {!login && (
                     <>
-                        <button className="hidden px-4 py-2 text-sm font-semibold text-white transition rounded-full sm:block bg-[#FF6F61] hover:bg-[#E55B4D] dark:bg-orange-400 dark:hover:bg-orange-500" onClick={() => navigate("/ai")}>\
+                        <button className="hidden px-4 py-2 text-sm font-semibold text-white transition rounded-full sm:block bg-[#FF6F61] hover:bg-[#E55B4D] dark:bg-orange-400 dark:hover:bg-orange-500" onClick={() => navigate("/ai")}>
                             Cook With AI ✨
                         </button>
-                        <button className="hidden px-4 py-2 text-sm font-semibold text-gray-700 dark:text-orange-200 transition rounded-full sm:block hover:bg-[#FFDAB9]/50 dark:hover:bg-gray-800" onClick={() => navigate("/explore")}>\
+                        <button className="hidden px-4 py-2 text-sm font-semibold text-gray-700 dark:text-orange-200 transition rounded-full sm:block hover:bg-[#FFDAB9]/50 dark:hover:bg-gray-800" onClick={() => navigate("/explore")}>
                             Explore
                         </button>
                         <button className="px-4 py-2 text-sm font-semibold text-white transition rounded-full bg-[#FF6F61] hover:bg-[#E55B4D] dark:bg-orange-400 dark:hover:bg-orange-500" onClick={() => setSigninPopUp(true)}>
@@ -109,7 +107,7 @@ const Navbar = ({ login, setLogin, setIsSideBarExpanded, theme, setTheme,userDat
             </div>
 
             {/* Sign In/Up Modal */}
-            {signinPopUp && (<Signin setSigninPopUp={setSigninPopUp} what={what} setWhat={setWhat} setLogin={setLogin} setUserData={setUserData}/>)}
+            {signinPopUp && (<Signin setSigninPopUp={setSigninPopUp} what={what} setWhat={setWhat} handleSucessAuth={handleSucessAuth}/>)}
         </nav>
     );
 };

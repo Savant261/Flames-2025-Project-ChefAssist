@@ -3,7 +3,7 @@ import signin from "/Images/signin.jpg";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axiosInstance.js";
 
-const Signin = ({ setSigninPopUp, what, setWhat, setLogin,setUserData }) => {
+const Signin = ({ setSigninPopUp, what, setWhat,handleSucessAuth }) => {
   const navigate = useNavigate();
 
   const [loginData, setLoginData] = useState({
@@ -32,9 +32,7 @@ const Signin = ({ setSigninPopUp, what, setWhat, setLogin,setUserData }) => {
     try {
       const response = await api.post("/auth/signin", loginData);
       console.log(response.data);
-      setUserData(response.data)
-      setSigninPopUp(false);
-      navigate("/explore");
+      handleSucessAuth(response.data)
     } catch (error) {
       console.log("Error in submitLogin", error);
     }
@@ -44,17 +42,14 @@ const Signin = ({ setSigninPopUp, what, setWhat, setLogin,setUserData }) => {
     try {
       const response = await api.post("/auth/signup", signupData);
       console.log(response.data);
-
-      setUserData(response.data)
-      setSigninPopUp(false);
-      navigate("/explore");
+      handleSucessAuth(response.data)
     } catch (error) {
       console.log("Error in submitSiginup", error);
     }
   };
-  useEffect(() => {
-    console.log(loginData, signupData);
-  }, [loginData, signupData]);
+  // useEffect(() => {
+  //   console.log(loginData, signupData);
+  // }, [loginData, signupData]);
   return (
     <div
       id="auth-modal"

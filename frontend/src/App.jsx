@@ -4,7 +4,7 @@ import "./App.css";
 import Footer from "./components/Footer.jsx";
 import Navbar from "./components/Navbar.jsx";
 import Home from "./pages/Home.jsx";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import Explore from "./pages/Explore.jsx";
 import Profile from "./pages/Profile.jsx";
 import EditProfile from "./pages/EditProfile.jsx";
@@ -19,18 +19,29 @@ import MyFeed from "./pages/MyFeed.jsx";
 import SavedRecipes from "./pages/SavedRecipes.jsx";
 import Settings from "./pages/Settings.jsx";
 import CreateRecipe from "./pages/CreateRecipe.jsx";
-import api from "./api/axiosInstance.js"
+import api from "./api/axiosInstance.js";
 
 function App() {
+  const navigate = useNavigate();
   const [isSidebarExpanded, setIsSideBarExpanded] = useState(false);
   const [login, setLogin] = useState(false);
   const [theme, setTheme] = useState("light");
-  const [userData,setUserData] = useState({
-    avatar:"",
-    username:"",
-    email:"",
+  const [userData, setUserData] = useState({
+    avatar: "",
+    username: "",
+    email: "",
   });
-
+  const [popUp, setPopUp] = useState(false);
+  const [signinPopUp, setSigninPopUp] = useState(false);
+  const [oAuth, setOAuth] = useState(false);
+  const handleSucessAuth = (data) => {
+    console.log("sucessfully signin or signup");
+    setUserData(data);
+    setLogin(true);
+    setPopUp(false);
+    setSigninPopUp(false);
+    setOAuth(true);
+  };
   useEffect(() => {
     if (theme === "dark") {
       document.documentElement.classList.add("dark");
@@ -39,20 +50,26 @@ function App() {
     }
   }, [theme]);
   useEffect(() => {
-    const check = async ()=>{
+    const check = async () => {
       try {
         const response = await api.get("/auth/check");
-        if(response){
-          setLogin(true)
-          setUserData(response.data)
-        } 
-        else setLogin(false);
+        if (response) {
+          setLogin(true);
+          handleSucessAuth(response.data);
+        } else setLogin(false);
       } catch (error) {
-        console.log("Error in check Function in app.jsx",error)
+        console.log("Error in check Function in app.jsx", error);
       }
-    }
+    };
     check();
-  }, [userData]);
+    console.log("check function");
+  }, []);
+  useEffect(() => {
+    if (oAuth) {
+      navigate("/explore");
+    }
+    setOAuth(false);
+  }, [oAuth]);
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar
@@ -61,8 +78,13 @@ function App() {
         setLogin={setLogin}
         theme={theme}
         setTheme={setTheme}
+        popUp={popUp}
+        setPopUp={setPopUp}
         userData={userData}
         setUserData={setUserData}
+        handleSucessAuth={handleSucessAuth}
+        signinPopUp={signinPopUp}
+        setSigninPopUp={setSigninPopUp}
       />
       <div className="flex flex-1 overflow-hidden">
         <SideBar isSidebarExpanded={isSidebarExpanded} login={login} />
