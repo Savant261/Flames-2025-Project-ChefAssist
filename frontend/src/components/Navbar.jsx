@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ProfilePopUp from './ProfilePopUp.jsx';
 import Signin from './Signin.jsx';
 import { Bell, PlusCircle, Search, Menu } from 'lucide-react';
-import SideBar from './SideBar.jsx';
+import { toast } from 'react-toastify';
 
 const Navbar = ({ login, setLogin, setIsSideBarExpanded, theme, setTheme,setPopUp,popUp,userData,setUserData,handleSucessAuth,setSigninPopUp,signinPopUp }) => {
     const navigate = useNavigate();
@@ -78,7 +78,7 @@ const Navbar = ({ login, setLogin, setIsSideBarExpanded, theme, setTheme,setPopU
                         <button className="p-2 rounded-full hover:bg-[#FFDAB9]/50 dark:hover:bg-gray-800" onClick={()=> navigate("/recipe/create")}>
                             <PlusCircle className="w-6 h-6 text-[#D35400] dark:text-orange-400" />
                         </button>
-                        <button className="p-2 rounded-full hover:bg-[#FFDAB9]/50 dark:hover:bg-gray-800">
+                        <button className="p-2 rounded-full hover:bg-[#FFDAB9]/50 dark:hover:bg-gray-800" onClick={()=> toast("In Development")}>
                             <Bell className="w-6 h-6 text-[#D35400] dark:text-orange-400" />
                         </button>
                         <div className="relative">

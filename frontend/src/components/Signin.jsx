@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import signin from "/Images/signin.jpg";
-import { useNavigate } from "react-router-dom";
 import api from "../api/axiosInstance.js";
+import { toast } from 'react-toastify';
 
 const Signin = ({ setSigninPopUp, what, setWhat,handleSucessAuth }) => {
-  const navigate = useNavigate();
 
   const [loginData, setLoginData] = useState({
     email: "",
@@ -34,6 +33,7 @@ const Signin = ({ setSigninPopUp, what, setWhat,handleSucessAuth }) => {
       console.log(response.data);
       handleSucessAuth(response.data)
     } catch (error) {
+      toast.error(error.response.data.message)
       console.log("Error in submitLogin", error);
     }
   };
@@ -44,6 +44,7 @@ const Signin = ({ setSigninPopUp, what, setWhat,handleSucessAuth }) => {
       console.log(response.data);
       handleSucessAuth(response.data)
     } catch (error) {
+      toast.error(error.response.data.message)
       console.log("Error in submitSiginup", error);
     }
   };

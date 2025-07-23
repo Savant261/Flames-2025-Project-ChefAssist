@@ -1,4 +1,8 @@
 import { useState, useEffect } from "react";
+import { ToastContainer, toast } from "react-toastify";
+// The direct CSS import is removed as it's not supported in this environment.
+import "react-toastify/dist/ReactToastify.css";
+import { CheckCircle, XCircle, Info, AlertTriangle } from "lucide-react";
 import Ai from "./pages/Ai.jsx";
 import "./App.css";
 import Footer from "./components/Footer.jsx";
@@ -21,6 +25,42 @@ import Settings from "./pages/Settings.jsx";
 import CreateRecipe from "./pages/CreateRecipe.jsx";
 import api from "./api/axiosInstance.js";
 
+const StyledToastContainer = ({theme}) => {
+  return (
+    <ToastContainer
+      position="top-right"
+      autoClose={3000}
+      hideProgressBar={false}
+      newestOnTop={true}
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+      theme={theme} // We will control dark mode with CSS
+      style={{
+        // Using your custom color variables
+        "--toastify-color-light": "var(--color-chef-cream)",
+        "--toastify-color-dark": "#1F2937", // A dark gray for the container
+        "--toastify-text-color-light": "var(--color-chef-orange-dark)",
+        "--toastify-text-color-dark": "var(--color-chef-peach)",
+
+        // Progress bar color
+        "--toastify-color-progress-light": "var(--color-chef-orange)",
+        "--toastify-color-progress-dark": "var(--color-chef-orange-light)",
+
+        // Icon colors for different types
+        "--toastify-color-success": "#28a745",
+        "--toastify-color-warning": "#F59E0B", // Using your orange-light
+        "--toastify-color-error": "#dc3545",
+        "--toastify-color-info": "#3B82F6",
+
+        "--toastify-font-family": "Poppins, Arial, sans-serif",
+      }}
+    />
+  );
+};
+
 function App() {
   const navigate = useNavigate();
   const [isSidebarExpanded, setIsSideBarExpanded] = useState(false);
@@ -36,6 +76,7 @@ function App() {
   const [oAuth, setOAuth] = useState(false);
   const handleSucessAuth = (data) => {
     console.log("sucessfully signin or signup");
+    toast.success("Logged in successfully!");
     setUserData(data);
     setLogin(true);
     setPopUp(false);
@@ -70,6 +111,10 @@ function App() {
     }
     setOAuth(false);
   }, [oAuth]);
+  //  const showSuccessToast = () => toast.success("Recipe saved successfully!");
+  //   const showErrorToast = () => toast.error("Failed to upload image. Please try again.");
+  //   const showInfoToast = () => toast.info("Your profile has been updated.");
+  //   const showWarningToast = () => toast.warning("Your session is about to expire.");
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar
@@ -90,6 +135,7 @@ function App() {
         <SideBar isSidebarExpanded={isSidebarExpanded} login={login} />
         <div className="flex-1 relative">
           <main className="absolute inset-0 overflow-y-auto">
+            <StyledToastContainer theme={theme} />
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/ai" element={<Ai />} />
