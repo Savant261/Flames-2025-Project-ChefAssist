@@ -96,7 +96,10 @@ function App() {
         const response = await api.get("/auth/check");
         if (response) {
           setLogin(true);
-          handleSucessAuth(response.data);
+          setUserData(data);
+          setLogin(true);
+          setPopUp(false);
+          setSigninPopUp(false);
         } else setLogin(false);
       } catch (error) {
         console.log("Error in check Function in app.jsx", error);
