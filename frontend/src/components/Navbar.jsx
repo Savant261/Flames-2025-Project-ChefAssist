@@ -5,7 +5,7 @@ import Signin from './Signin.jsx';
 import { Bell, PlusCircle, Search, Menu } from 'lucide-react';
 import SideBar from './SideBar.jsx';
 
-const Navbar = ({ login, setLogin, setIsSideBarExpanded, theme, setTheme,userData }) => {
+const Navbar = ({ login, setLogin, setIsSideBarExpanded, theme, setTheme,userData,setUserData }) => {
     const navigate = useNavigate();
 
     const [popUp, setPopUp] = useState(false);
@@ -110,7 +110,7 @@ const Navbar = ({ login, setLogin, setIsSideBarExpanded, theme, setTheme,userDat
             </div>
 
             {/* Sign In/Up Modal */}
-            {signinPopUp && (<Signin setSigninPopUp={setSigninPopUp} what={what} setWhat={setWhat} setLogin={setLogin} />)}
+            {signinPopUp && (<Signin setSigninPopUp={setSigninPopUp} what={what} setWhat={setWhat} setLogin={setLogin} setUserData={setUserData}/>)}
         </nav>
     );
 };

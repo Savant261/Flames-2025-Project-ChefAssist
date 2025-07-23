@@ -52,7 +52,7 @@ function App() {
       }
     }
     check();
-  }, []);
+  }, [userData]);
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar
@@ -62,6 +62,7 @@ function App() {
         theme={theme}
         setTheme={setTheme}
         userData={userData}
+        setUserData={setUserData}
       />
       <div className="flex flex-1 overflow-hidden">
         <SideBar isSidebarExpanded={isSidebarExpanded} login={login} />
