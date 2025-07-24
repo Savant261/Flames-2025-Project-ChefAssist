@@ -54,11 +54,11 @@ const Settings = () => {
             <Route path="subscription" element={<SubscriptionSettings />} />
           </Routes>
         </div>
-        <div className="mt-8 flex justify-end">
+       {/* <div className="mt-8 flex justify-end">
           <button className="px-6 py-3 rounded-lg bg-[var(--color-chef-orange)] text-white font-semibold hover:bg-[var(--color-chef-orange-dark)] transition-colors">
             Save All Changes
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );
