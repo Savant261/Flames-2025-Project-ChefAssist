@@ -70,7 +70,7 @@ const userSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      default: "",
+      default: "prefer not to say",
     },
     currentPlanDetail: {
       type: Object,
@@ -80,7 +80,7 @@ const userSchema = new mongoose.Schema(
         time: { type: String },
       },
     },
-    InventoryIngredient: [
+    inventoryIngredient: [
       {
         name: { type: String, required: true, trim: true },
         qty: { type: Number, required: true },
@@ -88,12 +88,22 @@ const userSchema = new mongoose.Schema(
         value: { type: Number, required: true },
       },
     ],
-    DietaryPreferences: [
-      {
-        name: { type: String, required: true },
-        value: {type: Boolean, required: true, default:false}
-      },
-    ],
+    dietaryPreferences: {
+      type: [
+        {
+          name: { type: String, required: true },
+          value: { type: Boolean, required: true, default: false },
+        },
+      ],
+      default: [
+        { name: "Vegetarian", value: false },
+        { name: "Vegan", value: false },
+        { name: "Gluten-Free", value: false },
+        { name: "Dairy-Free", value: false },
+        { name: "Keto", value: false },
+        { name: "Paleo", value: false },
+      ],
+    },
   },
   { timestamps: true }
 );

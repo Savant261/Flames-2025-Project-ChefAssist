@@ -94,13 +94,19 @@ function App() {
     const check = async () => {
       try {
         const response = await api.get("/auth/check");
-        if (response) {
+        if (response.status==200) {
           setLogin(true);
-          setUserData(data);
+          setUserData(response.data);
           setLogin(true);
           setPopUp(false);
           setSigninPopUp(false);
-        } else setLogin(false);
+          if (window.location.pathname=='/') {
+            navigate("/explore");
+          }
+        } else {
+          setLogin(false);
+          navigate("/");
+        }
       } catch (error) {
         console.log("Error in check Function in app.jsx", error);
       }

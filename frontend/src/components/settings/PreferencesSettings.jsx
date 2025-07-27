@@ -4,14 +4,14 @@ import {toast} from "react-toastify";
 const PreferencesSettings = () => {
   const [preferencesData, setPreferencesData] = useState({
     dietaryPreferences: [
-      { name: "Vegetarian", value: false },
+      { name: "Vegetarian", value: true },
       { name: "Vegan", value: false },
       { name: "Gluten-Free", value: false },
       { name: "Dairy-Free", value: false },
       { name: "Keto", value: false },
       { name: "Paleo", value: false },
     ],
-    gender: "male",
+    gender: "prefer not to say",
     cookingLevel: "Beginner",
   });
   const onChangeHandler = (e) => {
@@ -41,6 +41,18 @@ const PreferencesSettings = () => {
   useEffect(() => {
     console.log(preferencesData);
   }, [preferencesData]);
+  useEffect(() => {
+    const func = async ()=>{
+      try {
+        const response = await api.get("/auth/update-Preference");
+        console.log(response.data);
+        setPreferencesData(response.data)
+      } catch (error) {
+        console.log("Error in get Preference function in useEffect",error);
+      }
+    }
+    func();
+  }, []);
 
   return (
     <div className="space-y-8">
@@ -61,6 +73,7 @@ const PreferencesSettings = () => {
                 type="checkbox"
                 value={diet.value}
                 name={diet.name}
+                checked={diet.value}
                 onChange={(e) => onChangePreferenceHandler(e)}
                 className="mr-3 h-4 w-4 rounded text-[var(--color-chef-orange)] focus:ring-[var(--color-chef-orange)]"
               />

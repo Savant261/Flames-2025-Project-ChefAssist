@@ -88,28 +88,92 @@ const chechAuth = async (req, res) => {
 const updateProfile = async (req, res) => {
   try {
     const { fullName, bio, socialLinks } = req.body;
-    if(!fullName || !bio || !socialLinks) return res.status(400).json({message:"All fields are required"});
+    if (!fullName || !bio || !socialLinks)
+      return res.status(400).json({ message: "All fields are required" });
     const userId = req.user._id;
-    const user = User.findByIdAndUpdate(userId,{fullName,bio,socialLinks});
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { fullName, bio, socialLinks },
+      { new: true }
+    );
 
-    return res.status(200).json({message:"Sucessfully updated profile",user,bio,socialLinks});
+    return res.status(200).json({
+      message: "Sucessfully updated profile",
+      fullName: user.fullName,
+      bio: user.bio,
+      socialLinks: user.socialLinks,
+    });
   } catch (error) {
     console.log("Error in update Profile", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
-const updatePreference = async (req,res)=>{
+const updatePreference = async (req, res) => {
   try {
-    const {dietaryPreferences,gender,cookingLevel} = req.body;
-    if(!gender || !cookingLevel || !dietaryPreferences) return res.status(400).json({message:"All fields are required"});
+    const { dietaryPreferences, gender, cookingLevel } = req.body;
+    if (!gender || !cookingLevel || !dietaryPreferences)
+      return res.status(400).json({ message: "All fields are required" });
     const userId = req.user._id;
-    const user = User.findByIdAndUpdate(userId,{dietaryPreferences,gender,cookingLevel});
-    return res.status(200).json({message:"Sucessfully updated preference",dietaryPreferences,gender,cookingLevel});
-  } catch (error) {
-      console.log("Error in update Preference", error);
-      return res.status(500).json({ message: "Internal Server Error" });
-  }
-}
+    const user = await User.findByIdAndUpdate(userId, {
+      dietaryPreferences,
+      gender,
+      cookingLevel,
+    });
 
-export { signup, signin, logout, chechAuth, updateProfile, updatePreference };
+    return res.status(200).json(
+      {
+        message: "Sucessfully updated preference",
+        dietaryPreferences: user.dietaryPreferences,
+        gender: user.gender,
+        cookingLevel: user.cookingLevel,
+      },
+      { new: true }
+    );
+  } catch (error) {
+    console.log("Error in update Preference", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const getProfile = async (req, res) => {
+  try {
+    const userId = req.user;
+    const user = await User.findById(userId);
+    console.log(user);
+    return res.status(200).json({
+      fullName: user.fullName,
+      bio: user.bio,
+      socialLinks: user.socialLinks,
+    });
+  } catch (error) {
+    console.log("Error in get Profile Controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const getPreference = async (req, res) => {
+  try {
+    const userId = req.user;
+    const user = await User.findById(userId);
+    return res.status(200).json({
+      dietaryPreferences: user.dietaryPreferences,
+      gender: user.gender,
+      cookingLevel: user.cookingLevel,
+    });
+  } catch (error) {
+    console.log("Error in get Profile Controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+export {
+  signup,
+  signin,
+  logout,
+  chechAuth,
+  updateProfile,
+  updatePreference,
+  getProfile,
+  getPreference,
+};
