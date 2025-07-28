@@ -6,31 +6,46 @@ import {
   chechAuth,
   updateProfile,
   updatePreference,
-  getProfile,
+  getSettingsProfile,
   getPreference,
   changePassword,
   updateEmail,
   updatePhoneNumber,
   tooglePublicProfile,
-  deleteAccount
+  deleteAccount,
+  getProfile,
+  getSavedRecipe,
+  addSavedRecipe,
+  deleteSavedRecipe,
+  updateProfilePhoto,
 } from "../controllers/user.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
+
 const router = express.Router();
 
 router.post("/signup", signup);
 router.post("/signin", signin);
 router.post("/logout", logout);
+
+router.get("/profile", protectRoute, getProfile);
 router.get("/check", protectRoute, chechAuth);
+
+router.get("/savedRecipe", protectRoute, getSavedRecipe);
+router.post("/savedRecipe", protectRoute, addSavedRecipe);
+router.delete("/savedRecipe/:recipeId", protectRoute, deleteSavedRecipe);
+
+//settings
+router.post("/update-profile-photo", protectRoute, updateProfilePhoto);
 router.post("/update-profile", protectRoute, updateProfile);
-router.get("/update-profile", protectRoute, getProfile);
+router.get("/update-profile", protectRoute, getSettingsProfile);
 router.post("/update-Preference", protectRoute, updatePreference);
-router.get("/update-Preference", protectRoute, getPreference); 
+router.get("/update-Preference", protectRoute, getPreference);
 
-router.get("/change-Password", protectRoute, changePassword); 
-router.get("/update-Email", protectRoute, updateEmail); 
-router.get("/update-PhoneNumber", protectRoute, updatePhoneNumber); 
-router.get("/public-Profile-toogle", protectRoute, tooglePublicProfile); 
-router.get("/delete-Account", protectRoute, deleteAccount); 
+router.get("/change-Password", protectRoute, changePassword);
+router.get("/update-Email", protectRoute, updateEmail);
+router.get("/update-PhoneNumber", protectRoute, updatePhoneNumber);
+router.get("/public-Profile-toogle", protectRoute, tooglePublicProfile);
+router.get("/delete-Account", protectRoute, deleteAccount);
 
-// notificaton & subscription 
+// notificaton & subscription
 export default router;

@@ -1,6 +1,7 @@
 import { User } from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../utils/utils.js";
+import cloudinary from "../utils/cloudinary.js";
 
 const signup = async (req, res) => {
   try {
@@ -85,6 +86,40 @@ const chechAuth = async (req, res) => {
   }
 };
 
+const updateProfilePhoto = async (req, res) => {
+  try {
+    const { avatar } = req.body;
+    const userId = req.user._id;
+
+    if (!avatar) {
+      return res.status(400).json({ message: "No avatar data received." });
+    }
+
+    const uploadResponse = await cloudinary.uploader.upload(avatar, {
+        folder: "profile_pictures",
+        resource_type: "image",
+    });
+
+    const user = await User.findByIdAndUpdate(
+        userId,
+        { avatar: uploadResponse.secure_url },
+        { new: true }
+    );
+
+    if (!user) {
+        return res.status(404).json({ message: "User not found." });
+    }
+
+    return res.status(200).json({
+      message: "Profile photo updated successfully!",
+      avatar: user.avatar
+    });
+
+  } catch (error) {
+    console.log("Error in update Profile", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 const updateProfile = async (req, res) => {
   try {
     const { fullName, bio, socialLinks } = req.body;
@@ -102,6 +137,7 @@ const updateProfile = async (req, res) => {
       fullName: user.fullName,
       bio: user.bio,
       socialLinks: user.socialLinks,
+      avatar: user.avatar
     });
   } catch (error) {
     console.log("Error in update Profile", error);
@@ -136,15 +172,16 @@ const updatePreference = async (req, res) => {
   }
 };
 
-const getProfile = async (req, res) => {
+const getSettingsProfile = async (req, res) => {
   try {
     const userId = req.user;
     const user = await User.findById(userId);
-    console.log(user);
+
     return res.status(200).json({
-      fullName: user.fullName,
-      bio: user.bio,
-      socialLinks: user.socialLinks,
+      fullName: user.fullName ?? "",
+      bio: user.bio ?? "", 
+      socialLinks: user.socialLinks ?? { x: "", instagram: "", youtube: "" }, 
+      avatar: user.avatar ?? "",
     });
   } catch (error) {
     console.log("Error in get Profile Controller", error);
@@ -177,6 +214,14 @@ const tooglePublicProfile = async (req, res) => {};
 
 const deleteAccount = async (req, res) => {};
 
+const getProfile = async (req, res) => {};
+
+const getSavedRecipe = async (req, res) => {};
+
+const addSavedRecipe = async (req, res) => {};
+
+const deleteSavedRecipe = async (req, res) => {};
+
 export {
   signup,
   signin,
@@ -184,11 +229,16 @@ export {
   chechAuth,
   updateProfile,
   updatePreference,
-  getProfile,
+  getSettingsProfile,
   getPreference,
   changePassword,
   updateEmail,
   updatePhoneNumber,
   tooglePublicProfile,
   deleteAccount,
+  getProfile,
+  getSavedRecipe,
+  addSavedRecipe,
+  deleteSavedRecipe,
+  updateProfilePhoto
 };

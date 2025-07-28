@@ -1,10 +1,15 @@
 import { Instagram, Twitter, Youtube } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useState } from "react";
 import api from "../../api/axiosInstance.js";
 import { toast } from "react-toastify";
 
 const ProfileSettings = () => {
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(
+    "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400"
+  );
+  const fileInputRef = useRef(null);
   const [profileData, setProfileData] = useState({
     fullName: "",
     bio: "",
@@ -27,6 +32,45 @@ const ProfileSettings = () => {
       socialLinks: { ...prev.socialLinks, [name]: value },
     }));
   };
+  // --- Handlers for Photo Upload ---
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
+
+  const handlePhotoUpload = async () => {
+    if (!selectedFile) {
+      toast.error("Please select a photo to upload.");
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onloadend = async () => {
+      // The result is the Base64 encoded string
+      const base64String = reader.result;
+
+      try {
+        const response = await api.post("/auth/update-profile-photo", {
+          avatar: base64String, // Sending the string, not FormData
+        });
+        console.log(response);
+        if (response.data && response.data.avatar) {
+          setPreviewUrl(response.data.avatar);
+        }
+        setSelectedFile(null);
+        toast.success(response.data.message || "Profile photo updated!");
+      } catch (error) {
+        toast.error(error.response?.data?.message || "Upload failed.");
+        console.error("Error in photo upload", error);
+      }
+    };
+
+    reader.readAsDataURL(selectedFile);
+  };
   const submitProfile = async () => {
     try {
       const response = await api.post("/auth/update-profile", profileData);
@@ -45,6 +89,7 @@ const ProfileSettings = () => {
       try {
         const response = await api.get("/auth/update-profile");
         setProfileData(response.data);
+        if (response.data.avatar) setPreviewUrl(response.data.avatar);
         toast.success(response.data.message);
         console.log(response);
       } catch (error) {
@@ -63,28 +108,37 @@ const ProfileSettings = () => {
         <div className="flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8">
           <div className="relative group">
             <img
-              src="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400"
-              alt="Profile"
-              className="w-32 h-32 rounded-full border-4 border-[var(--color-chef-peach)] object-cover"
+              src={previewUrl}
+              alt="Profile Preview"
+              className="w-32 h-32 rounded-full border-4 border-[var(--color-chef-peach)] object-cover cursor-pointer"
+              onClick={() => fileInputRef.current.click()}
             />
-            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 rounded-full transition-all duration-300 flex items-center justify-center">
-              {/* Camera Icon can go here */}
-            </div>
           </div>
           <div className="flex-1">
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={handleFileSelect}
+              className="hidden"
+            />
             <div className="flex flex-wrap gap-3">
               <button
                 type="button"
+                onClick={() => fileInputRef.current.click()}
                 className="bg-[var(--color-chef-orange)] text-white px-4 py-2 rounded-lg hover:bg-[var(--color-chef-orange-dark)] transition-colors"
               >
-                Upload New Photo
+                Choose Photo
               </button>
-              <button
-                type="button"
-                className="border border-gray-300 text-gray-700 dark:text-gray-300 dark:border-gray-600 px-4 py-2 rounded-lg hover:border-[var(--color-chef-orange)] hover:text-[var(--color-chef-orange)] transition-colors"
-              >
-                Remove Photo
-              </button>
+              {selectedFile && (
+                <button
+                  type="button"
+                  onClick={handlePhotoUpload}
+                  className="border border-green-500 text-green-600 px-4 py-2 rounded-lg hover:bg-green-50 transition-colors"
+                >
+                  Upload & Save Photo
+                </button>
+              )}
             </div>
             <p className="text-sm text-gray-500 mt-2">
               Recommended: Square image, 400x400px. Max 5MB.

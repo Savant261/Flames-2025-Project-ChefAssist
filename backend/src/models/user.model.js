@@ -1,4 +1,3 @@
-import { json } from "express";
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
@@ -23,7 +22,6 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      unique: true,
       trim: true,
       required: [true, "Password is required"],
     },
@@ -39,6 +37,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       unique: true,
       trim: true,
+      sparse: true,
     },
     fullName: {
       type: String,
@@ -49,12 +48,9 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
     socialLinks: {
-      type: Object,
-      fields: {
-        x: { type: "string" },
-        instagram: { type: "string" },
-        youtube: { type: "string" },
-      },
+      x: { type: String, trim: true },
+      instagram: { type: String, trim: true },
+      youtube: { type: String, trim: true },
     },
     theme: {
       type: String,
@@ -62,7 +58,7 @@ const userSchema = new mongoose.Schema(
     },
     publicProfile: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     cookingLevel: {
       type: String,
@@ -73,12 +69,9 @@ const userSchema = new mongoose.Schema(
       default: "prefer not to say",
     },
     currentPlanDetail: {
-      type: Object,
-      fields: {
-        name: { type: String },
-        price: { type: Number },
-        time: { type: String },
-      },
+      name: { type: String },
+      price: { type: Number },
+      time: { type: String },
     },
     inventoryIngredient: [
       {
@@ -89,12 +82,7 @@ const userSchema = new mongoose.Schema(
       },
     ],
     dietaryPreferences: {
-      type: [
-        {
-          name: { type: String, required: true },
-          value: { type: Boolean, required: true, default: false },
-        },
-      ],
+      type: [String],
       default: [
         { name: "Vegetarian", value: false },
         { name: "Vegan", value: false },
@@ -102,7 +90,7 @@ const userSchema = new mongoose.Schema(
         { name: "Dairy-Free", value: false },
         { name: "Keto", value: false },
         { name: "Paleo", value: false },
-      ],
+      ]
     },
   },
   { timestamps: true }
