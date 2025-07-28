@@ -167,6 +167,16 @@ const getPreference = async (req, res) => {
   }
 };
 
+const changePassword = async (req, res) => {};
+
+const updateEmail = async (req, res) => {};
+
+const updatePhoneNumber = async (req, res) => {};
+
+const tooglePublicProfile = async (req, res) => {};
+
+const deleteAccount = async (req, res) => {};
+
 export {
   signup,
   signin,
@@ -176,4 +186,9 @@ export {
   updatePreference,
   getProfile,
   getPreference,
+  changePassword,
+  updateEmail,
+  updatePhoneNumber,
+  tooglePublicProfile,
+  deleteAccount,
 };

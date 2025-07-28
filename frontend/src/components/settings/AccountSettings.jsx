@@ -1,6 +1,7 @@
 import React from 'react'
 
 const AccountSettings = () => {
+  
   return (
     <div className="space-y-8">
       <div className="bg-white dark:bg-gray-800 rounded-2xl p-8">
