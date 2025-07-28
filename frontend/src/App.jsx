@@ -84,6 +84,15 @@ function App() {
     setOAuth(true);
   };
   useEffect(() => {
+    const updateBackend = async ()=>{
+      try {
+        const response = await api.get("/auth/toogle-theme");
+        console.log(response.data);
+      } catch (error) {
+        console.log("Error in updateBackend in useEffect for updating them in backend",error);
+      }
+    }
+    updateBackend();
     if (theme === "dark") {
       document.documentElement.classList.add("dark");
     } else {
@@ -97,6 +106,7 @@ function App() {
         if (response.status==200) {
           setLogin(true);
           setUserData(response.data);
+          setTheme(response.data.theme);
           setLogin(true);
           setPopUp(false);
           setSigninPopUp(false);

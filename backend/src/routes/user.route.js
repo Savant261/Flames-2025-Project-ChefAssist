@@ -18,6 +18,7 @@ import {
   addSavedRecipe,
   deleteSavedRecipe,
   updateProfilePhoto,
+  toogleTheme
 } from "../controllers/user.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 
@@ -29,6 +30,7 @@ router.post("/logout", logout);
 
 router.get("/profile", protectRoute, getProfile);
 router.get("/check", protectRoute, chechAuth);
+router.get("/toogle-theme", protectRoute, toogleTheme);
 
 router.get("/savedRecipe", protectRoute, getSavedRecipe);
 router.post("/savedRecipe", protectRoute, addSavedRecipe);

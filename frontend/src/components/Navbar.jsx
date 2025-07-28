@@ -80,10 +80,15 @@ const Navbar = ({ login, setLogin, setIsSideBarExpanded, theme, setTheme,signinP
                         <button className="p-2 rounded-full hover:bg-[#FFDAB9]/50 dark:hover:bg-gray-800">
                             <Bell className="w-6 h-6 text-[#D35400] dark:text-orange-400" />
                         </button>
-                        <div className="relative">
-                            <div id="user-profile-preview" className="flex items-center justify-center w-10 h-10 rounded-full cursor-pointer bg-[#FFDAB9] dark:bg-gray-800 border border-[#E5C6B0] dark:border-orange-400 shadow" onClick={() => setPopUp((prev) => !prev)}>
-                                <svg width="26" height="26" fill="#D35400" className="dark:fill-orange-400" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M12 14c-4.418 0-8 1.79-8 4v2h16v-2c0-2.21-3.582-4-8-4z" /></svg>
-                            </div>
+                            
+                            <div className="relative">
+                                {userData.avatar ? (
+                                    <div style={{ backgroundImage: `url('${userData.avatar}')` }}
+                                        className="flex items-center justify-center w-10 h-10 rounded-full cursor-pointer bg-cover bg-center border border-[#E5C6B0] dark:border-orange-400 shadow" 
+                                        onClick={() => setPopUp((prev) => !prev)}
+                                    >
+                                    </div>) : (<div id="user-profile-preview" className="flex items-center justify-center w-10 h-10 rounded-full cursor-pointer bg-[#FFDAB9] dark:bg-gray-800 border border-[#E5C6B0] dark:border-orange-400 shadow" onClick={() => setPopUp((prev) => !prev)}> <svg width="26" height="26" fill="#D35400" className="dark:fill-orange-400" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" /><path d="M12 14c-4.418 0-8 1.79-8 4v2h16v-2c0-2.21-3.582-4-8-4z" /></svg></div>)}
+                               
                             {popUp && (<ProfilePopUp setSigninPopUp={setSigninPopUp} setLogin={setLogin} theme={theme} setTheme={setTheme} userData={userData}/>)}
                         </div>
                     </>

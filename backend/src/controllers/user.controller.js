@@ -96,30 +96,30 @@ const updateProfilePhoto = async (req, res) => {
     }
 
     const uploadResponse = await cloudinary.uploader.upload(avatar, {
-        folder: "profile_pictures",
-        resource_type: "image",
+      folder: "profile_pictures",
+      resource_type: "image",
     });
 
     const user = await User.findByIdAndUpdate(
-        userId,
-        { avatar: uploadResponse.secure_url },
-        { new: true }
+      userId,
+      { avatar: uploadResponse.secure_url },
+      { new: true }
     );
 
     if (!user) {
-        return res.status(404).json({ message: "User not found." });
+      return res.status(404).json({ message: "User not found." });
     }
 
     return res.status(200).json({
       message: "Profile photo updated successfully!",
-      avatar: user.avatar
+      avatar: user.avatar,
     });
-
   } catch (error) {
     console.log("Error in update Profile", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 const updateProfile = async (req, res) => {
   try {
     const { fullName, bio, socialLinks } = req.body;
@@ -137,7 +137,7 @@ const updateProfile = async (req, res) => {
       fullName: user.fullName,
       bio: user.bio,
       socialLinks: user.socialLinks,
-      avatar: user.avatar
+      avatar: user.avatar,
     });
   } catch (error) {
     console.log("Error in update Profile", error);
@@ -174,13 +174,13 @@ const updatePreference = async (req, res) => {
 
 const getSettingsProfile = async (req, res) => {
   try {
-    const userId = req.user;
+    const userId =  req.user._id;
     const user = await User.findById(userId);
 
     return res.status(200).json({
       fullName: user.fullName ?? "",
-      bio: user.bio ?? "", 
-      socialLinks: user.socialLinks ?? { x: "", instagram: "", youtube: "" }, 
+      bio: user.bio ?? "",
+      socialLinks: user.socialLinks ?? { x: "", instagram: "", youtube: "" },
       avatar: user.avatar ?? "",
     });
   } catch (error) {
@@ -191,7 +191,7 @@ const getSettingsProfile = async (req, res) => {
 
 const getPreference = async (req, res) => {
   try {
-    const userId = req.user;
+    const userId = req.user._id;
     const user = await User.findById(userId);
     return res.status(200).json({
       dietaryPreferences: user.dietaryPreferences,
@@ -222,6 +222,29 @@ const addSavedRecipe = async (req, res) => {};
 
 const deleteSavedRecipe = async (req, res) => {};
 
+const toogleTheme = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+    let nextTheme;
+    if (user.theme === "light") nextTheme = "dark";
+    else nextTheme = "light";
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { theme: nextTheme },
+      { new: true }
+    );
+
+    return res
+      .status(200)
+      .json({ message: "SuccessFully toogled the theme", theme: updatedUser.theme });
+  } catch (error) {
+    console.log("Error in toogle Theme controller", error);
+    return res.status(200).json({ message: "Internal Server Error" });
+  }
+};
+
 export {
   signup,
   signin,
@@ -240,5 +263,6 @@ export {
   getSavedRecipe,
   addSavedRecipe,
   deleteSavedRecipe,
-  updateProfilePhoto
+  updateProfilePhoto,
+  toogleTheme,
 };
