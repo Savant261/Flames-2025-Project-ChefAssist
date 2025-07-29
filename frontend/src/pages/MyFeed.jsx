@@ -1316,13 +1316,12 @@ const MyFeed = () => {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#FEF3E2' }}>
+    <div className="min-h-screen bg-[#FEF3E2] dark:bg-gray-900 transition-colors duration-300">
       {/* Toast Notification */}
       {showToast && (
         <div className="fixed top-4 right-4 z-50 transform transition-all duration-300 ease-in-out animate-bounce">
           <div 
-            className="px-6 py-3 rounded-lg shadow-lg text-white font-medium"
-            style={{ backgroundColor: '#D97706' }}
+            className="px-6 py-3 rounded-lg shadow-lg text-white font-medium bg-[#D97706] dark:bg-orange-700"
           >
             {toastMessage}
           </div>
@@ -1330,7 +1329,7 @@ const MyFeed = () => {
       )}
 
       {/* Chef Profile Cards Section */}
-      <div className="bg-white border-b border-orange-100 shadow-sm">
+      <div className="bg-white dark:bg-gray-800 border-b border-orange-100 dark:border-gray-700 shadow-sm">
         <div className="px-6 py-4">
           <div className="flex items-center justify-center space-x-4 flex-wrap">
             {/* All Chefs Card */}
@@ -1338,20 +1337,19 @@ const MyFeed = () => {
               onClick={() => setSelectedChef(null)}
               className={`flex flex-col items-center space-y-2 p-3 rounded-xl transition-all duration-300 transform hover:scale-105 ${
                 selectedChef === null
-                  ? 'bg-orange-100 shadow-md'
-                  : 'hover:bg-orange-50'
+                  ? 'bg-orange-100 dark:bg-orange-900 shadow-md'
+                  : 'hover:bg-orange-50 dark:hover:bg-orange-900'
               }`}
             >
               <div 
                 className={`w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-lg ${
-                  selectedChef === null ? 'ring-4 ring-orange-300' : ''
-                }`}
-                style={{ backgroundColor: '#D97706' }}
+                  selectedChef === null ? 'ring-4 ring-orange-300 dark:ring-orange-700' : ''
+                } bg-[#D97706] dark:bg-orange-700`}
               >
                 All
               </div>
               <span className={`text-sm font-medium ${
-                selectedChef === null ? 'text-orange-700' : 'text-gray-600'
+                selectedChef === null ? 'text-orange-700 dark:text-orange-300' : 'text-gray-600 dark:text-gray-300'
               }`}>
                 All Chefs
               </span>
@@ -1365,8 +1363,8 @@ const MyFeed = () => {
                 onClick={() => setSelectedChef(chef)}
                 className={`flex flex-col items-center space-y-2 p-3 rounded-xl transition-all duration-300 transform hover:scale-105 ${
                   selectedChef?.id === chef.id
-                    ? 'bg-orange-100 shadow-md'
-                    : 'hover:bg-orange-50'
+                    ? 'bg-orange-100 dark:bg-orange-900 shadow-md'
+                    : 'hover:bg-orange-50 dark:hover:bg-orange-900'
                 }`}
               >
                 <div className="relative">
@@ -1374,15 +1372,15 @@ const MyFeed = () => {
                     src={chef.avatar}
                     alt={chef.name}
                     className={`w-16 h-16 rounded-full object-cover ${
-                      selectedChef?.id === chef.id ? 'ring-4 ring-orange-300' : ''
+                      selectedChef?.id === chef.id ? 'ring-4 ring-orange-300 dark:ring-orange-700' : ''
                     }`}
                   />
                   {chef.isActive && (
-                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white"></div>
+                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></div>
                   )}
                 </div>
                 <span className={`text-sm font-medium text-center ${
-                  selectedChef?.id === chef.id ? 'text-orange-700' : 'text-gray-600'
+                  selectedChef?.id === chef.id ? 'text-orange-700 dark:text-orange-300' : 'text-gray-600 dark:text-gray-300'
                 }`}>
                   {chef.name.split(' ')[0]}
                 </span>
@@ -1393,7 +1391,7 @@ const MyFeed = () => {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="sticky top-0 z-40 bg-white border-b border-orange-100 shadow-sm">
+      <div className="sticky top-0 z-40 bg-white dark:bg-gray-800 border-b border-orange-100 dark:border-gray-700 shadow-sm">
         <div className="px-6 py-4">
           <div className="flex items-center space-x-8">
             
@@ -1402,8 +1400,8 @@ const MyFeed = () => {
               onClick={() => handleTabChange('recipes')}
               className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 ${
                 activeTab === 'recipes'
-                  ? 'text-white shadow-lg'
-                  : 'text-gray-600 hover:text-orange-600 hover:bg-orange-50'
+                  ? 'text-white shadow-lg dark:text-gray-900'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900'
               }`}
               style={{ 
                 backgroundColor: activeTab === 'recipes' ? '#D97706' : 'transparent'
@@ -1417,8 +1415,8 @@ const MyFeed = () => {
               onClick={() => handleTabChange('activities')}
               className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 ${
                 activeTab === 'activities'
-                  ? 'text-white shadow-lg'
-                  : 'text-gray-600 hover:text-orange-600 hover:bg-orange-50'
+                  ? 'text-white shadow-lg dark:text-gray-900'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900'
               }`}
               style={{ 
                 backgroundColor: activeTab === 'activities' ? '#D97706' : 'transparent'
@@ -1436,14 +1434,14 @@ const MyFeed = () => {
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(9)].map((_, index) => (
-              <div key={index} className="bg-white rounded-xl shadow-sm overflow-hidden animate-pulse">
-                <div className="h-48 bg-gray-200"></div>
+              <div key={index} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden animate-pulse">
+                <div className="h-48 bg-gray-200 dark:bg-gray-700"></div>
                 <div className="p-4">
-                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-2/3 mb-4"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mb-4"></div>
                   <div className="flex justify-between">
-                    <div className="h-3 bg-gray-200 rounded w-1/4"></div>
-                    <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
                   </div>
                 </div>
               </div>
@@ -1461,8 +1459,7 @@ const MyFeed = () => {
             <button
               onClick={handleLoadMore}
               disabled={loadingMore}
-              className="px-8 py-3 rounded-full font-medium text-white transition-all duration-300 hover:shadow-lg transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-              style={{ backgroundColor: '#D97706' }}
+              className="px-8 py-3 rounded-full font-medium text-white transition-all duration-300 hover:shadow-lg transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none bg-[#D97706] dark:bg-orange-700"
             >
               {loadingMore ? (
                 <div className="flex items-center space-x-2">
@@ -1480,14 +1477,13 @@ const MyFeed = () => {
       {/* Empty State */}
       {getTotalContent().length === 0 && !loading && (
         <div className="flex flex-col items-center justify-center py-16 px-6">
-          <ChefHat size={64} className="text-gray-400 mb-4" />
-          <h3 className="text-xl font-semibold text-gray-600 mb-2">No content yet</h3>
-          <p className="text-gray-500 text-center max-w-md">
+          <ChefHat size={64} className="text-gray-400 dark:text-gray-600 mb-4" />
+          <h3 className="text-xl font-semibold text-gray-600 dark:text-gray-300 mb-2">No content yet</h3>
+          <p className="text-gray-500 dark:text-gray-400 text-center max-w-md">
             Start following some chefs to see their latest recipes and updates in your feed.
           </p>
           <button 
-            className="mt-6 px-6 py-3 rounded-full font-medium text-white transition-all duration-300 hover:shadow-lg transform hover:scale-105"
-            style={{ backgroundColor: '#D97706' }}
+            className="mt-6 px-6 py-3 rounded-full font-medium text-white transition-all duration-300 hover:shadow-lg transform hover:scale-105 bg-[#D97706] dark:bg-orange-700"
           >
             Discover Chefs
           </button>

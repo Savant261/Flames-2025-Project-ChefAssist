@@ -243,16 +243,16 @@ const SavedRecipes = ({ onViewRecipe }) => {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
             <div className="flex justify-center items-center mb-6">
-              <ChefHat className="w-12 h-12 text-white mr-4" />
-              <h1 className="text-5xl font-bold text-white">ChefAssist</h1>
+              <ChefHat className="w-12 h-12 text-white dark:text-orange-400 mr-4" />
+              <h1 className="text-5xl font-bold text-white dark:text-orange-200">ChefAssist</h1>
             </div>
-            <h2 className="text-3xl font-semibold text-white mb-4">Your Saved Recipes</h2>
-            <p className="text-xl text-white opacity-90 max-w-2xl mx-auto">
+            <h2 className="text-3xl font-semibold text-white dark:text-orange-200 mb-4">Your Saved Recipes</h2>
+            <p className="text-xl text-white dark:text-orange-100 opacity-90 max-w-2xl mx-auto">
               Discover and revisit your favorite AI-generated recipes. From quick weeknight dinners to elaborate weekend feasts.
             </p>
             <div className="mt-8 flex justify-center">
               <div className="bg-opacity-20 backdrop-blur-sm rounded-full px-6 py-3 bg-chef-orange-light dark:bg-gray-700/50"> {/* Added dark mode bg */}
-                <span className="text-white font-medium">{recipes.length} Saved Recipes</span>
+                <span className="text-white dark:text-orange-200 font-medium">{recipes.length} Saved Recipes</span>
               </div>
             </div>
           </div>
@@ -260,7 +260,7 @@ const SavedRecipes = ({ onViewRecipe }) => {
         {/* Dark Mode Toggle Button */}
         <button
           onClick={() => setIsDarkMode(!isDarkMode)}
-          className="absolute top-4 right-4 p-2 rounded-full bg-white/20 text-white hover:bg-white/30 transition-colors duration-200 z-10"
+          className="absolute top-4 right-4 p-2 rounded-full bg-white/20 dark:bg-gray-700/60 text-white dark:text-orange-200 hover:bg-white/30 dark:hover:bg-gray-700 transition-colors duration-200 z-10"
           aria-label="Toggle Dark Mode"
         >
           {isDarkMode ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
