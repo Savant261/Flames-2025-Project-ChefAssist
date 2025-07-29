@@ -2,6 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./db/index.js";
 import UserRouter from "./routes/user.route.js";
+import RecipeRouter from "./routes/recipe.route.js";
+import AiChatRouter from "./routes/aiChat.route.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
@@ -32,6 +34,8 @@ app.use(
   })
 );
 app.use("/api/auth", UserRouter);
+app.use("/api/recipe", RecipeRouter);
+app.use("/api/aiChat", AiChatRouter);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
