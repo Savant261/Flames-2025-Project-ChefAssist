@@ -8,17 +8,6 @@ const ViewRecipe = ({ recipe, onBack }) => {
   const [checkedSteps, setCheckedSteps] = useState({});
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
-  const [isDarkMode, setIsDarkMode] = useState(false); // New state for dark mode
-
-  // Effect to apply/remove 'dark' class on the HTML element
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDarkMode]);
-
   // Define comprehensive default recipe data
   const defaultRecipeData = {
     id: 'default-recipe',
@@ -127,15 +116,6 @@ const ViewRecipe = ({ recipe, onBack }) => {
               <ArrowLeft className="w-5 h-5 mr-2" />
             </button>
             <div className="flex items-center space-x-3">
-              {/* Dark Mode Toggle Button */}
-              <button
-                onClick={() => setIsDarkMode(prev => !prev)}
-                className="p-2 rounded-full bg-[#FED7AA] hover:bg-[#D97706] hover:text-white transition-all duration-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                aria-label="Toggle dark mode"
-              >
-                {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-              </button>
-
               <button
                 onClick={() => showToastNotification('Recipe saved to favorites!')}
                 className="p-2 rounded-full bg-[#FED7AA] hover:bg-[#D97706] hover:text-white transition-all duration-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
