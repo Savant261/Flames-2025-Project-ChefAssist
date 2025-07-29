@@ -83,14 +83,7 @@ const userSchema = new mongoose.Schema(
     ],
     dietaryPreferences: {
       type: [String],
-      default: [
-        { name: "Vegetarian", value: false },
-        { name: "Vegan", value: false },
-        { name: "Gluten-Free", value: false },
-        { name: "Dairy-Free", value: false },
-        { name: "Keto", value: false },
-        { name: "Paleo", value: false },
-      ]
+      default: []
     },
   },
   { timestamps: true }

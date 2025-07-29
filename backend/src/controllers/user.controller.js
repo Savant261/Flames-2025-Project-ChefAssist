@@ -156,7 +156,7 @@ const updatePreference = async (req, res) => {
       gender,
       cookingLevel,
     });
-
+    
     return res.status(200).json(
       {
         message: "Sucessfully updated preference",
@@ -193,8 +193,16 @@ const getPreference = async (req, res) => {
   try {
     const userId = req.user._id;
     const user = await User.findById(userId);
+    console.log(user)
     return res.status(200).json({
-      dietaryPreferences: user.dietaryPreferences,
+      dietaryPreferences: user.dietaryPreferences ?? [
+        { name: "Vegetarian", value: false },
+        { name: "Vegan", value: false },
+        { name: "Gluten-Free", value: false },
+        { name: "Dairy-Free", value: false },
+        { name: "Keto", value: false },
+        { name: "Paleo", value: false },
+      ],
       gender: user.gender,
       cookingLevel: user.cookingLevel,
     });
