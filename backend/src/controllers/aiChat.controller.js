@@ -12,9 +12,9 @@ const createChat = async (req, res) => {
       title: title || "New Recipe Chat",
       messages: []
     });
-    res.status(201).json(chat);
+    return res.status(201).json(chat);
   } catch (error) {
-    res.status(500).json({ message: "Failed to create chat", error: error.message });
+    return res.status(500).json({ message: "Failed to create chat", error: error.message });
   }
 };
 

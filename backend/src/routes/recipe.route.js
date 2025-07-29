@@ -1,7 +1,7 @@
 import express from "express";
 import { protectRoute } from "../middleware/auth.middleware.js";
 import {
-  addRecipe,
+  // addRecipe,
   getRecipe,
   editRecipe,
   deleteRecipe,
@@ -11,7 +11,7 @@ import {
 } from "../controllers/recipe.controller.js";
 const router = express.Router();
 
-router.post("/recipe/add", protectRoute, addRecipe);
+// router.post("/recipe/add", protectRoute, addRecipe);
 router.get("/recipe/:recipeId", getRecipe);
 router.post("/recipe/:recipeId", protectRoute, editRecipe);
 router.delete("/recipe/:recipeId", protectRoute, deleteRecipe);

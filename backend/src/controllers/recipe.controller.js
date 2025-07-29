@@ -1,4 +1,4 @@
-import { Recipe } from "../models/recipe.model";
+import { Recipe } from "../models/recipe.model.js";
 
 const createRecipe = async (req,res)=>{
   const {image} = req.body;
@@ -74,7 +74,7 @@ const getRecipeAnalytics = async (req, res) => {
 };
 
 export {
-  addRecipe,
+  // addRecipe,
   getRecipe,
   editRecipe,
   deleteRecipe,
