@@ -213,23 +213,142 @@ const getPreference = async (req, res) => {
   }
 };
 
-const changePassword = async (req, res) => {};
+const changePassword = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { oldPassword, newPassword } = req.body;
+    if (!oldPassword || !newPassword)
+      return res.status(400).json({ message: "Both old and new password required" });
+    const user = await User.findById(userId);
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch)
+      return res.status(400).json({ message: "Old password is incorrect" });
+    if (newPassword.length < 6)
+      return res.status(400).json({ message: "New password must be at least 6 characters" });
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+    await user.save();
+    return res.status(200).json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.log("Error in changePassword controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
-const updateEmail = async (req, res) => {};
+const updateEmail = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { email } = req.body;
+    if (!email)
+      return res.status(400).json({ message: "Email is required" });
+    const existing = await User.findOne({ email });
+    if (existing)
+      return res.status(400).json({ message: "Email already in use" });
+    const user = await User.findByIdAndUpdate(userId, { email }, { new: true });
+    return res.status(200).json({ message: "Email updated", email: user.email });
+  } catch (error) {
+    console.log("Error in updateEmail controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
-const updatePhoneNumber = async (req, res) => {};
+const updatePhoneNumber = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { phoneNo } = req.body;
+    if (!phoneNo)
+      return res.status(400).json({ message: "Phone number is required" });
+    const existing = await User.findOne({ phoneNo });
+    if (existing)
+      return res.status(400).json({ message: "Phone number already in use" });
+    const user = await User.findByIdAndUpdate(userId, { phoneNo }, { new: true });
+    return res.status(200).json({ message: "Phone number updated", phoneNo: user.phoneNo });
+  } catch (error) {
+    console.log("Error in updatePhoneNumber controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
-const tooglePublicProfile = async (req, res) => {};
+const tooglePublicProfile = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+    user.publicProfile = !user.publicProfile;
+    await user.save();
+    return res.status(200).json({ message: "Public profile toggled", publicProfile: user.publicProfile });
+  } catch (error) {
+    console.log("Error in tooglePublicProfile controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
-const deleteAccount = async (req, res) => {};
+const deleteAccount = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    await User.findByIdAndDelete(userId);
+    res.cookie("jwt", "", { maxAge: 0 });
+    return res.status(200).json({ message: "Account deleted" });
+  } catch (error) {
+    console.log("Error in deleteAccount controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
-const getProfile = async (req, res) => {};
+const getProfile = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId).select("-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    return res.status(200).json(user);
+  } catch (error) {
+    console.log("Error in getProfile controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
-const getSavedRecipe = async (req, res) => {};
+const getSavedRecipe = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+    return res.status(200).json(user.savedRecipes || []);
+  } catch (error) {
+    console.log("Error in getSavedRecipe controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
-const addSavedRecipe = async (req, res) => {};
+const addSavedRecipe = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const recipe = req.body;
+    if (!recipe.recipeId)
+      return res.status(400).json({ message: "Recipe ID required" });
+    const user = await User.findById(userId);
+    if (user.savedRecipes.some(r => r.recipeId === recipe.recipeId)) {
+      return res.status(400).json({ message: "Recipe already saved" });
+    }
+    user.savedRecipes.push(recipe);
+    await user.save();
+    return res.status(201).json({ message: "Recipe saved", savedRecipes: user.savedRecipes });
+  } catch (error) {
+    console.log("Error in addSavedRecipe controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
-const deleteSavedRecipe = async (req, res) => {};
+const deleteSavedRecipe = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { recipeId } = req.params;
+    const user = await User.findById(userId);
+    user.savedRecipes = user.savedRecipes.filter(r => r.recipeId !== recipeId);
+    await user.save();
+    return res.status(200).json({ message: "Recipe removed", savedRecipes: user.savedRecipes });
+  } catch (error) {
+    console.log("Error in deleteSavedRecipe controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
 
 const toogleTheme = async (req, res) => {
   try {

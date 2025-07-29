@@ -85,6 +85,18 @@ const userSchema = new mongoose.Schema(
       type: [String],
       default: []
     },
+    savedRecipes: [
+      {
+        recipeId: { type: String, required: true },
+        title: { type: String },
+        image: { type: String },
+        cuisine: { type: String },
+        difficulty: { type: String },
+        rating: { type: Number },
+        reviews: { type: Number },
+        cookTime: { type: String }
+      }
+    ],
   },
   { timestamps: true }
 );
