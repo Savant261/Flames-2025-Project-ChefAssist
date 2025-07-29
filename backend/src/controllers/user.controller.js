@@ -180,6 +180,7 @@ const getSettingsProfile = async (req, res) => {
     return res.status(200).json({
       fullName: user.fullName ?? "",
       bio: user.bio ?? "",
+      username: user.username,
       socialLinks: user.socialLinks ?? { x: "", instagram: "", youtube: "" },
       avatar: user.avatar ?? "",
     });

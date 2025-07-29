@@ -9,7 +9,6 @@ const createRecipe = async (req,res)=>{
     folder: "recipe_pictures",
     resource_type: "image",
   });
-
 }
 
 const updateRecipe = async (req, res) => {

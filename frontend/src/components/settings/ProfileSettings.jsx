@@ -13,6 +13,7 @@ const ProfileSettings = () => {
   const [profileData, setProfileData] = useState({
     fullName: "",
     bio: "",
+    username:"",
     socialLinks: {
       x: "",
       youtube: "",
@@ -173,7 +174,7 @@ const ProfileSettings = () => {
           <div>
             <label
               htmlFor="username"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
             >
               Username *{" "}
               <span className="text-xs text-gray-500">(Cannot be changed)</span>
@@ -181,7 +182,7 @@ const ProfileSettings = () => {
             <input
               type="text"
               id="username"
-              value="priya_chef"
+              value={profileData.username}
               readOnly
               className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed dark:bg-gray-900 dark:border-gray-700 dark:text-gray-400"
             />
