@@ -1,21 +1,29 @@
 import { Recipe } from "../models/recipe.model.js";
+import cloudinary from "../utils/cloudinary.js";
 
-const createRecipe = async (req,res)=>{
+const createRecipe = async (req, res) => {
   try {
-    const {image } = req.body;
-    if (!image ) {
-      return res.status(400).json({ message: "All fields are required" });
+    const { image } = req.body;
+    if (!image) {
+      return res.status(400).json({ message: "Image is required" });
     }
+    
     const uploadResponse = await cloudinary.uploader.upload(image, {
       folder: "recipe_pictures",
       resource_type: "image",
     });
+    
     const recipe = await Recipe.create({
-      
       imageUrl: uploadResponse.secure_url,
-      author: req.user._id
+      author: req.user._id,
+      visibility: 'draft' // Always start as draft
     }); 
-    return res.status(201).json({ recipeId: recipe._id, imageUrl: recipe.imageUrl });
+    
+    return res.status(201).json({ 
+      recipeId: recipe._id, 
+      imageUrl: recipe.imageUrl,
+      message: "Recipe created successfully. Please complete the details." 
+    });
   } catch (error) {
     console.log("Error in createRecipe controller", error);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -24,14 +32,45 @@ const createRecipe = async (req,res)=>{
 
 const updateRecipe = async (req, res) => {
   try {
-    const {title, description, cookTime, servings, ingredient, instructions, tags, visibility, allowComment} = req.body;
+    const { recipeId } = req.params;
+    const { title, description, cookTime, servings, ingredients, instructions, tags, allowComments } = req.body;
 
-   
-    const recipe = Recipe.create({authorId:req.user._id,imageUrl:uploadResponse.secure_url,title, description, cookTime, servings,ingredient, instructions, tags, visibility, allowComment});
+    // Find the recipe and verify ownership
+    const recipe = await Recipe.findById(recipeId);
+    if (!recipe) {
+      return res.status(404).json({ message: "Recipe not found" });
+    }
+    
+    if (recipe.author.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
 
-    return res.status(200).json(recipe);
+    // Update recipe fields
+    const updateData = {};
+    if (title !== undefined) updateData.title = title;
+    if (description !== undefined) updateData.description = description;
+    if (cookTime !== undefined) updateData.cookTime = cookTime;
+    if (servings !== undefined) updateData.servings = servings;
+    if (ingredients !== undefined) updateData.ingredients = ingredients;
+    if (instructions !== undefined) updateData.instructions = instructions;
+    if (tags !== undefined) updateData.tags = tags;
+    if (allowComments !== undefined) updateData.allowComments = allowComments;
+
+    // Always keep as draft during updates - can only be published via publishRecipe
+    updateData.visibility = 'draft';
+
+    const updatedRecipe = await Recipe.findByIdAndUpdate(
+      recipeId, 
+      updateData, 
+      { new: true, runValidators: true }
+    );
+
+    return res.status(200).json({ 
+      message: "Recipe updated successfully", 
+      recipe: updatedRecipe 
+    });
   } catch (error) {
-    console.log("Error in add Recipe controller", error);
+    console.log("Error in updateRecipe controller", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -137,12 +176,196 @@ const getRecipeAnalytics = async (req, res) => {
   }
 };
 
+// Validation function to check if recipe is ready for publishing
+const validateRecipeForPublishing = (recipe) => {
+  const errors = [];
+  
+  // Check title (minimum 3 words)
+  if (!recipe.title || recipe.title.trim().split(/\s+/).length < 3) {
+    errors.push("Title must contain at least 3 words");
+  }
+  
+  // Check description (minimum 10 characters)
+  if (!recipe.description || recipe.description.trim().length < 10) {
+    errors.push("Description must be at least 10 characters long");
+  }
+  
+  // Check ingredients (minimum 3 ingredients)
+  if (!recipe.ingredients || recipe.ingredients.length < 3) {
+    errors.push("Recipe must have at least 3 ingredients");
+  }
+  
+  // Check instructions (minimum 3 steps)
+  if (!recipe.instructions || recipe.instructions.length < 3) {
+    errors.push("Recipe must have at least 3 instruction steps");
+  }
+  
+  // Check if all instruction steps have content
+  if (recipe.instructions) {
+    const emptySteps = recipe.instructions.filter(inst => !inst.step || inst.step.trim().length === 0);
+    if (emptySteps.length > 0) {
+      errors.push("All instruction steps must have content");
+    }
+  }
+  
+  // Check if all ingredients have required fields
+  if (recipe.ingredients) {
+    const invalidIngredients = recipe.ingredients.filter(ing => 
+      !ing.name || !ing.quantity || ing.name.trim().length === 0 || ing.quantity.trim().length === 0
+    );
+    if (invalidIngredients.length > 0) {
+      errors.push("All ingredients must have name and quantity");
+    }
+  }
+  
+  // Check cook time
+  if (!recipe.cookTime || recipe.cookTime.trim().length === 0) {
+    errors.push("Cook time is required");
+  }
+  
+  // Check servings
+  if (!recipe.servings || recipe.servings.trim().length === 0) {
+    errors.push("Number of servings is required");
+  }
+  
+  return errors;
+};
+
+const publishRecipe = async (req, res) => {
+  try {
+    const { recipeId } = req.params;
+    
+    const recipe = await Recipe.findById(recipeId);
+    if (!recipe) {
+      return res.status(404).json({ message: "Recipe not found" });
+    }
+    
+    if (recipe.author.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+    
+    // Validate recipe before publishing
+    const validationErrors = validateRecipeForPublishing(recipe);
+    if (validationErrors.length > 0) {
+      return res.status(400).json({ 
+        message: "Recipe cannot be published. Please fix the following issues:", 
+        errors: validationErrors 
+      });
+    }
+    
+    // If validation passes, publish the recipe
+    recipe.visibility = 'public';
+    await recipe.save();
+    
+    return res.status(200).json({ 
+      message: "Recipe published successfully!", 
+      recipe: recipe 
+    });
+  } catch (error) {
+    console.log("Error in publishRecipe controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const validateRecipe = async (req, res) => {
+  try {
+    const { recipeId } = req.params;
+    
+    const recipe = await Recipe.findById(recipeId);
+    if (!recipe) {
+      return res.status(404).json({ message: "Recipe not found" });
+    }
+    
+    if (recipe.author.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+    
+    const validationErrors = validateRecipeForPublishing(recipe);
+    
+    return res.status(200).json({ 
+      isValid: validationErrors.length === 0,
+      errors: validationErrors,
+      canPublish: validationErrors.length === 0
+    });
+  } catch (error) {
+    console.log("Error in validateRecipe controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const getUserRecipes = async (req, res) => {
+  try {
+    const { status } = req.query; // 'draft', 'public', or 'all'
+    
+    let filter = { author: req.user._id };
+    
+    if (status && status !== 'all') {
+      filter.visibility = status;
+    }
+    
+    const recipes = await Recipe.find(filter)
+      .populate("author", "username avatar")
+      .sort({ updatedAt: -1 });
+    
+    return res.status(200).json({
+      recipes,
+      total: recipes.length
+    });
+  } catch (error) {
+    console.log("Error in getUserRecipes controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const getAllPublicRecipes = async (req, res) => {
+  try {
+    const { page = 1, limit = 10, search = '', tags = '' } = req.query;
+    
+    let filter = { visibility: 'public' };
+    
+    if (search) {
+      filter.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ];
+    }
+    
+    if (tags) {
+      const tagArray = tags.split(',').map(tag => tag.trim());
+      filter.tags = { $in: tagArray };
+    }
+    
+    const recipes = await Recipe.find(filter)
+      .populate("author", "username avatar")
+      .sort({ createdAt: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+    
+    const total = await Recipe.countDocuments(filter);
+    
+    return res.status(200).json({
+      recipes,
+      total,
+      page: parseInt(page),
+      pages: Math.ceil(total / limit)
+    });
+  } catch (error) {
+    console.log("Error in getAllPublicRecipes controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 export {
   createRecipe,
   updateRecipe,
   getRecipe,
+  editRecipe,
   deleteRecipe,
   toogleRecipe,
   toogleRecipeComment,
   getRecipeAnalytics,
+  publishRecipe,
+  validateRecipe,
+  getUserRecipes,
+  getAllPublicRecipes,
 };

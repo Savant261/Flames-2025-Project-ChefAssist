@@ -159,6 +159,7 @@ function App() {
               <Route path="/feedback" element={<Feedback />} />
               <Route path="/recipe" element={<Recipe />} />
               <Route path="/recipe/create" element={<CreateRecipe />} />
+              <Route path="/recipe/create/:recipeId" element={<CreateRecipe />} />
               <Route path="/recipe/edit/:recipeId" element={<CreateRecipe />} />
               <Route path="/search" element={<Search />} />
               <Route path="/trending" element={<Trending />} />

@@ -4,20 +4,52 @@ import {
   getRecipe,
   createRecipe,
   updateRecipe,
+  editRecipe,
   deleteRecipe,
   toogleRecipe,
   toogleRecipeComment,
   getRecipeAnalytics,
+  publishRecipe,
+  validateRecipe,
+  getUserRecipes,
+  getAllPublicRecipes,
 } from "../controllers/recipe.controller.js";
 const router = express.Router();
 
+// Get all public recipes (with pagination and search)
+router.get("/", getAllPublicRecipes);
+
+// Get user's recipes
+router.get("/my-recipes", protectRoute, getUserRecipes);
+
+// Create recipe (Step 1: Upload image)
 router.post("/", protectRoute, createRecipe);
+
+// Update recipe (Steps 2-4: Update recipe details)
 router.put("/:recipeId", protectRoute, updateRecipe);
+
+// Edit recipe (Alternative update route)
+router.patch("/:recipeId", protectRoute, editRecipe);
+
+// Get specific recipe
 router.get("/:recipeId", getRecipe);
 
+// Validate recipe before publishing
+router.get("/:recipeId/validate", protectRoute, validateRecipe);
+
+// Publish recipe (Make it public)
+router.post("/:recipeId/publish", protectRoute, publishRecipe);
+
+// Delete recipe
 router.delete("/:recipeId", protectRoute, deleteRecipe);
-router.put("/:recipeId", protectRoute, toogleRecipe);
-router.post("/comment/:recipeId", protectRoute, toogleRecipeComment);
-router.post("/analytics/:recipeId", protectRoute, getRecipeAnalytics);
+
+// Toggle recipe visibility
+router.put("/:recipeId/toggle", protectRoute, toogleRecipe);
+
+// Toggle recipe comments
+router.post("/:recipeId/comment", protectRoute, toogleRecipeComment);
+
+// Get recipe analytics
+router.get("/:recipeId/analytics", protectRoute, getRecipeAnalytics);
 
 export default router;
