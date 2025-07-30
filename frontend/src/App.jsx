@@ -150,6 +150,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/ai" element={<Ai />} />
+              <Route path="/ai/:chatId" element={<Ai />} />
               <Route path="/explore" element={<Explore />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/editProfile" element={<EditProfile />} />

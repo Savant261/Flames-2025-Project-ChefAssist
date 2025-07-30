@@ -66,6 +66,7 @@ const Ai = () => {
   // Load user data on component mount
   useEffect(() => {
     loadUserData();
+    loadExistingChat();
     loadChatHistory();
   }, []);
 
@@ -73,13 +74,6 @@ const Ai = () => {
   useEffect(() => {
     if (chatId) {
       loadSpecificChat(chatId);
-    } else {
-      // Clear current chat when no chatId is present
-      setCurrentChat(null);
-      setActiveChats([]);
-      setMessages([]);
-      setOutput("");
-      setError("");
     }
   }, [chatId]);
 
@@ -87,25 +81,74 @@ const Ai = () => {
     try {
       const inventoryData = await aiService.getUserInventory();
       setUserInventory(inventoryData.ingredients || []);
-      
-      // Get dietary preferences from the backend using the new endpoint
-      const dietaryData = await aiService.getUserDietaryPreferences();
-      console.log("Dietary preferences fetched:", dietaryData);
-      setUserDietaryPreferences(dietaryData.dietaryPreferences || []);
+      setUserDietaryPreferences(inventoryData.dietaryPreferences || []);
 
       const ingredientNames = inventoryData.ingredients
         .map((item) => item.name)
         .join(", ");
       setAvailableIngredients(ingredientNames);
 
-      // Load dietary restrictions from backend and set them for UI display
-      const dietaryRestrictions = dietaryData.dietaryPreferences || [];
+      // Load dietary restrictions from backend and set them
+      const dietaryRestrictions = inventoryData.dietaryPreferences || [];
       const restrictionIds = restrictionsList
         .filter((r) => dietaryRestrictions.includes(r.label))
         .map((r) => r.id);
       setSelectedRestrictions(restrictionIds);
     } catch (error) {
       console.error("Failed to load user data:", error);
+    }
+  };
+
+  const loadExistingChat = async () => {
+    try {
+      setIsLoadingChat(true);
+      const urlParams = new URLSearchParams(window.location.search);
+      const chatIdFromUrl = urlParams.get("chatId");
+      const savedChatId = localStorage.getItem("currentChatId");
+
+      const chatIdToLoad = chatIdFromUrl || savedChatId;
+
+      if (chatIdToLoad) {
+        const chatData = await aiService.getChat(chatIdToLoad);
+        if (chatData) {
+          setCurrentChat(chatData);
+          
+          // Load previous messages and convert them to activeChats format
+          const messages = chatData.messages || [];
+          const convertedChats = [];
+          
+          for (let i = 0; i < messages.length; i += 2) {
+            const userMessage = messages[i];
+            const aiMessage = messages[i + 1];
+            
+            if (userMessage && aiMessage && userMessage.role === 'user' && aiMessage.role === 'ai') {
+              // Format the output using the same logic as new responses
+              let formattedOutput = aiMessage.content;
+              if (aiMessage.recipeData && typeof aiMessage.recipeData === 'object') {
+                formattedOutput = formatRecipeDisplay(aiMessage.recipeData, aiMessage.type || 'idea');
+              }
+              
+              const chatEntry = {
+                input: userMessage.content,
+                output: formattedOutput,
+                recipeData: aiMessage.recipeData,
+                restrictions: aiMessage.dietaryRestrictions?.join(', ') || 'Previous Chat',
+                mode: aiMessage.type || 'idea',
+                timestamp: aiMessage.createdAt || aiMessage.timestamp || new Date().toLocaleString()
+              };
+              convertedChats.push(chatEntry);
+            }
+          }
+          
+          setActiveChats(convertedChats);
+          setMessages(messages);
+          localStorage.setItem("currentChatId", chatData._id);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load existing chat:", error);
+    } finally {
+      setIsLoadingChat(false);
     }
   };
 
@@ -146,6 +189,7 @@ const Ai = () => {
         
         setActiveChats(convertedChats);
         setMessages(messages);
+        localStorage.setItem("currentChatId", chatData._id);
       }
     } catch (error) {
       console.error("Failed to load specific chat:", error);
@@ -186,6 +230,7 @@ const Ai = () => {
     try {
       const chat = await aiService.createChat("Recipe Generation Chat");
       setCurrentChat(chat);
+      localStorage.setItem("currentChatId", chat._id);
       // Navigate to the new chat URL
       navigate(`/ai/${chat._id}`);
       // Refresh chat history to include new chat
@@ -205,28 +250,11 @@ const Ai = () => {
       setOutput("");
       setError("");
       setInput("");
+      localStorage.removeItem("currentChatId");
       navigate("/ai");
     } catch (error) {
       console.error("Failed to start new chat:", error);
       setError("Failed to start new chat session");
-    }
-  };
-
-  // Handle chat deletion
-  const handleDeleteChat = async (chatIdToDelete) => {
-    try {
-      await aiService.deleteChat(chatIdToDelete);
-      
-      // If the deleted chat is the current chat, navigate to main AI page
-      if (chatId === chatIdToDelete) {
-        navigate("/ai");
-      }
-      
-      // Refresh chat history to remove deleted chat
-      loadChatHistory();
-    } catch (error) {
-      console.error("Failed to delete chat:", error);
-      setError("Failed to delete chat. Please try again.");
     }
   };
 
@@ -235,34 +263,11 @@ const Ai = () => {
     setInput(e.target.value);
   };
 
-  // Handle restriction selection with backend update
-  const handleRestrictionToggle = async (id) => {
-    try {
-      const newSelectedRestrictions = selectedRestrictions.includes(id) 
-        ? selectedRestrictions.filter((r) => r !== id) 
-        : [...selectedRestrictions, id];
-      
-      // Update UI immediately for better UX
-      setSelectedRestrictions(newSelectedRestrictions);
-      
-      // Convert restriction IDs back to labels for backend
-      const restrictionLabels = newSelectedRestrictions
-        .map((restrictionId) => restrictionsList.find((r) => r.id === restrictionId)?.label)
-        .filter(Boolean);
-      
-      // Update backend
-      await aiService.updateUserDietaryPreferences(restrictionLabels);
-      
-      // Update local state
-      setUserDietaryPreferences(restrictionLabels);
-      
-      console.log("Dietary preferences updated:", restrictionLabels);
-    } catch (error) {
-      console.error("Failed to update dietary preferences:", error);
-      // Revert UI change on error
-      setSelectedRestrictions(selectedRestrictions);
-      setError("Failed to update dietary preferences. Please try again.");
-    }
+  // Handle restriction selection
+  const handleRestrictionToggle = (id) => {
+    setSelectedRestrictions((prev) =>
+      prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]
+    );
   };
 
   // Handle history selection - navigate to specific chat
@@ -350,13 +355,13 @@ const Ai = () => {
 
     try {
       let response;
-      let currentChatId = chatId; // Use chatId from URL params
+      let chatId = currentChat?._id;
 
       // Create new chat if none exists
-      if (!currentChatId) {
+      if (!chatId) {
         try {
           const newChat = await createNewChat();
-          currentChatId = newChat._id;
+          chatId = newChat._id;
         } catch (chatError) {
           setError("Failed to create chat session. Please try again.");
           setIsLoading(false);
@@ -366,22 +371,22 @@ const Ai = () => {
 
       // Call different backend endpoints based on mode
       if (selectedMode === "idea") {
-        response = await aiService.generateRecipe(currentChatId, input, "generate_recipe");
+        response = await aiService.generateRecipe(chatId, input, "generate_recipe");
       } else if (selectedMode === "ingredients") {
         const ingredients = availableIngredients
           ? availableIngredients.split(",").map((i) => i.trim()).filter((i) => i)
           : [];
         response = await aiService.generateRecipeWithIngredients(
-          currentChatId,
+          chatId,
           input,
           ingredients,
           useInventory
         );
       } else if (selectedMode === "adapt") {
         if (recipeId) {
-          response = await aiService.adaptExistingRecipe(currentChatId, null, input, recipeId);
+          response = await aiService.adaptExistingRecipe(chatId, null, input, recipeId);
         } else if (originalRecipe.title) {
-          response = await aiService.adaptExistingRecipe(currentChatId, originalRecipe, input);
+          response = await aiService.adaptExistingRecipe(chatId, originalRecipe, input);
         } else {
           setError("Please provide either a recipe ID or original recipe details to adapt");
           setIsLoading(false);
@@ -420,23 +425,11 @@ const Ai = () => {
       loadChatHistory();
     } catch (error) {
       console.error("Failed to generate recipe:", error);
-      
-      // Handle different error types
-      let errorMessage = "Failed to generate recipe. Please try again.";
-      if (error.code === 'TIMEOUT') {
-        errorMessage = "⏱️ " + error.message;
-      } else {
-        errorMessage = error.message || errorMessage;
-      }
-      
-      setError(errorMessage);
+      setError(error.message || "Failed to generate recipe. Please try again.");
 
-      // Fallback response with better timeout messaging
-      let fallbackOutput;
-      if (error.code === 'TIMEOUT') {
-        fallbackOutput = `⏱️ Recipe Generation Timeout\n\nThe AI is taking longer than expected to generate your recipe. This usually happens with complex requests.\n\nTry:\n• Simplifying your request\n• Being more specific\n• Trying again in a moment\n\nRequest: "${input}"\nMode: ${selectedMode}`;
-      } else {
-        fallbackOutput = selectedMode === "idea"
+      // Fallback response
+      const fallbackOutput =
+        selectedMode === "idea"
           ? `✨ Recipe Idea for: ${input || "..."}\nRestrictions: ${
               selectedRestrictions
                 .map((r) => restrictionsList.find((x) => x.id === r)?.label)
@@ -447,7 +440,6 @@ const Ai = () => {
                 .map((r) => restrictionsList.find((x) => x.id === r)?.label)
                 .join(", ") || "None"
             }\n\n[API Error: ${error.message}]`;
-      }
 
       const fallbackChat = {
         input,
@@ -542,7 +534,6 @@ const Ai = () => {
         selectedHistoryIdx={selectedHistoryIdx}
         copiedIdx={copiedIdx}
         handleCopyHistory={handleCopyHistory}
-        handleDeleteChat={handleDeleteChat}
       />
 
       {/* Styles */}
