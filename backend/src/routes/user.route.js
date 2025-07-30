@@ -43,11 +43,11 @@ router.get("/update-profile", protectRoute, getSettingsProfile);
 router.post("/update-Preference", protectRoute, updatePreference);
 router.get("/update-Preference", protectRoute, getPreference);
 
-router.get("/change-Password", protectRoute, changePassword);
-router.get("/update-Email", protectRoute, updateEmail);
-router.get("/update-PhoneNumber", protectRoute, updatePhoneNumber);
-router.get("/public-Profile-toogle", protectRoute, tooglePublicProfile);
-router.get("/delete-Account", protectRoute, deleteAccount);
+router.post("/change-Password", protectRoute, changePassword);
+router.post("/update-Email", protectRoute, updateEmail);
+router.post("/update-PhoneNumber", protectRoute, updatePhoneNumber);
+router.post("/public-Profile-toogle", protectRoute, tooglePublicProfile);
+router.delete("/delete-Account", protectRoute, deleteAccount);
 
 // notificaton & subscription
 export default router;

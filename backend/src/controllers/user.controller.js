@@ -174,19 +174,31 @@ const updatePreference = async (req, res) => {
 
 const getSettingsProfile = async (req, res) => {
   try {
-    const userId =  req.user._id;
-    const user = await User.findById(userId);
+    const userId = req.user._id;
+    const user = await User.findById(userId).select('-password');
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
     return res.status(200).json({
-      fullName: user.fullName ?? "",
-      bio: user.bio ?? "",
+      fullName: user.fullName || "",
+      bio: user.bio || "",
       username: user.username,
-      socialLinks: user.socialLinks ?? { x: "", instagram: "", youtube: "" },
-      avatar: user.avatar ?? "",
+      email: user.email,
+      phoneNumber: user.phoneNumber || "",
+      isPublic: user.isPublic || false,
+      socialLinks: user.socialLinks || { x: "", instagram: "", youtube: "" },
+      avatar: user.avatar || "",
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt
     });
   } catch (error) {
-    console.log("Error in get Profile Controller", error);
-    return res.status(500).json({ message: "Internal Server Error" });
+    console.error("Error in getSettingsProfile:", error);
+    return res.status(500).json({ 
+      message: "Failed to fetch user settings",
+      error: error.message 
+    });
   }
 };
 
