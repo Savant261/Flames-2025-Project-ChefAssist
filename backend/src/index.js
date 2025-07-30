@@ -35,7 +35,7 @@ app.use(
 );
 app.use("/api/auth", UserRouter);
 app.use("/api/recipe", RecipeRouter);
-app.use("/api/aiChat", AiChatRouter);
+app.use("/api/aiChats", AiChatRouter);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);

@@ -14,7 +14,7 @@ const createRecipe = async (req,res)=>{
       
       imageUrl: uploadResponse.secure_url,
       author: req.user._id
-    });
+    }); 
     return res.status(201).json({ recipeId: recipe._id, imageUrl: recipe.imageUrl });
   } catch (error) {
     console.log("Error in createRecipe controller", error);

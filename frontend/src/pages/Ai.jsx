@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ChefHat, Leaf, WheatOff, Nut, MilkOff, Droplets, FishOff, EggOff, Shell, Ban, Carrot, Scale, HeartPulse, Lightbulb, Loader2 } from 'lucide-react';
+import aiService from '../api/aiService.js';
 
 const restrictionsList = [
   { id: 'vegan', label: 'Vegan', icon: Leaf },
@@ -19,11 +20,30 @@ const restrictionsList = [
 const modes = [
   { id: 'idea', label: 'Generate Recipe Idea', icon: 'lightbulb' },
   { id: 'ingredients', label: 'Generate Recipe Based on Ingredients', icon: 'chefhat' },
+  { id: 'adapt', label: 'Adapt Existing Recipe', icon: 'star' },
 ];
 
 const Ai = () => {
   // Store all selected chats for scrollable middle section
   const [activeChats, setActiveChats] = useState([]);
+
+  // Backend integration state
+  const [currentChat, setCurrentChat] = useState(null);
+  const [userInventory, setUserInventory] = useState([]);
+  const [userDietaryPreferences, setUserDietaryPreferences] = useState([]);
+  const [availableIngredients, setAvailableIngredients] = useState('');
+  const [error, setError] = useState('');
+
+  // Additional options
+  const [useInventory, setUseInventory] = useState(false);
+  const [recipeId, setRecipeId] = useState('');
+
+  // Recipe adaptation state
+  const [originalRecipe, setOriginalRecipe] = useState({
+    title: '',
+    ingredients: [],
+    instructions: []
+  });
 
   // When a history chat is selected, add it to activeChats
   const handleSelectHistory = (idx) => {
@@ -122,6 +142,37 @@ const Ai = () => {
   // Dropdown for restrictions
   const [showDropdown, setShowDropdown] = useState(false);
 
+  // Load user data and create chat session on component mount
+  useEffect(() => {
+    loadUserData();
+    createNewChat();
+  }, []);
+
+  const loadUserData = async () => {
+    try {
+      const inventoryData = await aiService.getUserInventory();
+      setUserInventory(inventoryData.ingredients || []);
+      setUserDietaryPreferences(inventoryData.dietaryPreferences || []);
+      
+      // Convert inventory to ingredient names for easy use
+      const ingredientNames = inventoryData.ingredients.map(item => item.name).join(', ');
+      setAvailableIngredients(ingredientNames);
+    } catch (error) {
+      console.error('Failed to load user data:', error);
+      // Continue without user data if failed
+    }
+  };
+
+  const createNewChat = async () => {
+    try {
+      const chat = await aiService.createChat('Recipe Generation Chat');
+      setCurrentChat(chat);
+    } catch (error) {
+      console.error('Failed to create chat:', error);
+      setError('Failed to create new chat session');
+    }
+  };
+
   // Handle input change (do not clear output when input is cleared)
   const handleInputChange = (e) => {
     setInput(e.target.value);
@@ -141,28 +192,182 @@ const Ai = () => {
     );
   };
 
-  // Simulate output generation
-  const handleSubmit = (e) => {
+  // Generate recipe with backend integration
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!input.trim()) return;
+
     setIsLoading(true);
-    setTimeout(() => {
-      const newOutput =
-        selectedMode === 'idea'
-          ? `✨ Recipe Idea for: ${input || '...'}\nRestrictions: ${selectedRestrictions.map(r => restrictionsList.find(x => x.id === r)?.label).join(', ') || 'None'}`
-          : `🍳 Recipe based on ingredients: ${input || '...'}\nRestrictions: ${selectedRestrictions.map(r => restrictionsList.find(x => x.id === r)?.label).join(', ') || 'None'}`;
+    setError('');
+
+    try {
+      let response;
+      let chatId = currentChat?._id;
+
+      // Create new chat if none exists
+      if (!chatId) {
+        const newChat = await aiService.createChat('Recipe Generation Chat');
+        setCurrentChat(newChat);
+        chatId = newChat._id;
+      }
+
+      // Call different backend endpoints based on mode
+      if (selectedMode === 'idea') {
+        response = await aiService.generateRecipe(chatId, input, 'generate_recipe');
+      } else if (selectedMode === 'ingredients') {
+        // Use available ingredients from user inventory or manual input
+        const ingredients = availableIngredients ? 
+          availableIngredients.split(',').map(i => i.trim()).filter(i => i) : 
+          [];
+        response = await aiService.generateRecipeWithIngredients(chatId, input, ingredients, useInventory);
+      } else if (selectedMode === 'adapt') {
+        // For adapt mode, support both platform recipes (by ID) and user-provided recipes
+        if (recipeId) {
+          // Adapt platform recipe by ID
+          response = await aiService.adaptExistingRecipe(chatId, null, input, recipeId);
+        } else if (originalRecipe.title) {
+          // Adapt user-provided recipe
+          response = await aiService.adaptExistingRecipe(chatId, originalRecipe, input);
+        } else {
+          setError('Please provide either a recipe ID or original recipe details to adapt');
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // Format response for display
+      const recipeData = response.response?.recipeData;
+      let formattedOutput = '';
+      
+      if (recipeData && typeof recipeData === 'object') {
+        formattedOutput = formatRecipeDisplay(recipeData, selectedMode);
+      } else {
+        formattedOutput = response.response?.content || 'Recipe generated successfully!';
+      }
+
       const newChat = {
         input,
         restrictions: selectedRestrictions.map(r => restrictionsList.find(x => x.id === r)?.label).join(', ') || 'None',
         mode: selectedMode,
-        output: newOutput,
+        output: formattedOutput,
+        recipeData: recipeData,
         timestamp: new Date().toLocaleString()
       };
-      setOutput(newOutput);
+
+      setOutput(formattedOutput);
       setHistory((prev) => [newChat, ...prev]);
       setActiveChats((prev) => [...prev, newChat]);
-      setIsLoading(false);
       setInput(''); // Reset input after output
-    }, 1200);
+
+    } catch (error) {
+      console.error('Failed to generate recipe:', error);
+      setError(error.message || 'Failed to generate recipe. Please try again.');
+      
+      // Fallback to mock response if API fails
+      const fallbackOutput = selectedMode === 'idea'
+        ? `✨ Recipe Idea for: ${input || '...'}\nRestrictions: ${selectedRestrictions.map(r => restrictionsList.find(x => x.id === r)?.label).join(', ') || 'None'}\n\n[API Error: ${error.message}]`
+        : `🍳 Recipe based on ingredients: ${input || '...'}\nRestrictions: ${selectedRestrictions.map(r => restrictionsList.find(x => x.id === r)?.label).join(', ') || 'None'}\n\n[API Error: ${error.message}]`;
+      
+      const fallbackChat = {
+        input,
+        restrictions: selectedRestrictions.map(r => restrictionsList.find(x => x.id === r)?.label).join(', ') || 'None',
+        mode: selectedMode,
+        output: fallbackOutput,
+        timestamp: new Date().toLocaleString()
+      };
+      
+      setOutput(fallbackOutput);
+      setHistory((prev) => [fallbackChat, ...prev]);
+      setActiveChats((prev) => [...prev, fallbackChat]);
+      setInput('');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Format recipe data for display
+  const formatRecipeDisplay = (recipeData, mode) => {
+    if (!recipeData) return 'Recipe generated successfully!';
+
+    let formatted = '';
+    
+    if (mode === 'idea') {
+      formatted += `✨ Recipe Idea: ${recipeData.title || 'Delicious Recipe'}\n\n`;
+    } else if (mode === 'ingredients') {
+      formatted += `🍳 Recipe with Your Ingredients: ${recipeData.title || 'Delicious Recipe'}\n\n`;
+    } else if (mode === 'adapt') {
+      formatted += `🔄 Adapted Recipe: ${recipeData.title || 'Improved Recipe'}\n\n`;
+    }
+
+    if (recipeData.description) {
+      formatted += `📝 Description: ${recipeData.description}\n\n`;
+    }
+
+    if (recipeData.prepTime) {
+      formatted += `⏱️ Time: Prep ${recipeData.prepTime} | Cook ${recipeData.cookTime} | Total ${recipeData.totalTime}\n`;
+    }
+
+    if (recipeData.servings) {
+      formatted += `👥 Serves: ${recipeData.servings}\n`;
+    }
+
+    if (recipeData.difficulty) {
+      formatted += `📊 Difficulty: ${recipeData.difficulty}\n\n`;
+    }
+
+    if (recipeData.ingredients && recipeData.ingredients.length > 0) {
+      formatted += `🛒 Ingredients:\n`;
+      recipeData.ingredients.forEach((ingredient, index) => {
+        formatted += `${index + 1}. ${ingredient}\n`;
+      });
+      formatted += '\n';
+    }
+
+    if (recipeData.instructions && recipeData.instructions.length > 0) {
+      formatted += `👨‍🍳 Instructions:\n`;
+      recipeData.instructions.forEach((step, index) => {
+        formatted += `${index + 1}. ${step}\n`;
+      });
+      formatted += '\n';
+    }
+
+    if (recipeData.tips && recipeData.tips.length > 0) {
+      formatted += `💡 Tips:\n`;
+      recipeData.tips.forEach((tip, index) => {
+        formatted += `• ${tip}\n`;
+      });
+      formatted += '\n';
+    }
+
+    if (recipeData.nutritionalBenefits) {
+      formatted += `🌱 Nutritional Benefits: ${recipeData.nutritionalBenefits}\n\n`;
+    }
+
+    // Add special indicators for ingredients mode
+    if (mode === 'ingredients') {
+      if (recipeData.usedIngredients && recipeData.usedIngredients.length > 0) {
+        formatted += `✅ Used Your Ingredients: ${recipeData.usedIngredients.join(', ')}\n`;
+      }
+      if (recipeData.additionalIngredients && recipeData.additionalIngredients.length > 0) {
+        formatted += `➕ Additional Ingredients Needed: ${recipeData.additionalIngredients.join(', ')}\n`;
+      }
+    }
+
+    // Add special indicators for adapt mode
+    if (mode === 'adapt') {
+      if (recipeData.adaptations && recipeData.adaptations.length > 0) {
+        formatted += `🔧 Adaptations Made:\n`;
+        recipeData.adaptations.forEach((adaptation, index) => {
+          formatted += `• ${adaptation}\n`;
+        });
+        formatted += '\n';
+      }
+      if (recipeData.originalVsAdapted) {
+        formatted += `📊 Original vs Adapted: ${recipeData.originalVsAdapted}\n`;
+      }
+    }
+
+    return formatted;
   };
 
   // Simulate user name from props or context (replace with actual user logic)
@@ -317,13 +522,145 @@ const Ai = () => {
               </button>
             ))}
           </div>
+          
+          {/* Ingredients input section for ingredients mode */}
+          {selectedMode === 'ingredients' && (
+            <div className="w-full mb-4 bg-white/20 dark:bg-gray-800/20 rounded-2xl p-4 border border-[#FFDCA9] dark:border-orange-400">
+              
+              {/* Use Inventory Option */}
+              <div className="mb-4">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={useInventory}
+                    onChange={(e) => setUseInventory(e.target.checked)}
+                    className="form-checkbox h-5 w-5 text-[#FF7F3F] dark:text-orange-400 border-[#FFDCA9] dark:border-orange-400 rounded focus:ring-2 focus:ring-[#FFDCA9] dark:focus:ring-orange-400 bg-white dark:bg-gray-900"
+                  />
+                  <span className="text-sm font-semibold text-[#FF7F3F] dark:text-orange-400">
+                    Use My Inventory ({userInventory.length} items)
+                  </span>
+                </label>
+                <p className="text-xs text-[#FF7F3F] dark:text-orange-400 mt-1 opacity-70 ml-8">
+                  {useInventory ? 'Will use ingredients from your inventory' : 'Will use only manually entered ingredients'}
+                </p>
+              </div>
+
+              <label className="block text-sm font-semibold text-[#FF7F3F] dark:text-orange-400 mb-2">
+                {useInventory ? 'Additional Ingredients (optional):' : 'Available Ingredients (comma separated):'}
+              </label>
+              <textarea
+                value={availableIngredients}
+                onChange={(e) => setAvailableIngredients(e.target.value)}
+                className="w-full p-3 border border-[#FFDCA9] dark:border-orange-400 rounded-lg resize-none bg-white/90 dark:bg-gray-800 text-[#FF7F3F] dark:text-orange-400"
+                rows={3}
+                placeholder={useInventory 
+                  ? "Additional ingredients to use beyond your inventory..."
+                  : "e.g., tomatoes, onions, garlic, chicken breast, olive oil..."
+                }
+              />
+              <p className="text-xs text-[#FF7F3F] dark:text-orange-400 mt-1 opacity-70">
+                {useInventory 
+                  ? `Your inventory: ${userInventory.map(item => item.name).join(', ') || 'No items'}`
+                  : userInventory.length > 0 
+                    ? `Available in inventory: ${userInventory.length} items`
+                    : 'No inventory items found'
+                }
+              </p>
+            </div>
+          )}
+
+          {/* Original recipe input section for adapt mode */}
+          {selectedMode === 'adapt' && (
+            <div className="w-full mb-4 bg-white/20 dark:bg-gray-800/20 rounded-2xl p-4 border border-[#FFDCA9] dark:border-orange-400">
+              <h3 className="text-lg font-semibold text-[#FF7F3F] dark:text-orange-400 mb-4">
+                Recipe to Adapt
+              </h3>
+              
+              {/* Platform Recipe ID Option */}
+              <div className="mb-4">
+                <label className="block text-sm font-semibold text-[#FF7F3F] dark:text-orange-400 mb-2">
+                  Platform Recipe ID (optional):
+                </label>
+                <input
+                  type="text"
+                  value={recipeId}
+                  onChange={(e) => setRecipeId(e.target.value)}
+                  className="w-full p-3 border border-[#FFDCA9] dark:border-orange-400 rounded-lg bg-white/90 dark:bg-gray-800 text-[#FF7F3F] dark:text-orange-400"
+                  placeholder="Enter recipe ID from our platform..."
+                />
+                <p className="text-xs text-[#FF7F3F] dark:text-orange-400 mt-1 opacity-70">
+                  Leave empty to provide your own recipe details below
+                </p>
+              </div>
+
+              {/* Manual Recipe Input - Only show if no recipe ID */}
+              {!recipeId && (
+                <>
+                  <div className="mb-3">
+                    <label className="block text-sm font-semibold text-[#FF7F3F] dark:text-orange-400 mb-2">
+                      OR Enter Recipe Details Manually:
+                    </label>
+                  </div>
+                  <div className="space-y-3">
+                    <input
+                      type="text"
+                      value={originalRecipe.title}
+                      onChange={(e) => setOriginalRecipe(prev => ({ ...prev, title: e.target.value }))}
+                      className="w-full p-3 border border-[#FFDCA9] dark:border-orange-400 rounded-lg bg-white/90 dark:bg-gray-800 text-[#FF7F3F] dark:text-orange-400"
+                      placeholder="Recipe title..."
+                    />
+                    <textarea
+                      value={originalRecipe.ingredients.join(', ')}
+                      onChange={(e) => setOriginalRecipe(prev => ({ 
+                        ...prev, 
+                        ingredients: e.target.value.split(',').map(i => i.trim()).filter(i => i)
+                      }))}
+                      className="w-full p-3 border border-[#FFDCA9] dark:border-orange-400 rounded-lg resize-none bg-white/90 dark:bg-gray-800 text-[#FF7F3F] dark:text-orange-400"
+                      rows={3}
+                      placeholder="Ingredients (comma separated)..."
+                    />
+                    <textarea
+                      value={originalRecipe.instructions.join('. ')}
+                      onChange={(e) => setOriginalRecipe(prev => ({ 
+                        ...prev, 
+                        instructions: e.target.value.split('.').map(i => i.trim()).filter(i => i)
+                      }))}
+                      className="w-full p-3 border border-[#FFDCA9] dark:border-orange-400 rounded-lg resize-none bg-white/90 dark:bg-gray-800 text-[#FF7F3F] dark:text-orange-400"
+                      rows={4}
+                      placeholder="Instructions (separate with periods)..."
+                    />
+                  </div>
+                </>
+              )}
+
+              {recipeId && (
+                <div className="bg-green-100 dark:bg-green-900/30 border border-green-400 text-green-700 dark:text-green-300 px-4 py-3 rounded">
+                  Will adapt recipe from platform (ID: {recipeId})
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Error display */}
+          {error && (
+            <div className="w-full mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+              {error}
+            </div>
+          )}
+
           <form className="w-full flex flex-row items-center gap-4" onSubmit={handleSubmit}>
             <div className="relative flex-1 flex items-center">
               <input
                 type="text"
                 value={input}
                 onChange={handleInputChange}
-                placeholder={selectedMode === 'idea' ? 'Search for recipes, ideas, or ingredients...' : 'Enter ingredients (e.g. chicken, tomato, cheese)'}
+                placeholder={
+                  selectedMode === 'idea' 
+                    ? 'Search for recipes, ideas, or ingredients...' 
+                    : selectedMode === 'ingredients'
+                    ? 'Enter ingredients (e.g. chicken, tomato, cheese)'
+                    : 'How would you like to adapt the recipe?'
+                }
                 className="w-full rounded-full bg-white/90 dark:bg-gray-900 text-[#FF7F3F] dark:text-orange-400 text-xl px-12 py-3 shadow focus:outline-none focus:ring-4 focus:ring-[#FF7F3F] dark:focus:ring-orange-400 placeholder:text-[#FF7F3F] dark:placeholder-orange-200 border-2 border-[#FFDCA9] dark:border-orange-400 transition-all duration-200 font-semibold pr-24 animate-slide-in-section"
                 style={{ boxShadow: '0 2px 12px #FFDCA955', minWidth: '350px', maxWidth: '100%' }}
               />
@@ -357,7 +694,10 @@ const Ai = () => {
               className={`rounded-full px-8 py-3 text-xl font-bold shadow-xl bg-gradient-to-r from-[#A5A6B2] to-[#FFDCA9] dark:from-orange-400 dark:to-orange-200 text-white dark:text-gray-900 transition-all duration-300 ${isLoading || input.trim().length === 0 ? 'bg-gray-400 dark:bg-gray-700 cursor-not-allowed' : 'hover:scale-105 hover:bg-[#FF7F3F] dark:hover:bg-orange-500 focus:outline-none focus:ring-4 focus:ring-[#FF7F3F] dark:focus:ring-orange-400 animate-pulse-on-hover'}`}
               style={{ boxShadow: '0 2px 16px #A5A6B255', transition: 'transform 0.2s' }}
             >
-              {isLoading ? <Loader2 className="w-6 h-6 mr-2 animate-spin inline" /> : selectedMode === 'idea' ? 'Ask ChefAI' : 'Generate Recipe'}
+              {isLoading ? <Loader2 className="w-6 h-6 mr-2 animate-spin inline" /> : 
+                selectedMode === 'idea' ? 'Ask ChefAI' :
+                selectedMode === 'ingredients' ? 'Generate Recipe' :
+                'Adapt Recipe'}
             </button>
           </form>
         </div>
