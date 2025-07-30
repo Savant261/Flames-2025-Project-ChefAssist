@@ -143,7 +143,7 @@ const DashBoard = () => {
                 <main className="lg:col-span-3">
                     <Routes>
                         <Route index element={<Overview sampleRecipes={sampleRecipes} />} />
-                        <Route path="myRecipes" element={<MyRecipe sampleRecipes={sampleRecipes} />} />
+                        <Route path="myRecipes" element={<MyRecipe />} />
                         <Route path="mealPlanner" element={<MealPlanner />} />
                         <Route path="inventory" element={<Inventory sampleRecipes={sampleRecipes} />} />
                         <Route path="nutrition" element={<Nutrition />} />

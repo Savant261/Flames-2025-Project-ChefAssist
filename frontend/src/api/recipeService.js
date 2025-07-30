@@ -89,6 +89,26 @@ export const recipeService = {
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Failed to delete recipe');
     }
+  },
+
+  // Toggle recipe comments
+  toggleRecipeComments: async (recipeId) => {
+    try {
+      const response = await axiosInstance.post(`/recipes/${recipeId}/comment`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to toggle comments');
+    }
+  },
+
+  // Toggle recipe visibility
+  toggleRecipeVisibility: async (recipeId) => {
+    try {
+      const response = await axiosInstance.put(`/recipes/${recipeId}/toggle`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to toggle visibility');
+    }
   }
 };
 

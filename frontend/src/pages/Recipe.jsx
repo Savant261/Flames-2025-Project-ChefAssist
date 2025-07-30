@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Clock, Users, Star, Bookmark, Share2, Play, Pause, ChefHat, Timer, Utensils, Heart, MessageCircle, Download, Printer as Print, Sun, Moon, CheckCircle2 } from 'lucide-react'; // Added Sun and Moon icons
+import { useParams, useNavigate } from 'react-router-dom';
+import { recipeService } from '../api/recipeService';
+import { ArrowLeft, Clock, Users, Star, Bookmark, Share2, Play, Pause, ChefHat, Timer, Utensils, Heart, MessageCircle, Download, Printer as Print, Sun, Moon, CheckCircle2 } from 'lucide-react';
 
 const ViewRecipe = ({ recipe, onBack }) => {
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
@@ -420,4 +422,119 @@ const ViewRecipe = ({ recipe, onBack }) => {
   );
 };
 
-export default ViewRecipe;
+// Main Recipe component that handles routing and data fetching
+const Recipe = () => {
+  const { recipeId } = useParams();
+  const navigate = useNavigate();
+  const [recipe, setRecipe] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (recipeId) {
+      fetchRecipe();
+    }
+  }, [recipeId]);
+
+  const fetchRecipe = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const fetchedRecipe = await recipeService.getRecipe(recipeId);
+      
+      // Transform backend data to match ViewRecipe component expectations
+      const transformedRecipe = {
+        id: fetchedRecipe._id,
+        title: fetchedRecipe.title || 'Untitled Recipe',
+        description: fetchedRecipe.description || 'No description available',
+        image: fetchedRecipe.imageUrl || 'https://images.unsplash.com/photo-1543339396-1807d9b5443a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wzNTkyOXwwfDF8c2VhcmNofDE4fHxyZWNpcGUlMjBwbGFjZWhvbGRlcnxlbnwwfHx8fDE3MDY2ODc5MDJ8MA&ixlib=rb-4.0.3&q=80&w=1080',
+        rating: 4.0, // Default rating since backend doesn't have this
+        cuisine: fetchedRecipe.tags?.[0] || "Global",
+        difficulty: "Medium", // Default difficulty
+        cookTime: fetchedRecipe.cookTime || "30 min",
+        servings: fetchedRecipe.servings || 4,
+        prepTime: "15 min", // Default prep time  
+        totalTime: fetchedRecipe.cookTime || "45 min",
+        calories: fetchedRecipe.nutrition?.calories || 350,
+        videoUrl: null, // No video in backend model
+        ingredients: fetchedRecipe.ingredients?.map((ing, index) => ({
+          id: index + 1,
+          item: `${ing.quantity} ${ing.unit || ''} ${ing.name}`.trim(),
+          category: "Ingredients" // Default category
+        })) || [],
+        instructions: fetchedRecipe.instructions?.map((inst, index) => ({
+          id: index + 1,
+          step: inst.step,
+          time: "5 min" // Default time per step
+        })) || [],
+        nutrition: {
+          calories: fetchedRecipe.nutrition?.calories || "350",
+          protein: fetchedRecipe.nutrition?.protein || "20g",
+          fat: fetchedRecipe.nutrition?.fat || "15g",
+          carbs: fetchedRecipe.nutrition?.carbs || "45g",
+          fiber: "5g" // Default value
+        },
+        tags: fetchedRecipe.tags || [],
+        reviews: [], // No reviews in backend model yet
+        author: fetchedRecipe.author
+      };
+      
+      setRecipe(transformedRecipe);
+    } catch (err) {
+      setError(err.message);
+      console.error('Error fetching recipe:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBack = () => {
+    navigate(-1); // Go back to previous page
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#FEF3E2] dark:bg-gray-900 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#D97706]"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#FEF3E2] dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Recipe Not Found</h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
+          <button
+            onClick={handleBack}
+            className="bg-[#D97706] text-white px-6 py-2 rounded-lg hover:bg-[#B45309] transition-colors"
+          >
+            Go Back
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!recipeId) {
+    return (
+      <div className="min-h-screen bg-[#FEF3E2] dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Recipe Browser</h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">Please select a recipe to view</p>
+          <button
+            onClick={() => navigate('/dashboard/myRecipes')}
+            className="bg-[#D97706] text-white px-6 py-2 rounded-lg hover:bg-[#B45309] transition-colors"
+          >
+            View My Recipes
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return <ViewRecipe recipe={recipe} onBack={handleBack} />;
+};
+
+export default Recipe;

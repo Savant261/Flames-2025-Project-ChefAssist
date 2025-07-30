@@ -158,6 +158,7 @@ function App() {
               <Route path="/dashboard/*" element={<DashBoard />} />
               <Route path="/feedback" element={<Feedback />} />
               <Route path="/recipe" element={<Recipe />} />
+              <Route path="/recipe/:recipeId" element={<Recipe />} />
               <Route path="/recipe/create" element={<CreateRecipe />} />
               <Route path="/recipe/create/:recipeId" element={<CreateRecipe />} />
               <Route path="/recipe/edit/:recipeId" element={<CreateRecipe />} />
