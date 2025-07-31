@@ -355,24 +355,6 @@ const getAllPublicRecipes = async (req, res) => {
   }
 };
 
-// Export all controllers
-export {
-  createRecipe,
-  updateRecipe,
-  getRecipe,
-  editRecipe,
-  deleteRecipe,
-  toogleRecipe,
-  toogleRecipeComment,
-  getRecipeAnalytics,
-  publishRecipe,
-  validateRecipe,
-  getUserRecipes,
-  getAllPublicRecipes,
-  getTrendingRecipes,
-  getHighestViewsRecipes,
-  getHighestLikesRecipes,
-};
 // Get trending recipes (recent, most viewed, most liked)
 // Returns trendingToday, trendingWeek, trendingMonth, allTimeFavorites
 const getTrendingRecipes = async (req, res) => {
@@ -393,7 +375,7 @@ const getTrendingRecipes = async (req, res) => {
     weekAgo.setDate(weekAgo.getDate() - 7);
     const trendingWeek = await Recipe.find({
       visibility: 'public',
-      createdAt: { $gte: weekAgo }
+      createdAt: { $gte: weekAgo } 
     })
       .sort({ views: -1 })
       .limit(5)
@@ -415,7 +397,7 @@ const getTrendingRecipes = async (req, res) => {
       .sort({ likes: -1 })
       .limit(5)
       .populate('author', 'username avatar');
-
+   
     return res.status(200).json({
       trendingToday,
       trendingWeek,
@@ -454,4 +436,23 @@ const getHighestLikesRecipes = async (req, res) => {
     console.log('Error in getHighestLikesRecipes controller', error);
     return res.status(500).json({ message: 'Internal Server Error' });
   }
+};
+
+// Export all controllers
+export {
+  createRecipe,
+  updateRecipe,
+  getRecipe,
+  editRecipe,
+  deleteRecipe,
+  toogleRecipe,
+  toogleRecipeComment,
+  getRecipeAnalytics,
+  publishRecipe,
+  validateRecipe,
+  getUserRecipes,
+  getAllPublicRecipes,
+  getTrendingRecipes,
+  getHighestViewsRecipes,
+  getHighestLikesRecipes,
 };

@@ -1,28 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/axiosInstance';
 import { Bookmark, Share2, Clock, Star, ChefHat, Sun, Moon } from 'lucide-react'; // Import Sun and Moon icons
 
 const SavedRecipes = ({ onViewRecipe }) => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [visibleRecipes, setVisibleRecipes] = useState(5);
-  const [isDarkMode, setIsDarkMode] = useState(false); // State for dark mode
   const [recipes, setRecipes] = useState([]);
-
-  // Effect to apply/remove 'dark' class on the body or html element
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDarkMode]);
 
   // Fetch saved recipes from backend on mount
   useEffect(() => {
     const fetchSavedRecipes = async () => {
       try {
-        const res = await axios.get('/api/savedRecipe');
+        const res = await api.get('/auth/savedRecipe');
         setRecipes(res.data);
       } catch (error) {
         setShowToast(true);
@@ -110,14 +100,7 @@ const SavedRecipes = ({ onViewRecipe }) => {
             </div>
           </div>
         </div>
-        {/* Dark Mode Toggle Button */}
-        <button
-          onClick={() => setIsDarkMode(!isDarkMode)}
-          className="absolute top-4 right-4 p-2 rounded-full bg-white/20 dark:bg-gray-700/60 text-white dark:text-orange-200 hover:bg-white/30 dark:hover:bg-gray-700 transition-colors duration-200 z-10"
-          aria-label="Toggle Dark Mode"
-        >
-          {isDarkMode ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
-        </button>
+      
         {/* Decorative elements */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
           <div className="absolute -top-16 -right-16 w-32 h-32 bg-white bg-opacity-10 rounded-full"></div>

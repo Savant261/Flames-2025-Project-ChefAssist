@@ -10,6 +10,7 @@ import {
   BarChart2,
   Share2,
   MessageSquare,
+  X,
 } from "lucide-react";
 
 const MyRecipeCard = ({ recipe, onRecipeUpdate }) => {
@@ -17,6 +18,7 @@ const MyRecipeCard = ({ recipe, onRecipeUpdate }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // Show notification
   const showNotification = (message, type = 'success') => {
@@ -26,10 +28,6 @@ const MyRecipeCard = ({ recipe, onRecipeUpdate }) => {
 
   // Handle recipe deletion
   const handleDeleteRecipe = async () => {
-    if (!window.confirm('Are you sure you want to delete this recipe? This action cannot be undone.')) {
-      return;
-    }
-
     try {
       setLoading(true);
       await recipeService.deleteRecipe(recipe._id);
@@ -47,7 +45,19 @@ const MyRecipeCard = ({ recipe, onRecipeUpdate }) => {
     } finally {
       setLoading(false);
       setMenuOpen(false);
+      setShowDeleteModal(false);
     }
+  };
+
+  // Handle opening delete modal
+  const handleOpenDeleteModal = () => {
+    setShowDeleteModal(true);
+    setMenuOpen(false);
+  };
+
+  // Handle closing delete modal
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
   };
 
   // Handle toggle comments
@@ -196,11 +206,11 @@ const MyRecipeCard = ({ recipe, onRecipeUpdate }) => {
                   {recipe.allowComments ? 'Disable Comments' : 'Enable Comments'}
                 </button>
                 <button 
-                  onClick={handleDeleteRecipe}
+                  onClick={handleOpenDeleteModal}
                   disabled={loading}
                   className="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 disabled:opacity-50"
                 >
-                  <Trash2 className="w-4 h-4" /> {loading ? 'Deleting...' : 'Delete Recipe'}
+                  <Trash2 className="w-4 h-4" /> Delete Recipe
                 </button>
               </div>
             )}
@@ -214,6 +224,61 @@ const MyRecipeCard = ({ recipe, onRecipeUpdate }) => {
           notification.type === 'error' ? 'bg-red-500' : 'bg-green-500'
         } animate-fade-in`}>
           {notification.message}
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                Delete Recipe
+              </h3>
+              <button
+                onClick={handleCloseDeleteModal}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="mb-6">
+              <p className="text-gray-600 dark:text-gray-300 mb-2">
+                Are you sure you want to delete "{recipe.title}"?
+              </p>
+              <p className="text-sm text-red-500 dark:text-red-400">
+                This action cannot be undone. All data associated with this recipe will be permanently deleted.
+              </p>
+            </div>
+            
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={handleCloseDeleteModal}
+                disabled={loading}
+                className="px-4 py-2 text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteRecipe}
+                disabled={loading}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50 flex items-center gap-2"
+              >
+                {loading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4" />
+                    Delete Recipe
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

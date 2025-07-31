@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import api from '../api/axiosInstance';
 
 const Trending = () => {
+  const navigate = useNavigate();
+  
   useEffect(() => {
     document.title = 'Trending / ChefAssist';
   }, []);
@@ -21,7 +24,7 @@ const Trending = () => {
 
   // Map backend data to frontend format
   const getRecipesByCategory = () => {
-    switch (activeCategory) {
+    switch (activeCategory) { 
       case "Trending Today":
         return trendingData.trendingToday;
       case "Trending This Week":
@@ -34,7 +37,11 @@ const Trending = () => {
         return [];
     }
   };
-  const filteredRecipes = getRecipesByCategory();
+  const filteredRecipes = getRecipesByCategory() || [];
+
+  const handleRecipeClick = (recipeId) => {
+    navigate(`/recipe/${recipeId}`);
+  };
 
   useEffect(() => {
     document.title = 'Trending / ChefAssist';
@@ -42,8 +49,9 @@ const Trending = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await axios.get('/api/recipes/trending');
+        const res = await api.get('/recipes/trending');
         setTrendingData(res.data);
+        // console.log(res)
       } catch (err) {
         setError('Failed to load trending recipes');
       } finally {
@@ -94,7 +102,8 @@ const Trending = () => {
             filteredRecipes.map((recipe, index) => (
               <div
                 key={recipe._id || recipe.id || index}
-                className="flex items-center bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition duration-300 overflow-hidden h-48"
+                onClick={() => handleRecipeClick(recipe._id || recipe.id)}
+                className="flex items-center bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition duration-300 overflow-hidden h-48 cursor-pointer transform hover:scale-[1.02]"
               >
                 {/* Trending Number */}
                 <div className="bg-[var(--color-chef-peach)] dark:bg-[var(--color-chef-orange-dark)] w-12 h-full flex items-center justify-center text-xl font-bold text-[var(--color-chef-orange-dark)] dark:text-white">

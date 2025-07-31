@@ -263,16 +263,16 @@ const Profile = ({ userData }) => {
 
   if (loading) {
     return (
-      <div className="flex flex-col bg-chef-cream min-h-screen">
+      <div className="flex flex-col bg-chef-cream dark:bg-gray-900 min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden animate-pulse">
-            <div className="bg-gray-300 h-64"></div>
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden animate-pulse">
+            <div className="bg-gray-300 dark:bg-gray-700 h-64"></div>
             <div className="p-6">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {[...Array(4)].map((_, i) => (
                   <div key={i} className="text-center">
-                    <div className="bg-gray-300 rounded-full w-20 h-20 mx-auto mb-3"></div>
-                    <div className="bg-gray-300 h-4 w-16 mx-auto rounded"></div>
+                    <div className="bg-gray-300 dark:bg-gray-700 rounded-full w-20 h-20 mx-auto mb-3"></div>
+                    <div className="bg-gray-300 dark:bg-gray-700 h-4 w-16 mx-auto rounded"></div>
                   </div>
                 ))}
               </div>
@@ -285,12 +285,12 @@ const Profile = ({ userData }) => {
 
   if (error) {
     return (
-      <div className="flex flex-col bg-chef-cream min-h-screen">
+      <div className="flex flex-col bg-chef-cream dark:bg-gray-900 min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden p-8 text-center">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden p-8 text-center">
             <div className="text-red-500 text-xl mb-4">⚠️</div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Profile Not Found</h2>
-            <p className="text-gray-600 mb-4">{error}</p>
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">Profile Not Found</h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">{error}</p>
             <button 
               onClick={() => navigate('/explore')}
               className="bg-chef-orange text-white px-6 py-2 rounded-lg hover:bg-chef-orange-dark transition-colors"
@@ -307,10 +307,10 @@ const Profile = ({ userData }) => {
 
   return (
     <>
-      <div className="flex flex-col bg-chef-cream min-h-screen">
+      <div className="flex flex-col bg-chef-cream dark:bg-gray-900 min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-            <div className="bg-gradient-to-r from-chef-orange to-chef-orange-light p-8">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+            <div className="bg-gradient-to-r from-chef-orange to-chef-orange-light dark:from-chef-orange-dark dark:to-chef-orange p-8">
               <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
                 <div className="relative group">
                   <img
@@ -424,51 +424,51 @@ const Profile = ({ userData }) => {
             </div>
 
             {/* Stats Section */}
-            <div className="bg-white p-6">
+            <div className="bg-white dark:bg-gray-800 p-6">
               <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
                 <div className="text-center group cursor-pointer">
-                  <div className="bg-chef-peach/30 rounded-full w-20 h-20 mx-auto flex items-center justify-center mb-3 group-hover:bg-chef-peach/50 transition-colors">
-                    <span className="text-3xl font-bold text-chef-orange">
+                  <div className="bg-chef-peach/30 dark:bg-chef-peach/20 rounded-full w-20 h-20 mx-auto flex items-center justify-center mb-3 group-hover:bg-chef-peach/50 dark:group-hover:bg-chef-peach/30 transition-colors">
+                    <span className="text-3xl font-bold text-chef-orange dark:text-chef-orange-light">
                       {profileData.stats.totalRecipes}
                     </span>
                   </div>
-                  <p className="text-gray-600 font-medium">Recipes</p>
+                  <p className="text-gray-600 dark:text-gray-300 font-medium">Recipes</p>
                 </div>
 
                 <div className="text-center group cursor-pointer">
-                  <div className="bg-chef-peach/30 rounded-full w-20 h-20 mx-auto flex items-center justify-center mb-3 group-hover:bg-chef-peach/50 transition-colors">
-                    <span className="text-2xl font-bold text-chef-orange">
+                  <div className="bg-chef-peach/30 dark:bg-chef-peach/20 rounded-full w-20 h-20 mx-auto flex items-center justify-center mb-3 group-hover:bg-chef-peach/50 dark:group-hover:bg-chef-peach/30 transition-colors">
+                    <span className="text-2xl font-bold text-chef-orange dark:text-chef-orange-light">
                       {followerCount}
                     </span>
                   </div>
-                  <p className="text-gray-600 font-medium">Followers</p>
+                  <p className="text-gray-600 dark:text-gray-300 font-medium">Followers</p>
                 </div>
 
                 <div className="text-center group cursor-pointer">
-                  <div className="bg-chef-peach/30 rounded-full w-20 h-20 mx-auto flex items-center justify-center mb-3 group-hover:bg-chef-peach/50 transition-colors">
-                    <span className="text-2xl font-bold text-chef-orange">
+                  <div className="bg-chef-peach/30 dark:bg-chef-peach/20 rounded-full w-20 h-20 mx-auto flex items-center justify-center mb-3 group-hover:bg-chef-peach/50 dark:group-hover:bg-chef-peach/30 transition-colors">
+                    <span className="text-2xl font-bold text-chef-orange dark:text-chef-orange-light">
                       {followingCount}
                     </span>
                   </div>
-                  <p className="text-gray-600 font-medium">Following</p>
+                  <p className="text-gray-600 dark:text-gray-300 font-medium">Following</p>
                 </div>
 
                 <div className="text-center group cursor-pointer">
-                  <div className="bg-chef-peach/30 rounded-full w-20 h-20 mx-auto flex items-center justify-center mb-3 group-hover:bg-chef-peach/50 transition-colors">
-                    <span className="text-3xl font-bold text-chef-orange">
+                  <div className="bg-chef-peach/30 dark:bg-chef-peach/20 rounded-full w-20 h-20 mx-auto flex items-center justify-center mb-3 group-hover:bg-chef-peach/50 dark:group-hover:bg-chef-peach/30 transition-colors">
+                    <span className="text-3xl font-bold text-chef-orange dark:text-chef-orange-light">
                       {profileData.stats.favoriteRecipesCount}
                     </span>
                   </div>
-                  <p className="text-gray-600 font-medium">Favorites</p>
+                  <p className="text-gray-600 dark:text-gray-300 font-medium">Favorites</p>
                 </div>
 
                 <div className="text-center group cursor-pointer">
-                  <div className="bg-chef-peach/30 rounded-full w-20 h-20 mx-auto flex items-center justify-center mb-3 group-hover:bg-chef-peach/50 transition-colors">
-                    <span className="text-2xl font-bold text-chef-orange">
+                  <div className="bg-chef-peach/30 dark:bg-chef-peach/20 rounded-full w-20 h-20 mx-auto flex items-center justify-center mb-3 group-hover:bg-chef-peach/50 dark:group-hover:bg-chef-peach/30 transition-colors">
+                    <span className="text-2xl font-bold text-chef-orange dark:text-chef-orange-light">
                       {profileData.stats.averageRating?.toFixed(1) || '0.0'}
                     </span>
                   </div>
-                  <p className="text-gray-600 font-medium">Avg Rating</p>
+                  <p className="text-gray-600 dark:text-gray-300 font-medium">Avg Rating</p>
                   <div className="flex justify-center mt-2">
                     <div className="flex text-yellow-400">⭐⭐⭐⭐⭐</div>
                   </div>
@@ -479,13 +479,13 @@ const Profile = ({ userData }) => {
         </div>
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
-          <div className="bg-white rounded-xl shadow-lg mb-6 border border-chef-peach/30">
-            <div className="flex flex-wrap border-b border-gray-200">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg mb-6 border border-chef-peach/30 dark:border-gray-700">
+            <div className="flex flex-wrap border-b border-gray-200 dark:border-gray-700">
               <button
                 className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === 'reviews' 
-                    ? 'border-chef-orange text-chef-orange' 
-                    : 'border-transparent text-gray-500 hover:text-chef-orange hover:border-chef-orange/50'
+                    ? 'border-chef-orange text-chef-orange dark:text-chef-orange-light' 
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-chef-orange dark:hover:text-chef-orange-light hover:border-chef-orange/50'
                 }`}
                 onClick={() => handleTabChange('reviews')}
               >
@@ -494,8 +494,8 @@ const Profile = ({ userData }) => {
               <button
                 className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === 'favorites' 
-                    ? 'border-chef-orange text-chef-orange' 
-                    : 'border-transparent text-gray-500 hover:text-chef-orange hover:border-chef-orange/50'
+                    ? 'border-chef-orange text-chef-orange dark:text-chef-orange-light' 
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-chef-orange dark:hover:text-chef-orange-light hover:border-chef-orange/50'
                 }`}
                 onClick={() => handleTabChange('favorites')}
               >
@@ -504,8 +504,8 @@ const Profile = ({ userData }) => {
               <button
                 className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === 'activity' 
-                    ? 'border-chef-orange text-chef-orange' 
-                    : 'border-transparent text-gray-500 hover:text-chef-orange hover:border-chef-orange/50'
+                    ? 'border-chef-orange text-chef-orange dark:text-chef-orange-light' 
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-chef-orange dark:hover:text-chef-orange-light hover:border-chef-orange/50'
                 }`}
                 onClick={() => handleTabChange('activity')}
               >
@@ -515,7 +515,7 @@ const Profile = ({ userData }) => {
 
             {/* Search and Filter */}
             {(activeTab === 'reviews') && (
-              <div className="p-4 border-b border-gray-200">
+              <div className="p-4 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex-1 relative">
                     <form onSubmit={handleSearch} className="flex">
@@ -524,7 +524,7 @@ const Profile = ({ userData }) => {
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         placeholder="Search recipes..."
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-l-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent"
                       />
                       <button
                         type="submit"
@@ -561,14 +561,14 @@ const Profile = ({ userData }) => {
                   </div>
                   <button
                     onClick={resetFilters}
-                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                    className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                   >
                     Reset All
                   </button>
                   <select 
                     value={selectedCuisine}
                     onChange={(e) => handleCuisineChange(e.target.value)}
-                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent"
+                    className="px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent"
                   >
                     {cuisineOptions.map(option => (
                       <option key={option} value={option}>{option}</option>
@@ -577,7 +577,7 @@ const Profile = ({ userData }) => {
                   <select 
                     value={selectedDifficulty}
                     onChange={(e) => handleDifficultyChange(e.target.value)}
-                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent"
+                    className="px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent"
                   >
                     {difficultyOptions.map(option => (
                       <option key={option} value={option}>{option}</option>
@@ -586,7 +586,7 @@ const Profile = ({ userData }) => {
                   <select 
                     value={selectedMealType}
                     onChange={(e) => handleMealTypeChange(e.target.value)}
-                    className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent"
+                    className="px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent"
                   >
                     {mealTypeOptions.map(option => (
                       <option key={option} value={option}>{option}</option>
@@ -602,16 +602,16 @@ const Profile = ({ userData }) => {
               {activeTab === 'reviews' && (
                 <div>
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold text-chef-orange">
+                    <h2 className="text-2xl font-bold text-chef-orange dark:text-chef-orange-light">
                       All Recipes by {profileData.user.username}
                     </h2>
                   </div>
 
                   {userRecipes.length === 0 ? (
                     <div className="text-center py-12">
-                      <div className="text-gray-400 text-6xl mb-4">📝</div>
-                      <h3 className="text-xl font-semibold text-gray-600 mb-2">No recipes found</h3>
-                      <p className="text-gray-500">This user hasn't shared any public recipes yet.</p>
+                      <div className="text-gray-400 dark:text-gray-500 text-6xl mb-4">📝</div>
+                      <h3 className="text-xl font-semibold text-gray-600 dark:text-gray-300 mb-2">No recipes found</h3>
+                      <p className="text-gray-500 dark:text-gray-400">This user hasn't shared any public recipes yet.</p>
                     </div>
                   ) : (
                     <>
@@ -642,16 +642,16 @@ const Profile = ({ userData }) => {
               {activeTab === 'favorites' && (
                 <div>
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold text-chef-orange">
+                    <h2 className="text-2xl font-bold text-chef-orange dark:text-chef-orange-light">
                       Favorite Recipes
                     </h2>
                   </div>
 
                   {favoriteRecipes.length === 0 ? (
                     <div className="text-center py-12">
-                      <div className="text-gray-400 text-6xl mb-4">🍳</div>
-                      <h3 className="text-xl font-semibold text-gray-600 mb-2">No favorite recipes yet</h3>
-                      <p className="text-gray-500">Start exploring recipes to build your favorites collection!</p>
+                      <div className="text-gray-400 dark:text-gray-500 text-6xl mb-4">🍳</div>
+                      <h3 className="text-xl font-semibold text-gray-600 dark:text-gray-300 mb-2">No favorite recipes yet</h3>
+                      <p className="text-gray-500 dark:text-gray-400">Start exploring recipes to build your favorites collection!</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -669,7 +669,7 @@ const Profile = ({ userData }) => {
               {activeTab === 'activity' && (
                 <div>
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold text-chef-orange">
+                    <h2 className="text-2xl font-bold text-chef-orange dark:text-chef-orange-light">
                       Activity Feed
                     </h2>
                     {isOwner && (
@@ -687,13 +687,13 @@ const Profile = ({ userData }) => {
 
                   {/* Post Creation Form */}
                   {isOwner && showPostForm && (
-                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-6">
-                      <h3 className="text-lg font-semibold text-gray-800 mb-4">Create a New Post</h3>
+                    <div className="bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-6 mb-6">
+                      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Create a New Post</h3>
                       <textarea
                         value={newPost}
                         onChange={(e) => setNewPost(e.target.value)}
                         placeholder="Share something with your followers..."
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent resize-none"
+                        className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent resize-none"
                         rows="4"
                       />
                       <div className="flex justify-end space-x-3 mt-4">
@@ -702,14 +702,14 @@ const Profile = ({ userData }) => {
                             setShowPostForm(false);
                             setNewPost('');
                           }}
-                          className="px-4 py-2 text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
+                          className="px-4 py-2 text-gray-600 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
                         >
                           Cancel
                         </button>
                         <button
                           onClick={handleCreatePost}
                           disabled={!newPost.trim()}
-                          className="px-6 py-2 bg-chef-orange text-white rounded-lg hover:bg-chef-orange-dark disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                          className="px-6 py-2 bg-chef-orange text-white rounded-lg hover:bg-chef-orange-dark disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
                         >
                           Post
                         </button>
@@ -719,15 +719,15 @@ const Profile = ({ userData }) => {
 
                   {activityPosts.length === 0 ? (
                     <div className="text-center py-12">
-                      <div className="text-gray-400 text-6xl mb-4">📢</div>
-                      <h3 className="text-xl font-semibold text-gray-600 mb-2">No activity yet</h3>
-                      <p className="text-gray-500">This user hasn't shared any posts yet.</p>
+                      <div className="text-gray-400 dark:text-gray-500 text-6xl mb-4">📢</div>
+                      <h3 className="text-xl font-semibold text-gray-600 dark:text-gray-300 mb-2">No activity yet</h3>
+                      <p className="text-gray-500 dark:text-gray-400">This user hasn't shared any posts yet.</p>
                     </div>
                   ) : (
                     <>
                       <div className="grid grid-cols-1 gap-6">
                         {activityPosts.map((post, index) => (
-                          <div key={post._id || index} className="bg-white border border-gray-200 rounded-lg p-6 h-full">
+                          <div key={post._id || index} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 h-full">
                             <div className="flex items-start space-x-4">
                               <img
                                 src={post.author.avatar || "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400"}
@@ -736,14 +736,14 @@ const Profile = ({ userData }) => {
                               />
                               <div className="flex-1">
                                 <div className="flex items-center space-x-2 mb-2">
-                                  <h4 className="font-semibold text-gray-900">
+                                  <h4 className="font-semibold text-gray-900 dark:text-gray-100">
                                     {post.author.fullName || post.author.username}
                                   </h4>
-                                  <span className="text-gray-500 text-sm">
+                                  <span className="text-gray-500 dark:text-gray-400 text-sm">
                                     {new Date(post.createdAt).toLocaleDateString()}
                                   </span>
                                 </div>
-                                <p className="text-gray-800 mb-4">{post.content}</p>
+                                <p className="text-gray-800 dark:text-gray-200 mb-4">{post.content}</p>
                                 
                                 {post.images && post.images.length > 0 && (
                                   <div className="grid grid-cols-2 gap-2 mb-4">
@@ -758,7 +758,7 @@ const Profile = ({ userData }) => {
                                   </div>
                                 )}
                                 
-                                <div className="flex items-center space-x-6 text-gray-500">
+                                <div className="flex items-center space-x-6 text-gray-500 dark:text-gray-400">
                                   <span className="flex items-center space-x-1">
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />

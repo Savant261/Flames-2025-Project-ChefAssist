@@ -48,7 +48,7 @@ const profilePopUp = ({ setLogin, theme, setTheme,userData }) => {
                 </div>
             </div>
             <div className="flex flex-col gap-1">
-                <MenuItem to="/profile" icon={User}>View Public Profile</MenuItem>
+                <MenuItem to={`/profile/${userData.username}`} icon={User}>View Public Profile</MenuItem>
                 <MenuItem to="/dashboard" icon={LayoutDashboard}>Dashboard</MenuItem>
                 <MenuItem to="/subscription" icon={Star}>Subscription</MenuItem>
                 <MenuItem to="/settings" icon={Settings}>Settings</MenuItem>
