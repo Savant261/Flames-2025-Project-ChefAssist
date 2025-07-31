@@ -190,7 +190,7 @@ const AccountSettings = () => {
               Change
             </button>
           </div>
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
             <div>
               <h3 className="font-medium text-gray-900 dark:text-gray-100">Public Profile</h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">

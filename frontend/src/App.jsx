@@ -127,7 +127,8 @@ function App() {
   //   const showInfoToast = () => toast.info("Your profile has been updated.");
   //   const showWarningToast = () => toast.warning("Your session is about to expire.");
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col dark:bg-gray-800 dark:border-gray-700/50">
+      
       <Navbar
         setIsSideBarExpanded={setIsSideBarExpanded}
         login={login}
