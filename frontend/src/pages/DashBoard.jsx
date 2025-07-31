@@ -7,7 +7,7 @@ import MealPlanner from '../components/dashboard/MealPlanner.jsx';
 import Inventory from '../components/dashboard/Inventory.jsx';
 import Nutrition from "../components/dashboard/Nutrition.jsx";
 
-const DashBoard = () => {
+const DashBoard = ({userData}) => {
     const sampleRecipes = [
         {
             id: 1,
@@ -87,12 +87,12 @@ const DashBoard = () => {
                         {/* User Profile Summary */}
                         <div className="text-center mb-6">
                             <img
-                                src="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=200"
+                                src={userData.avatar}
                                 alt="Profile"
                                 className="w-20 h-20 rounded-full mx-auto mb-3 border-4 border-[var(--color-chef-peach)] dark:border-orange-500/50"
                             />
-                            <h3 className="font-bold text-lg text-gray-800 dark:text-gray-100">Priya Malhotra</h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">Home Chef</p>
+                            <h3 className="font-bold text-lg text-gray-800 dark:text-gray-100">{userData.fullName}</h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">{userData.username}</p>
                             <div className="flex justify-center space-x-4 mt-3 text-sm">
                                 <div className="text-center">
                                     <div className="font-bold text-[var(--color-chef-orange)]">24</div>
@@ -142,7 +142,7 @@ const DashBoard = () => {
                 {/* --- Main Content --- */}
                 <main className="lg:col-span-3">
                     <Routes>
-                        <Route index element={<Overview sampleRecipes={sampleRecipes} />} />
+                        <Route index element={<Overview sampleRecipes={sampleRecipes} userData={userData}/>} />
                         <Route path="myRecipes" element={<MyRecipe />} />
                         <Route path="mealPlanner" element={<MealPlanner />} />
                         <Route path="inventory" element={<Inventory sampleRecipes={sampleRecipes} />} />

@@ -15,7 +15,7 @@ import AiStyles from '../components/ai/AiStyles';
 import { restrictionsList } from '../components/ai/constants';
 import { formatRecipeDisplay } from '../components/ai/utils';
 
-const Ai = () => {
+const Ai = ({userData}) => {
   const { chatId } = useParams();
   const navigate = useNavigate();
   
@@ -470,7 +470,7 @@ const Ai = () => {
   };
 
   // Get user name
-  const userName = window.localStorage.getItem("userName") || "User";
+  const userName = userData.fullName || "User";
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#FFF6E9] via-[#FFDCA9] to-[#FF7F3F] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 px-4 pt-10 pb-40 relative">

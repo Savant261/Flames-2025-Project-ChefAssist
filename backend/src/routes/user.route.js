@@ -18,7 +18,12 @@ import {
   addSavedRecipe,
   deleteSavedRecipe,
   updateProfilePhoto,
-  toogleTheme
+  toogleTheme,
+  getInventory,
+  addInventoryItem,
+  updateInventoryItem,
+  deleteInventoryItem,
+  clearInventory
 } from "../controllers/user.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 
@@ -48,6 +53,13 @@ router.post("/update-Email", protectRoute, updateEmail);
 router.post("/update-PhoneNumber", protectRoute, updatePhoneNumber);
 router.post("/public-Profile-toogle", protectRoute, tooglePublicProfile);
 router.delete("/delete-Account", protectRoute, deleteAccount);
+
+// Inventory routes
+router.get("/inventory", protectRoute, getInventory);
+router.post("/inventory", protectRoute, addInventoryItem);
+router.put("/inventory/:itemId", protectRoute, updateInventoryItem);
+router.delete("/inventory/:itemId", protectRoute, deleteInventoryItem);
+router.delete("/inventory", protectRoute, clearInventory);
 
 // notificaton & subscription
 export default router;

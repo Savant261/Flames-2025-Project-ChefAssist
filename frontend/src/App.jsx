@@ -149,13 +149,12 @@ function App() {
             <StyledToastContainer theme={theme} />
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/ai" element={<Ai />} />
+              <Route path="/ai" element={<Ai userData={userData} />}  userData={userData}/>
               <Route path="/ai/:chatId" element={<Ai />} />
               <Route path="/explore" element={<Explore />} />
-              <Route path="/profile" element={<Profile />} />
               <Route path="/editProfile" element={<EditProfile />} />
               <Route path="/subscription" element={<Subscription />} />
-              <Route path="/dashboard/*" element={<DashBoard />} />
+              <Route path="/dashboard/*" element={<DashBoard  userData={userData}/>} />
               <Route path="/feedback" element={<Feedback />} />
               <Route path="/recipe" element={<Recipe />} />
               <Route path="/recipe/:recipeId" element={<Recipe />} />

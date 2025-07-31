@@ -78,7 +78,12 @@ const userSchema = new mongoose.Schema(
         name: { type: String, required: true, trim: true },
         qty: { type: Number, required: true },
         qtyName: { type: String, required: true, trim: true },
-        value: { type: Number, required: true },
+        expiryDate: { type: Date },
+        status: { 
+          type: String, 
+          enum: ['fresh', 'expiring', 'expired'], 
+          default: 'fresh' 
+        },
       },
     ],
     dietaryPreferences: {

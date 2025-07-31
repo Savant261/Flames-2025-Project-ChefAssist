@@ -385,6 +385,244 @@ const toogleTheme = async (req, res) => {
   }
 };
 
+const getInventory = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Update status for all items based on current date
+    const now = new Date();
+    const sixDaysFromNow = new Date(now.getTime() + (6 * 24 * 60 * 60 * 1000));
+    
+    let updated = false;
+    user.inventoryIngredient.forEach(item => {
+      if (item.expiryDate) {
+        const expiry = new Date(item.expiryDate);
+        let newStatus = 'fresh';
+        
+        if (now > expiry) {
+          newStatus = 'expired';
+        } else if (sixDaysFromNow > expiry) {
+          newStatus = 'expiring';
+        }
+        
+        if (item.status !== newStatus) {
+          item.status = newStatus;
+          updated = true;
+        }
+      }
+    });
+
+    // Save if any status was updated
+    if (updated) {
+      await user.save();
+    }
+
+    return res.status(200).json({
+      message: "Inventory retrieved successfully",
+      inventory: user.inventoryIngredient || []
+    });
+  } catch (error) {
+    console.log("Error in getInventory controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const addInventoryItem = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { name, qty, qtyName, expiryDate } = req.body;
+    
+    if (!name || !qty || !qtyName) {
+      return res.status(400).json({ 
+        message: "Name, quantity, and unit are required" 
+      });
+    }
+
+    if (qty <= 0) {
+      return res.status(400).json({ 
+        message: "Quantity must be a positive number" 
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Calculate status based on expiry date
+    let status = 'fresh';
+    if (expiryDate) {
+      const now = new Date();
+      const expiry = new Date(expiryDate);
+      const sixDaysFromNow = new Date(now.getTime() + (6 * 24 * 60 * 60 * 1000));
+      
+      if (now > expiry) {
+        status = 'expired';
+      } else if (sixDaysFromNow > expiry) {
+        status = 'expiring';
+      }
+    }
+
+    // Check if ingredient already exists
+    const existingItemIndex = user.inventoryIngredient.findIndex(
+      item => item.name.toLowerCase() === name.toLowerCase()
+    );
+
+    if (existingItemIndex !== -1) {
+      // Update existing item - add quantities but use newer expiry date if provided
+      user.inventoryIngredient[existingItemIndex].qty += qty;
+      if (expiryDate) {
+        user.inventoryIngredient[existingItemIndex].expiryDate = expiryDate;
+        user.inventoryIngredient[existingItemIndex].status = status;
+      }
+    } else {
+      // Add new item
+      user.inventoryIngredient.push({ 
+        name, 
+        qty, 
+        qtyName, 
+        expiryDate: expiryDate ? new Date(expiryDate) : null,
+        status 
+      });
+    }
+
+    await user.save();
+
+    return res.status(201).json({
+      message: "Inventory item added successfully",
+      inventory: user.inventoryIngredient
+    });
+  } catch (error) {
+    console.log("Error in addInventoryItem controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const updateInventoryItem = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { itemId } = req.params;
+    const { name, qty, qtyName, expiryDate } = req.body;
+
+    if (!name || !qty || !qtyName) {
+      return res.status(400).json({ 
+        message: "Name, quantity, and unit are required" 
+      });
+    }
+
+    if (qty <= 0) {
+      return res.status(400).json({ 
+        message: "Quantity must be a positive number" 
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const itemIndex = user.inventoryIngredient.findIndex(
+      item => item._id.toString() === itemId
+    );
+
+    if (itemIndex === -1) {
+      return res.status(404).json({ message: "Inventory item not found" });
+    }
+
+    // Calculate status based on expiry date
+    let status = 'fresh';
+    if (expiryDate) {
+      const now = new Date();
+      const expiry = new Date(expiryDate);
+      const sixDaysFromNow = new Date(now.getTime() + (6 * 24 * 60 * 60 * 1000));
+      
+      if (now > expiry) {
+        status = 'expired';
+      } else if (sixDaysFromNow > expiry) {
+        status = 'expiring';
+      }
+    }
+
+    user.inventoryIngredient[itemIndex] = { 
+      ...user.inventoryIngredient[itemIndex].toObject(),
+      name, 
+      qty, 
+      qtyName, 
+      expiryDate: expiryDate ? new Date(expiryDate) : null,
+      status 
+    };
+
+    await user.save();
+
+    return res.status(200).json({
+      message: "Inventory item updated successfully",
+      inventory: user.inventoryIngredient
+    });
+  } catch (error) {
+    console.log("Error in updateInventoryItem controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const deleteInventoryItem = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { itemId } = req.params;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const itemIndex = user.inventoryIngredient.findIndex(
+      item => item._id.toString() === itemId
+    );
+
+    if (itemIndex === -1) {
+      return res.status(404).json({ message: "Inventory item not found" });
+    }
+
+    user.inventoryIngredient.splice(itemIndex, 1);
+    await user.save();
+
+    return res.status(200).json({
+      message: "Inventory item deleted successfully",
+      inventory: user.inventoryIngredient
+    });
+  } catch (error) {
+    console.log("Error in deleteInventoryItem controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const clearInventory = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { inventoryIngredient: [] },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      message: "Inventory cleared successfully",
+      inventory: []
+    });
+  } catch (error) {
+    console.log("Error in clearInventory controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 export {
   signup,
   signin,
@@ -405,4 +643,9 @@ export {
   deleteSavedRecipe,
   updateProfilePhoto,
   toogleTheme,
+  getInventory,
+  addInventoryItem,
+  updateInventoryItem,
+  deleteInventoryItem,
+  clearInventory,
 };

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import RecipeCard from '../RecipeCard.jsx';
 
-const Overview = ({ sampleRecipes }) => {
+const Overview = ({ sampleRecipes,userData }) => {
     // inspriration box
     const [spinWheelRecipe, setSpinWheelRecipe] = useState(null);
     const [spin, setSpin] = useState(false);
@@ -18,7 +18,7 @@ const Overview = ({ sampleRecipes }) => {
             <div className="bg-gradient-to-r from-[var(--color-chef-orange)] to-[var(--color-chef-orange-light)] rounded-2xl p-8 mb-8 text-white relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
                 <div className="relative z-10">
-                    <h2 className="text-3xl font-bold mb-2">Good evening, Priya!</h2>
+                    <h2 className="text-3xl font-bold mb-2">Good evening, {userData.fullName}!</h2>
                     <p className="text-white/90 text-lg mb-4">Ready to cook something amazing today?</p>
                     <div className="flex items-center space-x-6">
                         <div className="text-center"><div className="text-2xl font-bold">7</div><div className="text-sm text-white/80">Day Streak</div></div>
