@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Bookmark, Share2, Clock, Star, ChefHat, Sun, Moon } from 'lucide-react'; // Import Sun and Moon icons
 
 const SavedRecipes = ({ onViewRecipe }) => {
@@ -6,6 +7,7 @@ const SavedRecipes = ({ onViewRecipe }) => {
   const [toastMessage, setToastMessage] = useState('');
   const [visibleRecipes, setVisibleRecipes] = useState(5);
   const [isDarkMode, setIsDarkMode] = useState(false); // State for dark mode
+  const [recipes, setRecipes] = useState([]);
 
   // Effect to apply/remove 'dark' class on the body or html element
   useEffect(() => {
@@ -16,173 +18,19 @@ const SavedRecipes = ({ onViewRecipe }) => {
     }
   }, [isDarkMode]);
 
-  const [recipes, setRecipes] = useState([
-    {
-      id: 1,
-      title: "Spicy Pasta Arrabbiata",
-      description: "Fiery pasta with tomatoes, garlic, and red chilies",
-      image: "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=400",
-      cuisine: "Italian",
-      difficulty: "Easy",
-      rating: 4.8,
-      reviews: 67,
-      cookTime: "20 min"
-    },
-    {
-      id: 2,
-      title: "Butter Chicken Curry",
-      description: "Creamy and rich Indian curry with tender chicken",
-      image: "https://images.pexels.com/photos/2474658/pexels-photo-2474658.jpeg?auto=compress&cs=tinysrgb&w=400",
-      cuisine: "Indian",
-      difficulty: "Medium",
-      rating: 4.9,
-      reviews: 89,
-      cookTime: "40 min"
-    },
-    {
-      id: 3,
-      title: "Mediterranean Quinoa Bowl",
-      description: "Healthy quinoa bowl with fresh vegetables and feta",
-      image: "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400",
-      cuisine: "Mediterranean",
-      difficulty: "Easy",
-      rating: 4.5,
-      reviews: 45,
-      cookTime: "25 min"
-    },
-    {
-      id: 4,
-      title: "Classic Caesar Salad",
-      description: "Fresh romaine lettuce with homemade Caesar dressing",
-      image: "https://images.pexels.com/photos/2097090/pexels-photo-2097090.jpeg?auto=compress&cs=tinysrgb&w=400",
-      cuisine: "American",
-      difficulty: "Easy",
-      rating: 4.3,
-      reviews: 32,
-      cookTime: "15 min"
-    },
-    {
-      id: 5,
-      title: "Thai Green Curry",
-      description: "Aromatic Thai curry with coconut milk and vegetables",
-      image: "https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=400",
-      cuisine: "Thai",
-      difficulty: "Medium",
-      rating: 4.7,
-      reviews: 78,
-      cookTime: "35 min"
-    },
-    {
-      id: 6,
-      title: "Margherita Pizza",
-      description: "Classic Italian pizza with fresh mozzarella and basil",
-      image: "https://images.pexels.com/photos/315755/pexels-photo-315755.jpeg?auto=compress&cs=tinysrgb&w=400",
-      cuisine: "Italian",
-      difficulty: "Medium",
-      rating: 4.6,
-      reviews: 54,
-      cookTime: "30 min"
-    },
-    {
-      id: 7,
-      title: "Beef Tacos",
-      description: "Seasoned ground beef in soft tortillas with fresh toppings",
-      image: "https://images.pexels.com/photos/461198/pexels-photo-461198.jpeg?auto=compress&cs=tinysrgb&w=400",
-      cuisine: "Mexican",
-      difficulty: "Easy",
-      rating: 4.4,
-      reviews: 63,
-      cookTime: "20 min"
-    },
-    {
-      id: 8,
-      title: "Chicken Teriyaki",
-      description: "Glazed chicken with sweet and savory teriyaki sauce",
-      image: "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=400",
-      cuisine: "Japanese",
-      difficulty: "Medium",
-      rating: 4.5,
-      reviews: 41,
-      cookTime: "25 min"
-    },
-    {
-      id: 9,
-      title: "Greek Moussaka",
-      description: "Layered eggplant casserole with meat sauce and béchamel",
-      image: "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400",
-      cuisine: "Greek",
-      difficulty: "Hard",
-      rating: 4.8,
-      reviews: 29,
-      cookTime: "90 min"
-    },
-    {
-      id: 10,
-      title: "Pad Thai Noodles",
-      description: "Stir-fried rice noodles with shrimp and peanuts",
-      image: "https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=400",
-      cuisine: "Thai",
-      difficulty: "Medium",
-      rating: 4.6,
-      reviews: 72,
-      cookTime: "30 min"
-    },
-    {
-      id: 11,
-      title: "French Ratatouille",
-      description: "Traditional Provençal vegetable stew with herbs",
-      image: "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400",
-      cuisine: "French",
-      difficulty: "Medium",
-      rating: 4.4,
-      reviews: 38,
-      cookTime: "45 min"
-    },
-    {
-      id: 12,
-      title: "Korean Bibimbap",
-      description: "Mixed rice bowl with vegetables and gochujang sauce",
-      image: "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=400",
-      cuisine: "Korean",
-      difficulty: "Medium",
-      rating: 4.7,
-      reviews: 56,
-      cookTime: "35 min"
-    },
-    {
-      id: 13,
-      title: "Spanish Paella",
-      description: "Saffron rice with seafood and vegetables",
-      image: "https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=400",
-      cuisine: "Spanish",
-      difficulty: "Hard",
-      rating: 4.9,
-      reviews: 84,
-      cookTime: "60 min"
-    },
-    {
-      id: 14,
-      title: "Moroccan Tagine",
-      description: "Slow-cooked stew with apricots and warm spices",
-      image: "https://images.pexels.com/photos/2474658/pexels-photo-2474658.jpeg?auto=compress&cs=tinysrgb&w=400",
-      cuisine: "Moroccan",
-      difficulty: "Medium",
-      rating: 4.5,
-      reviews: 47,
-      cookTime: "75 min"
-    },
-    {
-      id: 15,
-      title: "Brazilian Feijoada",
-      description: "Traditional black bean stew with pork and sausage",
-      image: "https://images.pexels.com/photos/2474658/pexels-photo-2474658.jpeg?auto=compress&cs=tinysrgb&w=400",
-      cuisine: "Brazilian",
-      difficulty: "Hard",
-      rating: 4.6,
-      reviews: 31,
-      cookTime: "120 min"
-    }
-  ]);
+  // Fetch saved recipes from backend on mount
+  useEffect(() => {
+    const fetchSavedRecipes = async () => {
+      try {
+        const res = await axios.get('/api/savedRecipe');
+        setRecipes(res.data);
+      } catch (error) {
+        setShowToast(true);
+        setToastMessage('Failed to load saved recipes');
+      }
+    };
+    fetchSavedRecipes();
+  }, []);
 
   const showToastNotification = (message) => {
     setToastMessage(message);
@@ -190,9 +38,14 @@ const SavedRecipes = ({ onViewRecipe }) => {
     setTimeout(() => setShowToast(false), 3000);
   };
 
-  const removeRecipe = (recipeId, recipeName) => {
-    setRecipes(recipes.filter(recipe => recipe.id !== recipeId));
-    showToastNotification(`"${recipeName}" removed from saved recipes`);
+  const removeRecipe = async (recipeId, recipeName) => {
+    try {
+      await axios.delete(`/api/savedRecipe/${recipeId}`);
+      setRecipes(prev => prev.filter(recipe => recipe.recipeId !== recipeId));
+      showToastNotification(`"${recipeName}" removed from saved recipes`);
+    } catch (error) {
+      showToastNotification('Failed to remove recipe');
+    }
   };
 
   const loadMoreRecipes = () => {
@@ -278,7 +131,7 @@ const SavedRecipes = ({ onViewRecipe }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {recipes.slice(0, visibleRecipes).map((recipe, index) => (
             <div
-              key={recipe.id}
+              key={recipe.recipeId || recipe.id}
               className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:hover:shadow-gray-700/50 ${
                 index >= 5 ? 'animate-fade-in' : ''
               }`}
@@ -286,7 +139,7 @@ const SavedRecipes = ({ onViewRecipe }) => {
               {/* Recipe Image */}
               <div className="relative">
                 <img
-                  src={recipe.image}
+                  src={recipe.image || recipe.imageUrl}
                   alt={recipe.title}
                   className="w-full h-48 object-cover"
                 />
@@ -303,7 +156,7 @@ const SavedRecipes = ({ onViewRecipe }) => {
 
                 {/* Bookmark Button */}
                 <button
-                  onClick={() => removeRecipe(recipe.id, recipe.title)}
+                  onClick={() => removeRecipe(recipe.recipeId || recipe.id, recipe.title)}
                   className="absolute top-3 right-3 p-2 rounded-full bg-[#D97706] transition-transform duration-200 hover:scale-110 dark:bg-orange-600 dark:hover:bg-orange-700"
                 >
                   <Bookmark className="w-5 h-5 text-white fill-white" />

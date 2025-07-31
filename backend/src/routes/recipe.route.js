@@ -13,6 +13,9 @@ import {
   validateRecipe,
   getUserRecipes,
   getAllPublicRecipes,
+  getTrendingRecipes,
+  getHighestViewsRecipes,
+  getHighestLikesRecipes,
 } from "../controllers/recipe.controller.js";
 const router = express.Router();
 
@@ -22,6 +25,14 @@ router.get("/", getAllPublicRecipes);
 // Get user's recipes
 router.get("/my-recipes", protectRoute, getUserRecipes);
 
+// Get trending recipes (today, week, month, all-time)
+router.get("/trending", getTrendingRecipes);
+
+// Get recipes with highest views
+router.get("/highest-views", getHighestViewsRecipes);
+
+// Get recipes with highest likes
+router.get("/highest-likes", getHighestLikesRecipes);
 // Create recipe (Step 1: Upload image)
 router.post("/", protectRoute, createRecipe);
 

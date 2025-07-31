@@ -355,6 +355,7 @@ const getAllPublicRecipes = async (req, res) => {
   }
 };
 
+// Export all controllers
 export {
   createRecipe,
   updateRecipe,
@@ -368,4 +369,89 @@ export {
   validateRecipe,
   getUserRecipes,
   getAllPublicRecipes,
+  getTrendingRecipes,
+  getHighestViewsRecipes,
+  getHighestLikesRecipes,
+};
+// Get trending recipes (recent, most viewed, most liked)
+// Returns trendingToday, trendingWeek, trendingMonth, allTimeFavorites
+const getTrendingRecipes = async (req, res) => {
+  try {
+    // Trending Today: last 24h, sorted by views
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const trendingToday = await Recipe.find({
+      visibility: 'public',
+      createdAt: { $gte: today }
+    })
+      .sort({ views: -1 })
+      .limit(5)
+      .populate('author', 'username avatar');
+
+    // Trending This Week: last 7 days, sorted by views
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    const trendingWeek = await Recipe.find({
+      visibility: 'public',
+      createdAt: { $gte: weekAgo }
+    })
+      .sort({ views: -1 })
+      .limit(5)
+      .populate('author', 'username avatar');
+
+    // Trending This Month: last 30 days, sorted by views
+    const monthAgo = new Date();
+    monthAgo.setDate(monthAgo.getDate() - 30);
+    const trendingMonth = await Recipe.find({
+      visibility: 'public',
+      createdAt: { $gte: monthAgo }
+    })
+      .sort({ views: -1 })
+      .limit(5)
+      .populate('author', 'username avatar');
+
+    // All-Time Favorites: highest likes
+    const allTimeFavorites = await Recipe.find({ visibility: 'public' })
+      .sort({ likes: -1 })
+      .limit(5)
+      .populate('author', 'username avatar');
+
+    return res.status(200).json({
+      trendingToday,
+      trendingWeek,
+      trendingMonth,
+      allTimeFavorites
+    });
+  } catch (error) {
+    console.log('Error in getTrendingRecipes controller', error);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+// Get recipes with highest views
+const getHighestViewsRecipes = async (req, res) => {
+  try {
+    const recipes = await Recipe.find({ visibility: 'public' })
+      .sort({ views: -1 })
+      .limit(10)
+      .populate('author', 'username avatar');
+    return res.status(200).json({ recipes });
+  } catch (error) {
+    console.log('Error in getHighestViewsRecipes controller', error);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+// Get recipes with highest likes
+const getHighestLikesRecipes = async (req, res) => {
+  try {
+    const recipes = await Recipe.find({ visibility: 'public' })
+      .sort({ likes: -1 })
+      .limit(10)
+      .populate('author', 'username avatar');
+    return res.status(200).json({ recipes });
+  } catch (error) {
+    console.log('Error in getHighestLikesRecipes controller', error);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
 };
