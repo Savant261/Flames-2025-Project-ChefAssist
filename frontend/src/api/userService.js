@@ -94,6 +94,56 @@ class UserService {
   }
 
   /**
+   * Get public profile by username
+   */
+  async getPublicProfile(userName) {
+    try {
+      const response = await axiosInstance.get(`/auth/profile/${userName}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to fetch public profile' };
+    }
+  }
+
+  /**
+   * Get user recipes by username
+   */
+  async getUserRecipesByUsername(userName, params = {}) {
+    try {
+      const queryParams = new URLSearchParams(params).toString();
+      const response = await axiosInstance.get(`/auth/profile/${userName}/recipes?${queryParams}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to fetch user recipes' };
+    }
+  }
+
+  /**
+   * Get public profile by username
+   */
+  async getPublicProfile(userName) {
+    try {
+      const response = await axiosInstance.get(`/auth/profile/${userName}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to fetch public profile' };
+    }
+  }
+
+  /**
+   * Get user recipes by username
+   */
+  async getUserRecipesByUsername(userName, params = {}) {
+    try {
+      const queryParams = new URLSearchParams(params).toString();
+      const response = await axiosInstance.get(`/auth/profile/${userName}/recipes?${queryParams}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to fetch user recipes' };
+    }
+  }
+
+  /**
    * Get user settings profile
    */
   async getSettingsProfile() {
@@ -102,6 +152,18 @@ class UserService {
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to fetch settings profile' };
+    }
+  }
+
+  /**
+   * Get account settings (email, phone, public profile status)
+   */
+  async getAccountSettings() {
+    try {
+      const response = await axiosInstance.get('/auth/account-settings');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to fetch account settings' };
     }
   }
 

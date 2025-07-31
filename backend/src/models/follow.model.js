@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose,{Schema} from "mongoose";
 
 const followSchema = new mongoose.Schema({
   // The user who is initiating the follow

@@ -172,6 +172,29 @@ const updatePreference = async (req, res) => {
   }
 };
 
+const getAccountSettings = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId).select('email phoneNo publicProfile');
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      email: user.email,
+      phoneNumber: user.phoneNo || "",
+      isPublic: user.publicProfile
+    });
+  } catch (error) {
+    console.error("Error in getAccountSettings:", error);
+    return res.status(500).json({ 
+      message: "Failed to fetch account settings",
+      error: error.message 
+    });
+  }
+};
+
 const getSettingsProfile = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -314,6 +337,156 @@ const getProfile = async (req, res) => {
     return res.status(200).json(user);
   } catch (error) {
     console.log("Error in getProfile controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const getPublicProfile = async (req, res) => {
+  try {
+    const { userName } = req.params;
+    const user = await User.findOne({ username: userName }).select("-password -refreshToken");
+    
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!user.publicProfile) {
+      return res.status(403).json({ message: "This profile is private" });
+    }
+
+    // Get user's recipe statistics
+    const Recipe = (await import("../models/recipe.model.js")).Recipe;
+    const userRecipes = await Recipe.find({ 
+      author: user._id, 
+      visibility: 'public' 
+    }).select('_id views tags');
+
+    // Calculate statistics
+    const totalRecipes = userRecipes.length;
+    const totalViews = userRecipes.reduce((sum, recipe) => sum + recipe.views, 0);
+    const averageRating = 4.5; // TODO: Calculate from actual ratings when rating system is implemented
+    
+    // Get follower and following counts
+    const Follow = (await import("../models/follow.model.js")).Follow;
+    const followers = await Follow.countDocuments({ following: user._id });
+    const following = await Follow.countDocuments({ follower: user._id });
+    
+    // Get favorite recipes count
+    const favoriteRecipesCount = user.savedRecipes.length;
+
+    // Check if current user is following this profile (if authenticated)
+    let isFollowing = false;
+    let isOwner = false;
+    if (req.user) {
+      isOwner = req.user._id.toString() === user._id.toString();
+      if (!isOwner) {
+        const followRelation = await Follow.findOne({
+          follower: req.user._id,
+          following: user._id
+        });
+        isFollowing = !!followRelation;
+      }
+    }
+
+    return res.status(200).json({
+      user: {
+        _id: user._id,
+        username: user.username,
+        fullName: user.fullName,
+        bio: user.bio,
+        avatar: user.avatar,
+        socialLinks: user.socialLinks,
+        cookingLevel: user.cookingLevel,
+        createdAt: user.createdAt
+      },
+      stats: {
+        totalRecipes,
+        followers,
+        following,
+        favoriteRecipesCount,
+        averageRating,
+        totalViews
+      },
+      favoriteRecipes: user.savedRecipes || [],
+      followData: {
+        isFollowing,
+        isOwner,
+        canFollow: req.user && !isOwner
+      }
+    });
+  } catch (error) {
+    console.log("Error in getPublicProfile controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const getUserRecipesByUsername = async (req, res) => {
+  try {
+    const { userName } = req.params;
+    const { 
+      page = 1, 
+      limit = 10, 
+      search = '', 
+      difficulty = '', 
+      cuisine = '',
+      mealType = ''
+    } = req.query;
+    
+    // Find user by username
+    const user = await User.findOne({ username: userName }).select('_id publicProfile');
+    
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!user.publicProfile) {
+      return res.status(403).json({ message: "This profile is private" });
+    }
+
+    // Build filter for recipes
+    const Recipe = (await import("../models/recipe.model.js")).Recipe;
+    let filter = { 
+      author: user._id, 
+      visibility: 'public' 
+    };
+    
+    // Add search filter
+    if (search) {
+      filter.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ];
+    }
+    
+    // Add filters
+    if (difficulty && difficulty !== 'All Difficulty') {
+      filter.tags = { $in: [difficulty] };
+    }
+    
+    if (cuisine && cuisine !== 'All Cuisines') {
+      filter.tags = { $in: [cuisine] };
+    }
+    
+    if (mealType && mealType !== 'All Meal Types') {
+      filter.tags = { $in: [mealType] };
+    }
+    
+    const recipes = await Recipe.find(filter)
+      .populate("author", "username avatar fullName")
+      .sort({ updatedAt: -1 })
+      .limit(limit * 1)
+      .skip((page - 1) * limit);
+    
+    const total = await Recipe.countDocuments(filter);
+    
+    return res.status(200).json({
+      recipes,
+      total,
+      page: parseInt(page),
+      pages: Math.ceil(total / limit)
+    });
+  } catch (error) {
+    console.log("Error in getUserRecipesByUsername controller", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -631,6 +804,7 @@ export {
   updateProfile,
   updatePreference,
   getSettingsProfile,
+  getAccountSettings,
   getPreference,
   changePassword,
   updateEmail,
@@ -638,6 +812,8 @@ export {
   tooglePublicProfile,
   deleteAccount,
   getProfile,
+  getPublicProfile,
+  getUserRecipesByUsername,
   getSavedRecipe,
   addSavedRecipe,
   deleteSavedRecipe,

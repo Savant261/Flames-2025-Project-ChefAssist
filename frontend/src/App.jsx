@@ -151,8 +151,9 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/ai" element={<Ai userData={userData} />}  userData={userData}/>
-              <Route path="/ai/:chatId" element={<Ai />} />
+              <Route path="/ai/:chatId" element={<Ai userData={userData}/>} />
               <Route path="/explore" element={<Explore />} />
+              <Route path="/profile/:userName" element={<Profile />} />
               <Route path="/editProfile" element={<EditProfile />} />
               <Route path="/subscription" element={<Subscription />} />
               <Route path="/dashboard/*" element={<DashBoard  userData={userData}/>} />

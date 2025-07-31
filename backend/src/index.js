@@ -4,6 +4,8 @@ import connectDB from "./db/index.js";
 import UserRouter from "./routes/user.route.js";
 import RecipeRouter from "./routes/recipe.route.js";
 import AiChatRouter from "./routes/aiChat.route.js";
+import ActivityFeedRouter from "./routes/activityFeed.route.js";
+import FollowRouter from "./routes/follow.route.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 
@@ -36,6 +38,8 @@ app.use(
 app.use("/api/auth", UserRouter);
 app.use("/api/recipes", RecipeRouter);
 app.use("/api/aiChats", AiChatRouter);
+app.use("/api/activity", ActivityFeedRouter);
+app.use("/api/follow", FollowRouter);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);

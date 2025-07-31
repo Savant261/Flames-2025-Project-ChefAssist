@@ -3,15 +3,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import RecipeCard from "../components/RecipeCard";
 import userService from "../api/userService";
 import activityFeedService from "../api/activityFeedService";
-import followService from "../api/followService";
 
-const Profile = ({ userData }) => {
+const Profile = () => {
   const navigate = useNavigate();
   const { userName } = useParams();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [profileData, setProfileData] = useState(null);
-  const [activeTab, setActiveTab] = useState('reviews');
+  const [activeTab, setActiveTab] = useState('favorites');
   
   // Recipe states
   const [favoriteRecipes, setFavoriteRecipes] = useState([]);
@@ -24,24 +23,11 @@ const Profile = ({ userData }) => {
   const [selectedDifficulty, setSelectedDifficulty] = useState('All Difficulty');
   const [selectedMealType, setSelectedMealType] = useState('All Meal Types');
   
-  // Activity feed states
-  const [newPost, setNewPost] = useState('');
-  const [showPostForm, setShowPostForm] = useState(false);
-  
   // Pagination states
   const [recipePage, setRecipePage] = useState(1);
   const [activityPage, setActivityPage] = useState(1);
   const [hasMoreRecipes, setHasMoreRecipes] = useState(true);
   const [hasMoreActivity, setHasMoreActivity] = useState(true);
-
-  // Follow states
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [followLoading, setFollowLoading] = useState(false);
-  const [followerCount, setFollowerCount] = useState(0);
-  const [followingCount, setFollowingCount] = useState(0);
-
-  // Check if current user is the profile owner
-  const isOwner = userData && userData.username === userName;
 
   // Filter options
   const cuisineOptions = [
@@ -71,15 +57,6 @@ const Profile = ({ userData }) => {
       const data = await userService.getPublicProfile(userName);
       setProfileData(data);
       setFavoriteRecipes(data.favoriteRecipes || []);
-      
-      // Set follow data
-      if (data.followData) {
-        setIsFollowing(data.followData.isFollowing);
-      }
-      if (data.stats) {
-        setFollowerCount(data.stats.followers || 0);
-        setFollowingCount(data.stats.following || 0);
-      }
     } catch (err) {
       setError(err.message || "Failed to load profile");
     } finally {
@@ -151,90 +128,6 @@ const Profile = ({ userData }) => {
     }
   };
 
-  // Reset filters to default
-  const resetFilters = () => {
-    setSearchTerm('');
-    setSelectedCuisine('All Cuisines');
-    setSelectedDifficulty('All Difficulty');
-    setSelectedMealType('All Meal Types');
-    // Reload recipes with default filters
-    setTimeout(() => {
-      loadUserRecipes(true);
-    }, 100);
-  };
-
-  // Handle cuisine filter change
-  const handleCuisineChange = (value) => {
-    if (value === 'All Cuisines') {
-      resetFilters();
-    } else {
-      setSelectedCuisine(value);
-      handleFilterChange();
-    }
-  };
-
-  // Handle difficulty filter change
-  const handleDifficultyChange = (value) => {
-    if (value === 'All Difficulty') {
-      resetFilters();
-    } else {
-      setSelectedDifficulty(value);
-      handleFilterChange();
-    }
-  };
-
-  // Handle meal type filter change
-  const handleMealTypeChange = (value) => {
-    if (value === 'All Meal Types') {
-      resetFilters();
-    } else {
-      setSelectedMealType(value);
-      handleFilterChange();
-    }
-  };
-
-  // Create activity post
-  const handleCreatePost = async () => {
-    if (!newPost.trim()) return;
-    
-    try {
-      const postData = {
-        content: newPost.trim()
-      };
-      
-      await activityFeedService.createActivityPost(postData);
-      setNewPost('');
-      setShowPostForm(false);
-      // Reload activity feed
-      loadActivityFeed(true);
-    } catch (error) {
-      console.error('Failed to create post:', error);
-    }
-  };
-
-  // Handle follow/unfollow
-  const handleFollowToggle = async () => {
-    if (followLoading || !profileData?.user?._id) return;
-    
-    try {
-      setFollowLoading(true);
-      
-      if (isFollowing) {
-        const result = await followService.unfollowUser(profileData.user._id);
-        setIsFollowing(false);
-        setFollowerCount(result.followerCount);
-      } else {
-        const result = await followService.followUser(profileData.user._id);
-        setIsFollowing(true);
-        setFollowerCount(result.followerCount);
-      }
-    } catch (error) {
-      console.error('Failed to toggle follow:', error);
-    } finally {
-      setFollowLoading(false);
-    }
-  };
-
   // Tab change handler
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -248,8 +141,6 @@ const Profile = ({ userData }) => {
   useEffect(() => {
     if (userName) {
       loadProfile();
-      // Load user recipes by default since 'reviews' is the default tab
-      loadUserRecipes(true);
     }
   }, [userName]);
 
@@ -380,52 +271,13 @@ const Profile = ({ userData }) => {
                       )}
                     </div>
                   )}
-
-                  {/* Follow Button - Only visible to other users */}
-                  {userData && !isOwner && (
-                    <div className="mt-4">
-                      <button
-                        onClick={handleFollowToggle}
-                        disabled={followLoading}
-                        className={`inline-flex items-center px-6 py-2 rounded-full font-semibold transition-all duration-200 ${
-                          isFollowing
-                            ? 'bg-white/20 text-white border border-white hover:bg-white/30'
-                            : 'bg-white text-chef-orange hover:bg-gray-100'
-                        } ${followLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      >
-                        {followLoading ? (
-                          <>
-                            <svg className="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            Processing...
-                          </>
-                        ) : isFollowing ? (
-                          <>
-                            <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            Following
-                          </>
-                        ) : (
-                          <>
-                            <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                            </svg>
-                            Follow
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
 
             {/* Stats Section */}
             <div className="bg-white p-6">
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <div className="text-center group cursor-pointer">
                   <div className="bg-chef-peach/30 rounded-full w-20 h-20 mx-auto flex items-center justify-center mb-3 group-hover:bg-chef-peach/50 transition-colors">
                     <span className="text-3xl font-bold text-chef-orange">
@@ -438,19 +290,10 @@ const Profile = ({ userData }) => {
                 <div className="text-center group cursor-pointer">
                   <div className="bg-chef-peach/30 rounded-full w-20 h-20 mx-auto flex items-center justify-center mb-3 group-hover:bg-chef-peach/50 transition-colors">
                     <span className="text-2xl font-bold text-chef-orange">
-                      {followerCount}
+                      {profileData.stats.followers}
                     </span>
                   </div>
                   <p className="text-gray-600 font-medium">Followers</p>
-                </div>
-
-                <div className="text-center group cursor-pointer">
-                  <div className="bg-chef-peach/30 rounded-full w-20 h-20 mx-auto flex items-center justify-center mb-3 group-hover:bg-chef-peach/50 transition-colors">
-                    <span className="text-2xl font-bold text-chef-orange">
-                      {followingCount}
-                    </span>
-                  </div>
-                  <p className="text-gray-600 font-medium">Following</p>
                 </div>
 
                 <div className="text-center group cursor-pointer">
@@ -483,16 +326,6 @@ const Profile = ({ userData }) => {
             <div className="flex flex-wrap border-b border-gray-200">
               <button
                 className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
-                  activeTab === 'reviews' 
-                    ? 'border-chef-orange text-chef-orange' 
-                    : 'border-transparent text-gray-500 hover:text-chef-orange hover:border-chef-orange/50'
-                }`}
-                onClick={() => handleTabChange('reviews')}
-              >
-                All Recipes ({profileData.stats.totalRecipes})
-              </button>
-              <button
-                className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === 'favorites' 
                     ? 'border-chef-orange text-chef-orange' 
                     : 'border-transparent text-gray-500 hover:text-chef-orange hover:border-chef-orange/50'
@@ -500,6 +333,16 @@ const Profile = ({ userData }) => {
                 onClick={() => handleTabChange('favorites')}
               >
                 Favorite Recipes
+              </button>
+              <button
+                className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
+                  activeTab === 'reviews' 
+                    ? 'border-chef-orange text-chef-orange' 
+                    : 'border-transparent text-gray-500 hover:text-chef-orange hover:border-chef-orange/50'
+                }`}
+                onClick={() => handleTabChange('reviews')}
+              >
+                All Recipes ({profileData.stats.totalRecipes})
               </button>
               <button
                 className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
@@ -518,32 +361,14 @@ const Profile = ({ userData }) => {
               <div className="p-4 border-b border-gray-200">
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex-1 relative">
-                    <form onSubmit={handleSearch} className="flex">
+                    <form onSubmit={handleSearch}>
                       <input
                         type="text"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         placeholder="Search recipes..."
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent"
                       />
-                      <button
-                        type="submit"
-                        className="px-4 py-2 bg-chef-orange text-white rounded-r-lg hover:bg-chef-orange-dark transition-colors flex items-center"
-                      >
-                        <svg
-                          className="w-5 h-5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                          />
-                        </svg>
-                      </button>
                       <svg
                         className="absolute left-3 top-2.5 w-5 h-5 text-gray-400"
                         fill="none"
@@ -559,15 +384,9 @@ const Profile = ({ userData }) => {
                       </svg>
                     </form>
                   </div>
-                  <button
-                    onClick={resetFilters}
-                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    Reset All
-                  </button>
                   <select 
                     value={selectedCuisine}
-                    onChange={(e) => handleCuisineChange(e.target.value)}
+                    onChange={(e) => setSelectedCuisine(e.target.value)}
                     className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent"
                   >
                     {cuisineOptions.map(option => (
@@ -576,7 +395,7 @@ const Profile = ({ userData }) => {
                   </select>
                   <select 
                     value={selectedDifficulty}
-                    onChange={(e) => handleDifficultyChange(e.target.value)}
+                    onChange={(e) => setSelectedDifficulty(e.target.value)}
                     className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent"
                   >
                     {difficultyOptions.map(option => (
@@ -585,7 +404,7 @@ const Profile = ({ userData }) => {
                   </select>
                   <select 
                     value={selectedMealType}
-                    onChange={(e) => handleMealTypeChange(e.target.value)}
+                    onChange={(e) => setSelectedMealType(e.target.value)}
                     className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent"
                   >
                     {mealTypeOptions.map(option => (
@@ -598,6 +417,33 @@ const Profile = ({ userData }) => {
 
             {/* Tab Content */}
             <div className="p-6">
+              {/* Favorites Tab */}
+              {activeTab === 'favorites' && (
+                <div>
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold text-chef-orange">
+                      Favorite Recipes
+                    </h2>
+                  </div>
+
+                  {favoriteRecipes.length === 0 ? (
+                    <div className="text-center py-12">
+                      <div className="text-gray-400 text-6xl mb-4">🍳</div>
+                      <h3 className="text-xl font-semibold text-gray-600 mb-2">No favorite recipes yet</h3>
+                      <p className="text-gray-500">Start exploring recipes to build your favorites collection!</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {favoriteRecipes.map((recipe, index) => (
+                        <div key={index}>
+                          <RecipeCard recipe={recipe} isMyRecipe={false} />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* All Recipes Tab */}
               {activeTab === 'reviews' && (
                 <div>
@@ -617,7 +463,7 @@ const Profile = ({ userData }) => {
                     <>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {userRecipes.map((recipe, index) => (
-                          <div key={index} className="h-full">
+                          <div key={index}>
                             <RecipeCard recipe={recipe} isMyRecipe={false} />
                           </div>
                         ))}
@@ -638,33 +484,6 @@ const Profile = ({ userData }) => {
                 </div>
               )}
 
-              {/* Favorites Tab */}
-              {activeTab === 'favorites' && (
-                <div>
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold text-chef-orange">
-                      Favorite Recipes
-                    </h2>
-                  </div>
-
-                  {favoriteRecipes.length === 0 ? (
-                    <div className="text-center py-12">
-                      <div className="text-gray-400 text-6xl mb-4">🍳</div>
-                      <h3 className="text-xl font-semibold text-gray-600 mb-2">No favorite recipes yet</h3>
-                      <p className="text-gray-500">Start exploring recipes to build your favorites collection!</p>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {favoriteRecipes.map((recipe, index) => (
-                        <div key={index} className="h-full">
-                          <RecipeCard recipe={recipe} isMyRecipe={false} />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
               {/* Activity Feed Tab */}
               {activeTab === 'activity' && (
                 <div>
@@ -672,50 +491,7 @@ const Profile = ({ userData }) => {
                     <h2 className="text-2xl font-bold text-chef-orange">
                       Activity Feed
                     </h2>
-                    {isOwner && (
-                      <button
-                        onClick={() => setShowPostForm(!showPostForm)}
-                        className="bg-chef-orange text-white px-4 py-2 rounded-lg hover:bg-chef-orange-dark transition-colors flex items-center space-x-2"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                        </svg>
-                        <span>Create Post</span>
-                      </button>
-                    )}
                   </div>
-
-                  {/* Post Creation Form */}
-                  {isOwner && showPostForm && (
-                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-6">
-                      <h3 className="text-lg font-semibold text-gray-800 mb-4">Create a New Post</h3>
-                      <textarea
-                        value={newPost}
-                        onChange={(e) => setNewPost(e.target.value)}
-                        placeholder="Share something with your followers..."
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-chef-orange focus:border-transparent resize-none"
-                        rows="4"
-                      />
-                      <div className="flex justify-end space-x-3 mt-4">
-                        <button
-                          onClick={() => {
-                            setShowPostForm(false);
-                            setNewPost('');
-                          }}
-                          className="px-4 py-2 text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          onClick={handleCreatePost}
-                          disabled={!newPost.trim()}
-                          className="px-6 py-2 bg-chef-orange text-white rounded-lg hover:bg-chef-orange-dark disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-                        >
-                          Post
-                        </button>
-                      </div>
-                    </div>
-                  )}
 
                   {activityPosts.length === 0 ? (
                     <div className="text-center py-12">
@@ -725,9 +501,9 @@ const Profile = ({ userData }) => {
                     </div>
                   ) : (
                     <>
-                      <div className="grid grid-cols-1 gap-6">
+                      <div className="space-y-6">
                         {activityPosts.map((post, index) => (
-                          <div key={post._id || index} className="bg-white border border-gray-200 rounded-lg p-6 h-full">
+                          <div key={post._id || index} className="bg-white border border-gray-200 rounded-lg p-6">
                             <div className="flex items-start space-x-4">
                               <img
                                 src={post.author.avatar || "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400"}

@@ -3,7 +3,7 @@ import axiosInstance from '../api/axiosInstance.js';
 // axios.defaults.withCredentials = true;
 
 export const getUserSettings = async () => {
-  const res = await axiosInstance.get('/auth/update-profile');
+  const res = await axiosInstance.get('/auth/account-settings');
   return res.data;
 };
 

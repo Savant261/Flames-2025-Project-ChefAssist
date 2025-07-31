@@ -7,6 +7,7 @@ import {
   updateProfile,
   updatePreference,
   getSettingsProfile,
+  getAccountSettings,
   getPreference,
   changePassword,
   updateEmail,
@@ -14,6 +15,8 @@ import {
   tooglePublicProfile,
   deleteAccount,
   getProfile,
+  getPublicProfile,
+  getUserRecipesByUsername,
   getSavedRecipe,
   addSavedRecipe,
   deleteSavedRecipe,
@@ -25,7 +28,7 @@ import {
   deleteInventoryItem,
   clearInventory
 } from "../controllers/user.controller.js";
-import { protectRoute } from "../middleware/auth.middleware.js";
+import { protectRoute, optionalAuth } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
@@ -37,6 +40,10 @@ router.get("/profile", protectRoute, getProfile);
 router.get("/check", protectRoute, chechAuth);
 router.get("/toogle-theme", protectRoute, toogleTheme);
 
+// Public profile routes (optional auth for follow data)
+router.get("/profile/:userName", optionalAuth, getPublicProfile);
+router.get("/profile/:userName/recipes", optionalAuth, getUserRecipesByUsername);
+
 router.get("/savedRecipe", protectRoute, getSavedRecipe);
 router.post("/savedRecipe", protectRoute, addSavedRecipe);
 router.delete("/savedRecipe/:recipeId", protectRoute, deleteSavedRecipe);
@@ -45,6 +52,7 @@ router.delete("/savedRecipe/:recipeId", protectRoute, deleteSavedRecipe);
 router.post("/update-profile-photo", protectRoute, updateProfilePhoto);
 router.post("/update-profile", protectRoute, updateProfile);
 router.get("/update-profile", protectRoute, getSettingsProfile);
+router.get("/account-settings", protectRoute, getAccountSettings);
 router.post("/update-Preference", protectRoute, updatePreference);
 router.get("/update-Preference", protectRoute, getPreference);
 
