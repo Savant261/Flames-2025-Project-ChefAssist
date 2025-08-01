@@ -106,8 +106,13 @@ export const UserProvider = ({ children }) => {
   }, []);
 
   // Check authentication on mount
-  const checkAuth = useCallback(async (redirectOnFail = false) => {
+  const checkAuth = useCallback(async (redirectOnFail = false, force = false) => {
     try {
+      // If we already have user data and not forcing, skip the check
+      if (state.userData && state.isAuthenticated && !force) {
+        return state.userData;
+      }
+
       setLoading(true);
       
       // For this app, we use cookies instead of localStorage tokens
@@ -137,7 +142,7 @@ export const UserProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [setLoading, setUserData, setError]);  // Login function
+  }, [setLoading, setUserData, setError, state.userData, state.isAuthenticated]);  // Login function
   const login = useCallback(async (credentials) => {
     try {
       setLoading(true);
@@ -378,15 +383,23 @@ export const UserProvider = ({ children }) => {
     
     const performInitialCheck = async () => {
       if (mounted) {
-        await checkAuth(false); // Don't redirect on initial check
+        await checkAuth(false, true); // Force initial check
       }
     };
     
-    performInitialCheck();
+    // Only perform initial check if we don't already have user data
+    if (!state.userData && !state.isAuthenticated) {
+      performInitialCheck();
+    }
     
     return () => {
       mounted = false;
     };
+  }, []); // Only run once on mount
+
+  // Refresh user data method for manual refresh when needed
+  const refreshUserData = useCallback(async () => {
+    return await checkAuth(false, true); // Force refresh
   }, [checkAuth]);
 
   const value = useMemo(() => ({
@@ -407,6 +420,7 @@ export const UserProvider = ({ children }) => {
     changePassword,
     togglePublicProfile,
     checkAuth,
+    refreshUserData,
     setLoading,
     setError,
     clearError
@@ -425,6 +439,7 @@ export const UserProvider = ({ children }) => {
     changePassword,
     togglePublicProfile,
     checkAuth,
+    refreshUserData,
     setLoading,
     setError,
     clearError
@@ -463,6 +478,7 @@ export const useUser = () => {
         changePassword: async () => { console.warn('UserProvider not available'); },
         togglePublicProfile: async () => { console.warn('UserProvider not available'); },
         checkAuth: () => { console.warn('UserProvider not available'); },
+        refreshUserData: async () => { console.warn('UserProvider not available'); },
         setLoading: () => { console.warn('UserProvider not available'); },
         setError: () => { console.warn('UserProvider not available'); },
         clearError: () => { console.warn('UserProvider not available'); }
@@ -490,6 +506,7 @@ export const useUser = () => {
       changePassword: async () => {},
       togglePublicProfile: async () => {},
       checkAuth: () => {},
+      refreshUserData: async () => {},
       setLoading: () => {},
       setError: () => {},
       clearError: () => {}

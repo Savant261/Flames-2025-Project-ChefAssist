@@ -109,6 +109,22 @@ export const recipeService = {
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Failed to toggle visibility');
     }
+  },
+
+  // Get recipes for Explore page
+  getExploreRecipes: async (type = '', limit = 12, following = '') => {
+    try {
+      const params = new URLSearchParams({
+        limit: limit.toString(),
+        ...(type && { type }),
+        ...(following && { following })
+      });
+      
+      const response = await axiosInstance.get(`/recipes/explore?${params}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch explore recipes');
+    }
   }
 };
 

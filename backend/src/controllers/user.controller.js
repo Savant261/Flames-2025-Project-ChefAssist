@@ -112,8 +112,7 @@ const updateProfilePhoto = async (req, res) => {
 
     return res.status(200).json({
       message: "Profile photo updated successfully!",
-      avatar: user.avatar,
-      ...user.toObject() // Return complete user object for consistency
+      ...user.toObject() // Return complete user object (includes avatar)
     });
   } catch (error) {
     console.log("Error in update Profile", error);

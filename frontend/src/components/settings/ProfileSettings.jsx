@@ -55,11 +55,16 @@ const ProfileSettings = () => {
             instagram: userData.socialLinks?.instagram || prev.socialLinks.instagram,
           },
         }));
-      }, 100);
+        
+        // Update avatar preview when userData changes and no file is selected
+        if (userData.avatar && !selectedFile) {
+          setPreviewUrl(userData.avatar);
+        }
+      }, 50); // Reduced delay for faster response
       
       return () => clearTimeout(timer);
     }
-  }, [userData, loading]);
+  }, [userData, loading, selectedFile]); // Removed previewUrl from dependencies to avoid loops
   const onChangeHandler = (e) => {
     const name = e.target.name;
     const value = e.target.value;
@@ -78,6 +83,7 @@ const ProfileSettings = () => {
     const file = e.target.files[0];
     if (file) {
       setSelectedFile(file);
+      // Only update preview locally, don't touch the global context
       setPreviewUrl(URL.createObjectURL(file));
     }
   };
@@ -92,17 +98,37 @@ const ProfileSettings = () => {
 
     reader.onloadend = async () => {
       try {
-        // Use the global store method to update avatar
+        // NOW upload to server and update global context
         const response = await updateAvatar(reader.result);
         
-        if (response && response.avatar) {
-          setPreviewUrl(response.avatar);
-          toast.success(response.message || "Profile photo updated!");
-        }
+        // Success - clear the selected file and reset input
+        toast.success(response.message || "Profile photo updated!");
         setSelectedFile(null);
+        
+        // Reset file input
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        
+        // Force update preview with new avatar from global context
+        // Small delay to ensure the global context has been updated
+        setTimeout(() => {
+          if (userData?.avatar) {
+            setPreviewUrl(userData.avatar);
+          }
+        }, 200);
       } catch (error) {
         toast.error(error.message || "Upload failed.");
         console.error("Error in photo upload", error);
+        
+        // Reset preview to original avatar on error
+        setPreviewUrl(userData?.avatar || "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400");
+        setSelectedFile(null);
+        
+        // Reset file input
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
       }
     };
 
@@ -158,6 +184,7 @@ const ProfileSettings = () => {
                 type="button"
                 onClick={() => fileInputRef.current.click()}
                 className="bg-[var(--color-chef-orange)] text-white px-4 py-2 rounded-lg hover:bg-[var(--color-chef-orange-dark)] transition-colors"
+                disabled={loading}
               >
                 Choose Photo
               </button>
@@ -165,9 +192,26 @@ const ProfileSettings = () => {
                 <button
                   type="button"
                   onClick={handlePhotoUpload}
-                  className="border border-green-500 text-green-600 px-4 py-2 rounded-lg hover:bg-green-50 transition-colors"
+                  disabled={loading}
+                  className="border border-green-500 text-green-600 px-4 py-2 rounded-lg hover:bg-green-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Upload & Save Photo
+                  {loading ? "Uploading..." : "Upload & Save Photo"}
+                </button>
+              )}
+              {selectedFile && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedFile(null);
+                    setPreviewUrl(userData?.avatar || "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400");
+                    if (fileInputRef.current) {
+                      fileInputRef.current.value = '';
+                    }
+                  }}
+                  className="border border-gray-300 text-gray-600 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                  disabled={loading}
+                >
+                  Cancel
                 </button>
               )}
             </div>
