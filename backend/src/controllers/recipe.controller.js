@@ -1,3 +1,6 @@
+import { Recipe } from "../models/recipe.model.js";
+import cloudinary from "../utils/cloudinary.js";
+
 // Get recipes for Explore page, supporting various filters
 const getExploreRecipes = async (req, res) => {
   try {
@@ -60,9 +63,6 @@ const getHomeRecipes = async (req, res) => {
     return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
-import { Recipe } from "../models/recipe.model.js";
-import cloudinary from "../utils/cloudinary.js";
-
 const createRecipe = async (req, res) => {
   try {
     const { image } = req.body;
@@ -417,6 +417,166 @@ const getAllPublicRecipes = async (req, res) => {
   }
 };
 
+// Enhanced search controller for comprehensive recipe search
+const searchRecipes = async (req, res) => {
+  try {
+    console.log('Search request received:', req.query);
+    
+    const { 
+      page = 1, 
+      limit = 10, 
+      q = '', 
+      tags = '', 
+      difficulty = '', 
+      cookTime = '', 
+      sortBy = 'relevance' 
+    } = req.query;
+    
+    let filter = { visibility: 'public' };
+    let sort = {};
+    
+    // Enhanced search across multiple fields
+    if (q && q.trim()) {
+      const searchRegex = { $regex: q.trim(), $options: 'i' };
+      filter.$or = [
+        { title: searchRegex },
+        { description: searchRegex },
+        { tags: searchRegex },
+        { 'ingredients.name': searchRegex },
+        { 'instructions.step': searchRegex }
+      ];
+    }
+    
+    // Filter by tags
+    if (tags && tags.trim()) {
+      const tagArray = tags.split(',').map(tag => tag.trim()).filter(Boolean);
+      if (tagArray.length > 0) {
+        if (filter.tags) {
+          // If tags filter already exists from search, combine with AND logic
+          filter.tags = { $in: tagArray };
+        } else {
+          filter.tags = { $in: tagArray };
+        }
+      }
+    }
+    
+    // Filter by difficulty
+    if (difficulty && difficulty.trim()) {
+      filter.difficulty = difficulty.trim();
+    }
+    
+    // Filter by cook time range
+    if (cookTime && cookTime.trim()) {
+      switch (cookTime) {
+        case '0-30':
+          filter.cookTime = { $regex: '^([0-2]?[0-9]|30) min', $options: 'i' };
+          break;
+        case '30-60':
+          filter.cookTime = { $regex: '^([3-5][0-9]|60) min', $options: 'i' };
+          break;
+        case '60+':
+          filter.cookTime = { $regex: '^([6-9][0-9]|[1-9][0-9]{2,}) min|hour', $options: 'i' };
+          break;
+      }
+    }
+    
+    // Sorting options
+    switch (sortBy) {
+      case 'newest':
+        sort = { createdAt: -1 };
+        break;
+      case 'oldest':
+        sort = { createdAt: 1 };
+        break;
+      case 'popular':
+        sort = { views: -1, createdAt: -1 };
+        break;
+      case 'rating':
+        sort = { rating: -1, createdAt: -1 };
+        break;
+      case 'relevance':
+      default:
+        sort = { views: -1, createdAt: -1 };
+        break;
+    }
+    
+    console.log('MongoDB filter:', JSON.stringify(filter, null, 2));
+    console.log('MongoDB sort:', sort);
+    
+    const recipes = await Recipe.find(filter)
+      .populate("author", "username avatar followers")
+      .sort(sort)
+      .limit(parseInt(limit))
+      .skip((parseInt(page) - 1) * parseInt(limit))
+      .lean();
+    
+    const total = await Recipe.countDocuments(filter);
+    
+    console.log(`Found ${recipes.length} recipes out of ${total} total`);
+    
+    // Add calculated fields for better search results
+    const enrichedRecipes = recipes.map(recipe => ({
+      ...recipe,
+      relevanceScore: calculateRelevanceScore(recipe, q),
+    }));
+    
+    return res.status(200).json({
+      recipes: enrichedRecipes,
+      total,
+      page: parseInt(page),
+      pages: Math.ceil(total / parseInt(limit)),
+      searchQuery: q,
+      filters: {
+        tags: tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : [],
+        difficulty,
+        cookTime,
+        sortBy
+      }
+    });
+  } catch (error) {
+    console.error("Error in searchRecipes controller:", error);
+    return res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
+};
+
+// Helper function to calculate relevance score
+const calculateRelevanceScore = (recipe, searchQuery) => {
+  if (!searchQuery) return 0;
+  
+  let score = 0;
+  const query = searchQuery.toLowerCase();
+  
+  // Title match (highest priority)
+  if (recipe.title?.toLowerCase().includes(query)) {
+    score += 10;
+  }
+  
+  // Description match
+  if (recipe.description?.toLowerCase().includes(query)) {
+    score += 5;
+  }
+  
+  // Tags match
+  if (recipe.tags?.some(tag => tag.toLowerCase().includes(query))) {
+    score += 7;
+  }
+  
+  // Ingredients match
+  if (recipe.ingredients?.some(ing => ing.name?.toLowerCase().includes(query))) {
+    score += 8;
+  }
+  
+  // Instructions match
+  if (recipe.instructions?.some(inst => inst.step?.toLowerCase().includes(query))) {
+    score += 3;
+  }
+  
+  // Boost for popular recipes
+  score += Math.log(recipe.views + 1) * 0.1;
+  
+  return score;
+};
+
 // Export all controllers
 
 // Get trending recipes (recent, most viewed, most liked)
@@ -514,6 +674,7 @@ export {
   validateRecipe,
   getUserRecipes,
   getAllPublicRecipes,
+  searchRecipes,
   getTrendingRecipes,
   getHighestViewsRecipes,
   getHighestLikesRecipes,
