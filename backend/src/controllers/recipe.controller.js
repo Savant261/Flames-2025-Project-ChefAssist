@@ -1,3 +1,65 @@
+// Get recipes for Explore page, supporting various filters
+const getExploreRecipes = async (req, res) => {
+  try {
+    const { type, limit = 12, following = '' } = req.query;
+    let filter = { visibility: 'public' };
+
+    // Filter by type
+    if (type === 'trending') {
+      // Trending: most views in last 7 days
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      filter.createdAt = { $gte: weekAgo };
+      // Will sort by views below
+    } else if (type === 'new') {
+      // Newest: just sort by createdAt
+    } else if (type === 'easy') {
+      filter.difficulty = 'Easy';
+    } else if (type === 'chefs-pick') {
+      filter.tags = { $in: ["Chef's Pick"] };
+    } else if (type === 'following' && following) {
+      // Recipes from authors the user follows (expects comma-separated user IDs)
+      const ids = following.split(',').map(id => id.trim()).filter(Boolean);
+      if (ids.length > 0) filter.author = { $in: ids };
+    }
+
+    let query = Recipe.find(filter).populate('author', 'username avatar followers');
+    if (type === 'trending') {
+      query = query.sort({ views: -1 });
+    } else if (type === 'new') {
+      query = query.sort({ createdAt: -1 });
+    } else {
+      query = query.sort({ createdAt: -1 });
+    }
+    query = query.limit(Number(limit));
+    const recipes = await query;
+    return res.status(200).json({ recipes });
+  } catch (error) {
+    console.log('Error in getExploreRecipes controller', error);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+// Get recipes for Home page, optionally filtered by tags and limited in number
+const getHomeRecipes = async (req, res) => {
+  try {
+    const { tags = '', limit = 8 } = req.query;
+    let filter = { visibility: 'public' };
+    if (tags) {
+      const tagArray = tags.split(',').map(tag => tag.trim()).filter(Boolean);
+      if (tagArray.length > 0) {
+        filter.tags = { $in: tagArray };
+      }
+    }
+    const recipes = await Recipe.find(filter)
+      .populate('author', 'username avatar')
+      .sort({ createdAt: -1 })
+      .limit(Number(limit));
+    return res.status(200).json({ recipes });
+  } catch (error) {
+    console.log('Error in getHomeRecipes controller', error);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
 import { Recipe } from "../models/recipe.model.js";
 import cloudinary from "../utils/cloudinary.js";
 
@@ -355,6 +417,8 @@ const getAllPublicRecipes = async (req, res) => {
   }
 };
 
+// Export all controllers
+
 // Get trending recipes (recent, most viewed, most liked)
 // Returns trendingToday, trendingWeek, trendingMonth, allTimeFavorites
 const getTrendingRecipes = async (req, res) => {
@@ -375,7 +439,7 @@ const getTrendingRecipes = async (req, res) => {
     weekAgo.setDate(weekAgo.getDate() - 7);
     const trendingWeek = await Recipe.find({
       visibility: 'public',
-      createdAt: { $gte: weekAgo } 
+      createdAt: { $gte: weekAgo }
     })
       .sort({ views: -1 })
       .limit(5)
@@ -397,7 +461,7 @@ const getTrendingRecipes = async (req, res) => {
       .sort({ likes: -1 })
       .limit(5)
       .populate('author', 'username avatar');
-   
+
     return res.status(200).json({
       trendingToday,
       trendingWeek,
@@ -437,8 +501,6 @@ const getHighestLikesRecipes = async (req, res) => {
     return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
-
-// Export all controllers
 export {
   createRecipe,
   updateRecipe,
@@ -455,4 +517,6 @@ export {
   getTrendingRecipes,
   getHighestViewsRecipes,
   getHighestLikesRecipes,
+  getHomeRecipes,
+  getExploreRecipes,
 };
