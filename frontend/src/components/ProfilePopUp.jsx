@@ -1,13 +1,17 @@
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { Settings, User, LayoutDashboard, LogOut, Star, Sun, Moon } from 'lucide-react';
+import { useUser } from '../store';
 import api from "../api/axiosInstance.js"
-const profilePopUp = ({ setLogin, theme, setTheme,userData }) => {
+
+const profilePopUp = ({ theme, setTheme }) => {
     const navigate = useNavigate();
+    const { userData, logout: contextLogout } = useUser();
+    
     const logout = async () => {
         try {
             await api.post("/auth/logout")
-            setLogin(false);
+            contextLogout(); // Use context logout
             navigate('/');
         } catch (error) {
             console.log("Error in Logout function",error)
@@ -22,8 +26,8 @@ const profilePopUp = ({ setLogin, theme, setTheme,userData }) => {
             console.log("Error in updateBackend in useEffect for updating them in backend",error);
     }}
     const MenuItem = ({ to, icon: Icon, children }) => (
-        <Link to={to} className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 rounded-md hover:bg-[#FFDAB9]">
-            <Icon className="w-5 h-5 text-gray-500" />
+        <Link to={to} className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-white rounded-md hover:bg-[#FFDAB9] dark:hover:bg-gray-700">
+            <Icon className="w-5 h-5 text-gray-500 dark:text-gray-300" />
             <span>{children}</span>
         </Link>
     );
@@ -57,7 +61,7 @@ const profilePopUp = ({ setLogin, theme, setTheme,userData }) => {
                 <ThemeToggle />
             </div>
             <div className="pt-2 mt-2 border-t dark:border-gray-700">
-                <button onClick={()=>logout()} className="flex items-center w-full gap-3 px-3 py-2 text-sm text-red-600 rounded-md hover:bg-[#FFDAB9] dark:hover:bg-red-500/10 dark:text-red-500">
+                <button onClick={()=>logout()} className="flex items-center w-full gap-3 px-3 py-2 text-sm text-red-600 rounded-md hover:bg-[#FFDAB9] dark:hover:bg-red-500/10 dark:text-red-400">
                     <LogOut className="w-5 h-5" />
                     <span>Logout</span>
                 </button>

@@ -104,7 +104,7 @@ const updateProfilePhoto = async (req, res) => {
       userId,
       { avatar: uploadResponse.secure_url },
       { new: true }
-    );
+    ).select('-password'); // Exclude password from response
 
     if (!user) {
       return res.status(404).json({ message: "User not found." });
@@ -113,6 +113,7 @@ const updateProfilePhoto = async (req, res) => {
     return res.status(200).json({
       message: "Profile photo updated successfully!",
       avatar: user.avatar,
+      ...user.toObject() // Return complete user object for consistency
     });
   } catch (error) {
     console.log("Error in update Profile", error);
@@ -123,21 +124,23 @@ const updateProfilePhoto = async (req, res) => {
 const updateProfile = async (req, res) => {
   try {
     const { fullName, bio, socialLinks } = req.body;
-    if (!fullName || !bio || !socialLinks)
-      return res.status(400).json({ message: "All fields are required" });
+    
+    // Create update object with only provided fields
+    const updateData = {};
+    if (fullName !== undefined) updateData.fullName = fullName;
+    if (bio !== undefined) updateData.bio = bio;
+    if (socialLinks !== undefined) updateData.socialLinks = socialLinks;
+
     const userId = req.user._id;
     const user = await User.findByIdAndUpdate(
       userId,
-      { fullName, bio, socialLinks },
+      updateData,
       { new: true }
-    );
+    ).select('-password'); // Exclude password from response
 
     return res.status(200).json({
-      message: "Sucessfully updated profile",
-      fullName: user.fullName,
-      bio: user.bio,
-      socialLinks: user.socialLinks,
-      avatar: user.avatar,
+      message: "Successfully updated profile",
+      ...user.toObject() // Return the complete updated user object
     });
   } catch (error) {
     console.log("Error in update Profile", error);
@@ -148,24 +151,24 @@ const updateProfile = async (req, res) => {
 const updatePreference = async (req, res) => {
   try {
     const { dietaryPreferences, gender, cookingLevel } = req.body;
-    if (!gender || !cookingLevel || !dietaryPreferences)
-      return res.status(400).json({ message: "All fields are required" });
-    const userId = req.user._id;
-    const user = await User.findByIdAndUpdate(userId, {
-      dietaryPreferences,
-      gender,
-      cookingLevel,
-    });
     
-    return res.status(200).json(
-      {
-        message: "Sucessfully updated preference",
-        dietaryPreferences: user.dietaryPreferences,
-        gender: user.gender,
-        cookingLevel: user.cookingLevel,
-      },
+    // Create update object with only provided fields
+    const updateData = {};
+    if (dietaryPreferences !== undefined) updateData.dietaryPreferences = dietaryPreferences;
+    if (gender !== undefined) updateData.gender = gender;
+    if (cookingLevel !== undefined) updateData.cookingLevel = cookingLevel;
+
+    const userId = req.user._id;
+    const user = await User.findByIdAndUpdate(
+      userId,
+      updateData,
       { new: true }
-    );
+    ).select('-password'); // Exclude password from response
+    
+    return res.status(200).json({
+      message: "Successfully updated preferences",
+      ...user.toObject() // Return the complete updated user object
+    });
   } catch (error) {
     console.log("Error in update Preference", error);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -263,7 +266,14 @@ const changePassword = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(newPassword, salt);
     await user.save();
-    return res.status(200).json({ message: "Password changed successfully" });
+    
+    // Get updated user without password for consistency
+    const updatedUser = await User.findById(userId).select('-password');
+    
+    return res.status(200).json({
+      message: "Password changed successfully",
+      ...updatedUser.toObject()
+    });
   } catch (error) {
     console.log("Error in changePassword controller", error);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -277,10 +287,19 @@ const updateEmail = async (req, res) => {
     if (!email)
       return res.status(400).json({ message: "Email is required" });
     const existing = await User.findOne({ email });
-    if (existing)
+    if (existing && existing._id.toString() !== userId.toString())
       return res.status(400).json({ message: "Email already in use" });
-    const user = await User.findByIdAndUpdate(userId, { email }, { new: true });
-    return res.status(200).json({ message: "Email updated", email: user.email });
+    
+    const user = await User.findByIdAndUpdate(
+      userId, 
+      { email }, 
+      { new: true }
+    ).select('-password');
+    
+    return res.status(200).json({
+      message: "Email updated",
+      ...user.toObject()
+    });
   } catch (error) {
     console.log("Error in updateEmail controller", error);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -294,10 +313,19 @@ const updatePhoneNumber = async (req, res) => {
     if (!phoneNo)
       return res.status(400).json({ message: "Phone number is required" });
     const existing = await User.findOne({ phoneNo });
-    if (existing)
+    if (existing && existing._id.toString() !== userId.toString())
       return res.status(400).json({ message: "Phone number already in use" });
-    const user = await User.findByIdAndUpdate(userId, { phoneNo }, { new: true });
-    return res.status(200).json({ message: "Phone number updated", phoneNo: user.phoneNo });
+    
+    const user = await User.findByIdAndUpdate(
+      userId, 
+      { phoneNo }, 
+      { new: true }
+    ).select('-password');
+    
+    return res.status(200).json({
+      message: "Phone number updated",
+      ...user.toObject()
+    });
   } catch (error) {
     console.log("Error in updatePhoneNumber controller", error);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -310,7 +338,14 @@ const tooglePublicProfile = async (req, res) => {
     const user = await User.findById(userId);
     user.publicProfile = !user.publicProfile;
     await user.save();
-    return res.status(200).json({ message: "Public profile toggled", publicProfile: user.publicProfile });
+    
+    // Get updated user without password
+    const updatedUser = await User.findById(userId).select('-password');
+    
+    return res.status(200).json({
+      message: "Public profile toggled",
+      ...updatedUser.toObject()
+    });
   } catch (error) {
     console.log("Error in tooglePublicProfile controller", error);
     return res.status(500).json({ message: "Internal Server Error" });

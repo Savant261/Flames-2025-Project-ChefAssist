@@ -6,8 +6,56 @@ import Overview from '../components/dashboard/Overview';
 import MealPlanner from '../components/dashboard/MealPlanner.jsx';
 import Inventory from '../components/dashboard/Inventory.jsx';
 import Nutrition from "../components/dashboard/Nutrition.jsx";
+import { useUser } from '../store';
 
-const DashBoard = ({userData}) => {
+// Utility function to format numbers (e.g., 1200 -> 1.2K)
+const formatNumber = (num) => {
+    if (!num || num === 0) return '0';
+    if (num < 1000) return num.toString();
+    if (num < 1000000) return (num / 1000).toFixed(1) + 'K';
+    return (num / 1000000).toFixed(1) + 'M';
+};
+
+const DashBoard = () => {
+    const { userData, loading, isAuthenticated } = useUser();
+    const [showContent, setShowContent] = useState(false);
+    
+    // After 2 seconds, show content regardless of loading state
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setShowContent(true);
+        }, 2000);
+        
+        return () => clearTimeout(timer);
+    }, []);
+    
+    // Show loading state only if we're loading and have no user data at all AND haven't timed out
+    if (loading && !userData && !isAuthenticated && !showContent) {
+        return (
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 dark:bg-gray-800 dark:border-gray-700/50">
+                <div className="flex items-center justify-center min-h-[400px]">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-chef-orange)] mx-auto"></div>
+                        <p className="mt-4 text-gray-600 dark:text-gray-400">Loading dashboard...</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+    
+    // Show message if user data is not available
+    if (!userData) {
+        return (
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 dark:bg-gray-800 dark:border-gray-700/50">
+                <div className="flex items-center justify-center min-h-[400px]">
+                    <div className="text-center">
+                        <p className="text-gray-600 dark:text-gray-400">Unable to load user data. Please try refreshing the page.</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+    
     const sampleRecipes = [
         {
             id: 1,
@@ -86,24 +134,44 @@ const DashBoard = ({userData}) => {
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200/50 dark:border-gray-700/50 sticky top-0">
                         {/* User Profile Summary */}
                         <div className="text-center mb-6">
-                            <img
-                                src={userData.avatar}
-                                alt="Profile"
-                                className="w-20 h-20 rounded-full mx-auto mb-3 border-4 border-[var(--color-chef-peach)] dark:border-orange-500/50"
-                            />
-                            <h3 className="font-bold text-lg text-gray-800 dark:text-gray-100">{userData.fullName}</h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">{userData.username}</p>
+                            {userData?.avatar ? (
+                                <img
+                                    src={userData.avatar}
+                                    alt="Profile"
+                                    className="w-20 h-20 rounded-full mx-auto mb-3 border-4 border-[var(--color-chef-peach)] dark:border-orange-500/50"
+                                    onError={(e) => {
+                                        e.target.style.display = 'none';
+                                        e.target.nextSibling.style.display = 'flex';
+                                    }}
+                                />
+                            ) : null}
+                            {!userData?.avatar && (
+                                <div className="w-20 h-20 rounded-full mx-auto mb-3 border-4 border-[var(--color-chef-peach)] dark:border-orange-500/50 bg-[#FFDAB9] dark:bg-gray-700 flex items-center justify-center">
+                                    <svg width="40" height="40" fill="var(--color-chef-orange)" className="dark:fill-orange-400" viewBox="0 0 24 24">
+                                        <circle cx="12" cy="8" r="4" />
+                                        <path d="M12 14c-4.418 0-8 1.79-8 4v2h16v-2c0-2.21-3.582-4-8-4z" />
+                                    </svg>
+                                </div>
+                            )}
+                            <h3 className="font-bold text-lg text-gray-800 dark:text-gray-100">{userData?.fullName || 'Loading...'}</h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">{userData?.username || 'Loading...'}</p>
                             <div className="flex justify-center space-x-4 mt-3 text-sm">
                                 <div className="text-center">
-                                    <div className="font-bold text-[var(--color-chef-orange)]">24</div>
+                                    <div className="font-bold text-[var(--color-chef-orange)]">
+                                        {formatNumber(userData?.stats?.recipesCount || userData?.recipesCount || 0)}
+                                    </div>
                                     <div className="text-gray-500 dark:text-gray-400">Recipes</div>
                                 </div>
                                 <div className="text-center">
-                                    <div className="font-bold text-[var(--color-chef-orange)]">1.2K</div>
+                                    <div className="font-bold text-[var(--color-chef-orange)]">
+                                        {formatNumber(userData?.stats?.followersCount || userData?.followersCount || 0)}
+                                    </div>
                                     <div className="text-gray-500 dark:text-gray-400">Followers</div>
                                 </div>
                                 <div className="text-center">
-                                    <div className="font-bold text-[var(--color-chef-orange)]">89</div>
+                                    <div className="font-bold text-[var(--color-chef-orange)]">
+                                        {formatNumber(userData?.stats?.savedRecipesCount || userData?.savedRecipesCount || 0)}
+                                    </div>
                                     <div className="text-gray-500 dark:text-gray-400">Saved</div>
                                 </div>
                             </div>
@@ -142,7 +210,7 @@ const DashBoard = ({userData}) => {
                 {/* --- Main Content --- */}
                 <main className="lg:col-span-3">
                     <Routes>
-                        <Route index element={<Overview sampleRecipes={sampleRecipes} userData={userData}/>} />
+                        <Route index element={<Overview sampleRecipes={sampleRecipes} />} />
                         <Route path="myRecipes" element={<MyRecipe />} />
                         <Route path="mealPlanner" element={<MealPlanner />} />
                         <Route path="inventory" element={<Inventory sampleRecipes={sampleRecipes} />} />

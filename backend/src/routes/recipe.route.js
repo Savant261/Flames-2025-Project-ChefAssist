@@ -16,9 +16,15 @@ import {
   getTrendingRecipes,
   getHighestViewsRecipes,
   getHighestLikesRecipes,
+  getHomeRecipes,
+  getExploreRecipes,
 } from "../controllers/recipe.controller.js";
-const router = express.Router();
+// Get recipes for Explore page (type: trending, new, easy, chefs-pick, following)
+// Get recipes for Home page (optionally by tags)
 
+const router = express.Router();
+router.get("/explore", getExploreRecipes);
+router.get("/home", getHomeRecipes);
 // Get all public recipes (with pagination and search)
 router.get("/", getAllPublicRecipes);
 

@@ -231,6 +231,6 @@ const RecipeCard = ({ recipe, isMyRecipe = false }) => {
       </div>
     </div>
   );
-}
+};
 
 export default RecipeCard;

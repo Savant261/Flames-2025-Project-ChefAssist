@@ -1,11 +1,13 @@
 import React from 'react'
 import { useLocation, Link } from 'react-router-dom';
 import { Home, Flame, Users, BookOpen, Bookmark, History, Settings, HelpCircle } from 'lucide-react';
+import { useUser } from '../store';
 
-const SideBar = ({ isSidebarExpanded, login }) => {
+const SideBar = ({ isSidebarExpanded }) => {
     const location = useLocation();
+    const { isAuthenticated } = useUser();
 
-    if (!login) return null;
+    if (!isAuthenticated) return null;
 
     const NavLink = ({ to, icon: Icon, children }) => {
         const isActive = location.pathname === to;

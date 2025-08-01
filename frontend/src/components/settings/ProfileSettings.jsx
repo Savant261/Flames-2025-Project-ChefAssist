@@ -3,23 +3,63 @@ import { useEffect, useRef } from "react";
 import { useState } from "react";
 import api from "../../api/axiosInstance.js";
 import { toast } from "react-toastify";
+import { useUser } from "../../store";
 
 const ProfileSettings = () => {
+  const { userData, updateAvatar, updateBasicProfile, loading } = useUser();
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(
-    "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400"
+    userData?.avatar || "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400"
   );
   const fileInputRef = useRef(null);
   const [profileData, setProfileData] = useState({
     fullName: "",
     bio: "",
-    username:"",
+    username: "",
     socialLinks: {
       x: "",
       youtube: "",
       instagram: "",
     },
   });
+
+  // Initialize profile data from context
+  useEffect(() => {
+    if (userData) {
+      setProfileData({
+        fullName: userData.fullName || "",
+        bio: userData.bio || "",
+        username: userData.username || "",
+        socialLinks: {
+          x: userData.socialLinks?.x || "",
+          youtube: userData.socialLinks?.youtube || "",
+          instagram: userData.socialLinks?.instagram || "",
+        },
+      });
+      setPreviewUrl(userData?.avatar || "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400");
+    }
+  }, [userData]); // Re-run whenever userData changes
+
+  // Force a re-sync after successful update
+  useEffect(() => {
+    if (userData && !loading) {
+      // Small delay to ensure data is properly updated
+      const timer = setTimeout(() => {
+        setProfileData(prev => ({
+          ...prev,
+          fullName: userData.fullName || prev.fullName,
+          bio: userData.bio || prev.bio,
+          socialLinks: {
+            x: userData.socialLinks?.x || prev.socialLinks.x,
+            youtube: userData.socialLinks?.youtube || prev.socialLinks.youtube,
+            instagram: userData.socialLinks?.instagram || prev.socialLinks.instagram,
+          },
+        }));
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [userData, loading]);
   const onChangeHandler = (e) => {
     const name = e.target.name;
     const value = e.target.value;
@@ -51,21 +91,17 @@ const ProfileSettings = () => {
     const reader = new FileReader();
 
     reader.onloadend = async () => {
-      // The result is the Base64 encoded string
-      const base64String = reader.result;
-
       try {
-        const response = await api.post("/auth/update-profile-photo", {
-          avatar: base64String, // Sending the string, not FormData
-        });
-        console.log(response);
-        if (response.data && response.data.avatar) {
-          setPreviewUrl(response.data.avatar);
+        // Use the global store method to update avatar
+        const response = await updateAvatar(reader.result);
+        
+        if (response && response.avatar) {
+          setPreviewUrl(response.avatar);
+          toast.success(response.message || "Profile photo updated!");
         }
         setSelectedFile(null);
-        toast.success(response.data.message || "Profile photo updated!");
       } catch (error) {
-        toast.error(error.response?.data?.message || "Upload failed.");
+        toast.error(error.message || "Upload failed.");
         console.error("Error in photo upload", error);
       }
     };
@@ -74,31 +110,25 @@ const ProfileSettings = () => {
   };
   const submitProfile = async () => {
     try {
-      const response = await api.post("/auth/update-profile", profileData);
-      toast.success(response.data.message);
-      console.log(response);
+      // Use the global store method to update profile
+      const response = await updateBasicProfile(profileData);
+      
+      // The UserContext will handle updating the userData,
+      // so we don't need to manually update local state here
+      // The useEffect will automatically sync the form with updated userData
+      
+      toast.success(response.message || "Profile updated successfully!");
     } catch (error) {
-      toast.error("Something went Wrong");
+      toast.error(error.message || "Something went wrong");
       console.log("Error in submit Profile", error);
     }
   };
+
+  // Remove the old useEffect that fetched profile data since we're using global store
   useEffect(() => {
-    console.log(profileData);
-  }, [profileData]);
-  useEffect(() => {
-    const func = async () => {
-      try {
-        const response = await api.get("/auth/update-profile");
-        setProfileData(response.data);
-        if (response.data.avatar) setPreviewUrl(response.data.avatar);
-        toast.success(response.data.message);
-        console.log(response);
-      } catch (error) {
-        console.log("Error in get Profile useEffect", error);
-      }
-    };
-    func();
-  }, []);
+    console.log('ProfileSettings - Current profileData:', profileData);
+    console.log('ProfileSettings - Current userData:', userData);
+  }, [profileData, userData]);
   return (
     <div className="space-y-8">
       {/* Profile Picture Section */}
@@ -163,12 +193,12 @@ const ProfileSettings = () => {
             </label>
             <input
               type="text"
-              defaultValue="Priya Malhotra"
               required
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-chef-orange)] focus:border-transparent transition-colors dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               name="fullName"
               value={profileData.fullName}
               onChange={(e) => onChangeHandler(e)}
+              placeholder="Enter your full name"
             />
           </div>
           <div>
@@ -258,10 +288,11 @@ const ProfileSettings = () => {
       </div>
       <div className="mt-8 flex justify-end">
         <button
-          className="px-6 py-3 rounded-lg bg-[var(--color-chef-orange)] text-white font-semibold hover:bg-[var(--color-chef-orange-dark)] transition-colors"
+          className="px-6 py-3 rounded-lg bg-[var(--color-chef-orange)] text-white font-semibold hover:bg-[var(--color-chef-orange-dark)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           onClick={() => submitProfile()}
+          disabled={loading}
         >
-          Save All Changes
+          {loading ? "Saving..." : "Save All Changes"}
         </button>
       </div>
     </div>

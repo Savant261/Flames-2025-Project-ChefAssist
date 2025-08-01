@@ -23,6 +23,9 @@ import MyFeed from "./pages/MyFeed.jsx";
 import SavedRecipes from "./pages/SavedRecipes.jsx";
 import Settings from "./pages/Settings.jsx";
 import CreateRecipe from "./pages/CreateRecipe.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import { UserProvider, useUser } from "./store";
+import useAuthValidation from "./hooks/useAuthValidation.js";
 import api from "./api/axiosInstance.js";
 
 const StyledToastContainer = ({theme}) => {
@@ -61,120 +64,184 @@ const StyledToastContainer = ({theme}) => {
   );
 };
 
-function App() {
+// App Content component that uses the UserContext
+function AppContent() {
   const navigate = useNavigate();
+  const { 
+    userData, 
+    isAuthenticated, 
+    loading, 
+    setUserData, 
+    setLoading,
+    checkAuth 
+  } = useUser();
+  
+  // Use auth validation hook for periodic token checking
+  useAuthValidation();
+  
   const [isSidebarExpanded, setIsSideBarExpanded] = useState(false);
-  const [login, setLogin] = useState(false);
   const [theme, setTheme] = useState("light");
-  const [userData, setUserData] = useState({
-    avatar: "",
-    username: "",
-    email: "",
-  });
   const [popUp, setPopUp] = useState(false);
   const [signinPopUp, setSigninPopUp] = useState(false);
-  const [oAuth, setOAuth] = useState(false);
-  const handleSucessAuth = (data) => {
-    console.log("sucessfully signin or signup");
-    toast.success("Logged in successfully!");
-    setUserData(data);
-    setLogin(true);
-    setPopUp(false);
-    setSigninPopUp(false);
-    setOAuth(true);
-  };
+  
+  // Handle theme updates from user data
   useEffect(() => {
-   
+    if (userData?.theme) {
+      setTheme(userData.theme);
+    }
+  }, [userData]);
+
+  // Close modals when user is authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      setPopUp(false);
+      setSigninPopUp(false);
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
     if (theme === "dark") {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
   }, [theme]);
-  useEffect(() => {
-    const check = async () => {
-      try {
-        const response = await api.get("/auth/check");
-        if (response.status==200) {
-          setLogin(true);
-          setUserData(response.data);
-          setTheme(response.data.theme);
-          setLogin(true);
-          setPopUp(false);
-          setSigninPopUp(false);
-          if (window.location.pathname=='/') {
-            navigate("/explore");
-          }
-        } else {
-          setLogin(false);
-          navigate("/");
-        }
-      } catch (error) {
-        console.log("Error in check Function in app.jsx", error);
-      }
-    };
-    check();
-    console.log("check function");
-  }, []);
-  useEffect(() => {
-    if (oAuth) {
-      navigate("/explore");
-    }
-    setOAuth(false);
-  }, [oAuth]);
-  //  const showSuccessToast = () => toast.success("Recipe saved successfully!");
-  //   const showErrorToast = () => toast.error("Failed to upload image. Please try again.");
-  //   const showInfoToast = () => toast.info("Your profile has been updated.");
-  //   const showWarningToast = () => toast.warning("Your session is about to expire.");
+
   return (
     <div className="min-h-screen flex flex-col dark:bg-gray-800 dark:border-gray-700/50">
-      
       <Navbar
         setIsSideBarExpanded={setIsSideBarExpanded}
-        login={login}
-        setLogin={setLogin}
         theme={theme}
         setTheme={setTheme}
         popUp={popUp}
         setPopUp={setPopUp}
-        userData={userData}
-        setUserData={setUserData}
-        handleSucessAuth={handleSucessAuth}
         signinPopUp={signinPopUp}
         setSigninPopUp={setSigninPopUp}
       />
       <div className="flex flex-1 overflow-hidden">
-        <SideBar isSidebarExpanded={isSidebarExpanded} login={login} />
+        <SideBar isSidebarExpanded={isSidebarExpanded} />
         <div className="flex-1 relative">
           <main className="absolute inset-0 overflow-y-auto">
             <StyledToastContainer theme={theme} />
             <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/ai" element={<Ai userData={userData} />}  userData={userData}/>
-              <Route path="/ai/:chatId" element={<Ai userData={userData}/>} />
-              <Route path="/explore" element={<Explore />} />
-              <Route path="/profile/:userName" element={<Profile />} />
-              <Route path="/editProfile" element={<EditProfile />} />
-              <Route path="/subscription" element={<Subscription />} />
-              <Route path="/dashboard/*" element={<DashBoard  userData={userData}/>} />
-              <Route path="/feedback" element={<Feedback />} />
-              <Route path="/recipe" element={<Recipe />} />
-              <Route path="/recipe/:recipeId" element={<Recipe />} />
-              <Route path="/recipe/create" element={<CreateRecipe />} />
-              <Route path="/recipe/create/:recipeId" element={<CreateRecipe />} />
-              <Route path="/recipe/edit/:recipeId" element={<CreateRecipe />} />
-              <Route path="/search" element={<Search />} />
-              <Route path="/trending" element={<Trending />} />
-              <Route path="/myFeed" element={<MyFeed />} />
-              <Route path="/savedRecipes" element={<SavedRecipes />} />
-              <Route path="/settings/*" element={<Settings />} />
-              <Route path="/trending/*" element={<Trending />} />
+              {/* Public route - Home page */}
+              <Route path="/" element={
+                <ProtectedRoute requireAuth={false}>
+                  <Home />
+                </ProtectedRoute>
+              } />
+              
+              {/* Protected routes - require authentication */}
+              <Route path="/ai" element={
+                <ProtectedRoute>
+                  <Ai />
+                </ProtectedRoute>
+              } />
+              <Route path="/ai/:chatId" element={
+                <ProtectedRoute>
+                  <Ai />
+                </ProtectedRoute>
+              } />
+              <Route path="/explore" element={
+                <ProtectedRoute>
+                  <Explore />
+                </ProtectedRoute>
+              } />
+              <Route path="/profile/:userName" element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              } />
+              <Route path="/editProfile" element={
+                <ProtectedRoute>
+                  <EditProfile />
+                </ProtectedRoute>
+              } />
+              <Route path="/subscription" element={
+                <ProtectedRoute>
+                  <Subscription />
+                </ProtectedRoute>
+              } />
+              <Route path="/dashboard/*" element={
+                <ProtectedRoute>
+                  <DashBoard />
+                </ProtectedRoute>
+              } />
+              <Route path="/feedback" element={
+                <ProtectedRoute>
+                  <Feedback />
+                </ProtectedRoute>
+              } />
+              <Route path="/recipe" element={
+                <ProtectedRoute>
+                  <Recipe />
+                </ProtectedRoute>
+              } />
+              <Route path="/recipe/:recipeId" element={
+                <ProtectedRoute>
+                  <Recipe />
+                </ProtectedRoute>
+              } />
+              <Route path="/recipe/create" element={
+                <ProtectedRoute>
+                  <CreateRecipe />
+                </ProtectedRoute>
+              } />
+              <Route path="/recipe/create/:recipeId" element={
+                <ProtectedRoute>
+                  <CreateRecipe />
+                </ProtectedRoute>
+              } />
+              <Route path="/recipe/edit/:recipeId" element={
+                <ProtectedRoute>
+                  <CreateRecipe />
+                </ProtectedRoute>
+              } />
+              <Route path="/search" element={
+                <ProtectedRoute>
+                  <Search />
+                </ProtectedRoute>
+              } />
+              <Route path="/trending" element={
+                <ProtectedRoute>
+                  <Trending />
+                </ProtectedRoute>
+              } />
+              <Route path="/myFeed" element={
+                <ProtectedRoute>
+                  <MyFeed />
+                </ProtectedRoute>
+              } />
+              <Route path="/savedRecipes" element={
+                <ProtectedRoute>
+                  <SavedRecipes />
+                </ProtectedRoute>
+              } />
+              <Route path="/settings/*" element={
+                <ProtectedRoute>
+                  <Settings />
+                </ProtectedRoute>
+              } />
+              <Route path="/trending/*" element={
+                <ProtectedRoute>
+                  <Trending />
+                </ProtectedRoute>
+              } />
             </Routes>
             <Footer />
           </main>
         </div>
       </div>
     </div>
+  );
+}
+
+// Main App component that provides the UserContext
+function App() {
+  return (
+    <UserProvider>
+      <AppContent />
+    </UserProvider>
   );
 }
 

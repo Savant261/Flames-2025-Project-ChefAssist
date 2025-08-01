@@ -1,7 +1,32 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import RecipeCard from '../RecipeCard.jsx';
+import { useUser } from '../../store';
 
-const Overview = ({ sampleRecipes,userData }) => {
+const Overview = ({ sampleRecipes }) => {
+    const { userData, loading, isAuthenticated } = useUser();
+    const [showContent, setShowContent] = useState(false);
+    
+    // After 3 seconds, show content regardless of loading state
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setShowContent(true);
+        }, 3000);
+        
+        return () => clearTimeout(timer);
+    }, []);
+    
+    // Show loading state only if we're not authenticated and still loading AND haven't timed out
+    if (loading && !isAuthenticated && !userData && !showContent) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-chef-orange)] mx-auto"></div>
+                    <p className="mt-4 text-gray-600 dark:text-gray-400">Loading overview...</p>
+                </div>
+            </div>
+        );
+    }
+    
     // inspriration box
     const [spinWheelRecipe, setSpinWheelRecipe] = useState(null);
     const [spin, setSpin] = useState(false);
@@ -18,12 +43,23 @@ const Overview = ({ sampleRecipes,userData }) => {
             <div className="bg-gradient-to-r from-[var(--color-chef-orange)] to-[var(--color-chef-orange-light)] rounded-2xl p-8 mb-8 text-white relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
                 <div className="relative z-10">
-                    <h2 className="text-3xl font-bold mb-2">Good evening, {userData.fullName}!</h2>
+                    <h2 className="text-3xl font-bold mb-2">
+                        Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}, {userData?.fullName || userData?.username || 'Chef'}!
+                    </h2>
                     <p className="text-white/90 text-lg mb-4">Ready to cook something amazing today?</p>
                     <div className="flex items-center space-x-6">
-                        <div className="text-center"><div className="text-2xl font-bold">7</div><div className="text-sm text-white/80">Day Streak</div></div>
-                        <div className="text-center"><div className="text-2xl font-bold">3</div><div className="text-sm text-white/80">Recipes This Week</div></div>
-                        <div className="text-center"><div className="text-2xl font-bold">156</div><div className="text-sm text-white/80">Total Likes</div></div>
+                        <div className="text-center">
+                            <div className="text-2xl font-bold">{userData?.stats?.dayStreak || 7}</div>
+                            <div className="text-sm text-white/80">Day Streak</div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-2xl font-bold">{userData?.stats?.recipesThisWeek || 3}</div>
+                            <div className="text-sm text-white/80">Recipes This Week</div>
+                        </div>
+                        <div className="text-center">
+                            <div className="text-2xl font-bold">{userData?.stats?.totalLikes || 156}</div>
+                            <div className="text-sm text-white/80">Total Likes</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -76,7 +112,7 @@ const Overview = ({ sampleRecipes,userData }) => {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm text-gray-600 dark:text-gray-400">Recipes Cooked</p>
-                            <p className="text-2xl font-bold text-[var(--color-chef-orange)]">47</p>
+                            <p className="text-2xl font-bold text-[var(--color-chef-orange)]">{userData?.stats?.recipesCooked || 47}</p>
                         </div>
                         <div className="w-12 h-12 bg-[var(--color-chef-orange)]/10 dark:bg-orange-500/20 rounded-lg flex items-center justify-center">
                             <svg className="w-6 h-6 text-[var(--color-chef-orange)] dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -87,7 +123,7 @@ const Overview = ({ sampleRecipes,userData }) => {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm text-gray-600 dark:text-gray-400">Avg Rating</p>
-                            <p className="text-2xl font-bold text-[var(--color-chef-orange)]">4.8</p>
+                            <p className="text-2xl font-bold text-[var(--color-chef-orange)]">{userData?.stats?.avgRating || '4.8'}</p>
                         </div>
                         <div className="w-12 h-12 bg-[var(--color-chef-orange)]/10 dark:bg-orange-500/20 rounded-lg flex items-center justify-center">
                             <svg className="w-6 h-6 text-[var(--color-chef-orange)] dark:text-orange-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
@@ -98,7 +134,7 @@ const Overview = ({ sampleRecipes,userData }) => {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm text-gray-600 dark:text-gray-400">Followers</p>
-                            <p className="text-2xl font-bold text-[var(--color-chef-orange)]">1.2K</p>
+                            <p className="text-2xl font-bold text-[var(--color-chef-orange)]">{userData?.stats?.followers || '1.2K'}</p>
                         </div>
                         <div className="w-12 h-12 bg-[var(--color-chef-orange)]/10 dark:bg-orange-500/20 rounded-lg flex items-center justify-center">
                             <svg className="w-6 h-6 text-[var(--color-chef-orange)] dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>

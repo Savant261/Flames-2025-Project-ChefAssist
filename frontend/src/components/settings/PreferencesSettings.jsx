@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import api from "../../api/axiosInstance.js";
 import { toast } from "react-toastify";
+import { useUser } from "../../store";
 
 const COMMON_DIETS = [
   "Vegetarian",
@@ -12,6 +12,7 @@ const COMMON_DIETS = [
 ];
 
 const PreferencesSettings = () => {
+  const { userData, updatePreferences, loading } = useUser();
   const [preferencesData, setPreferencesData] = useState({
     dietaryPreferences: [],
     gender: "prefer not to say",
@@ -21,26 +22,33 @@ const PreferencesSettings = () => {
   // Separate state for the custom preference input field
   const [customPreference, setCustomPreference] = useState("");
 
-  // --- Data Fetching ---
+  // Initialize preferences data from context
   useEffect(() => {
-    const getUserPreferences = async () => {
-      try {
-        const response = await api.get("/auth/update-Preference");
-        // Ensure that the fetched data structure is handled correctly
-        if (response.data) {
-          setPreferencesData({
-            dietaryPreferences: response.data.dietaryPreferences || [],
-            gender: response.data.gender || "prefer not to say",
-            cookingLevel: response.data.cookingLevel || "Beginner",
-          });
-        }
-      } catch (error) {
-        console.log("Error in get Preference function in useEffect", error);
-        toast.error("Could not load your saved preferences.");
-      }
-    };
-    getUserPreferences();
-  }, []);
+    if (userData) {
+      setPreferencesData({
+        dietaryPreferences: userData.dietaryPreferences || [],
+        gender: userData.gender || "prefer not to say",
+        cookingLevel: userData.cookingLevel || "Beginner",
+      });
+    }
+  }, [userData]); // Re-run whenever userData changes
+
+  // Force a re-sync after successful update
+  useEffect(() => {
+    if (userData && !loading) {
+      // Small delay to ensure data is properly updated
+      const timer = setTimeout(() => {
+        setPreferencesData(prev => ({
+          ...prev,
+          dietaryPreferences: userData.dietaryPreferences || prev.dietaryPreferences,
+          gender: userData.gender || prev.gender,
+          cookingLevel: userData.cookingLevel || prev.cookingLevel,
+        }));
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [userData, loading]);
 
   const onChangeHandler = (e) => {
     const { name, value } = e.target;
@@ -87,18 +95,20 @@ const PreferencesSettings = () => {
     }));
   };
 
-  // --- Form Submission ---
+  // Form Submission
   const submitPreference = async () => {
     try {
-      // The preferencesData state is already in the correct format to be sent
-      const response = await api.post(
-        "/auth/update-Preference",
-        preferencesData
-      );
-      toast.success(response.data.message);
+      // Use the global store method to update preferences
+      const response = await updatePreferences(preferencesData);
+      
+      // The UserContext will handle updating the userData,
+      // so we don't need to manually update local state here
+      // The useEffect will automatically sync the form with updated userData
+      
+      toast.success(response.message || "Preferences updated successfully!");
     } catch (error) {
-      toast.error("Something went wrong while saving.");
-      console.log("Error in submit preference", error);
+      toast.error(error.message || "Something went wrong while saving.");
+      console.log("Error in submit Preference", error);
     }
   };
 
@@ -217,9 +227,10 @@ const PreferencesSettings = () => {
       <div className="mt-8 flex justify-end">
         <button
           onClick={submitPreference}
-          className="px-6 py-3 rounded-lg bg-[var(--color-chef-orange)] text-white font-semibold hover:bg-[var(--color-chef-orange-dark)] transition-colors"
+          disabled={loading}
+          className="px-6 py-3 rounded-lg bg-[var(--color-chef-orange)] text-white font-semibold hover:bg-[var(--color-chef-orange-dark)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Save All Changes
+          {loading ? "Saving..." : "Save All Changes"}
         </button>
       </div>
     </div>

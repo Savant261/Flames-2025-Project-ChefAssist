@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import aiService from '../api/aiService.js';
+import { useUser } from '../store';
 
 // Import all AI components
 import AiHeader from '../components/ai/AiHeader';
@@ -15,9 +16,10 @@ import AiStyles from '../components/ai/AiStyles';
 import { restrictionsList } from '../components/ai/constants';
 import { formatRecipeDisplay } from '../components/ai/utils';
 
-const Ai = ({userData}) => {
+const Ai = () => {
   const { chatId } = useParams();
   const navigate = useNavigate();
+  const { userData } = useUser();
   
   // Store all selected chats for scrollable middle section
   const [activeChats, setActiveChats] = useState([]);
@@ -63,27 +65,7 @@ const Ai = ({userData}) => {
   const [selectedHistoryIdx, setSelectedHistoryIdx] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
 
-  // Load user data on component mount
-  useEffect(() => {
-    loadUserData();
-    loadChatHistory();
-  }, []);
-
-  // Load chat based on URL parameter
-  useEffect(() => {
-    if (chatId) {
-      loadSpecificChat(chatId);
-    } else {
-      // Clear current chat when no chatId is present
-      setCurrentChat(null);
-      setActiveChats([]);
-      setMessages([]);
-      setOutput("");
-      setError("");
-    }
-  }, [chatId]);
-
-  const loadUserData = async () => {
+  const loadUserData = useCallback(async () => {
     try {
       const inventoryData = await aiService.getUserInventory();
       setUserInventory(inventoryData.ingredients || []);
@@ -107,10 +89,10 @@ const Ai = ({userData}) => {
     } catch (error) {
       console.error("Failed to load user data:", error);
     }
-  };
+  }, []);
 
   // Load specific chat by ID (for URL navigation)
-  const loadSpecificChat = async (chatId) => {
+  const loadSpecificChat = useCallback(async (chatId) => {
     try {
       setIsLoadingChat(true);
       const chatData = await aiService.getChat(chatId);
@@ -152,10 +134,10 @@ const Ai = ({userData}) => {
     } finally {
       setIsLoadingChat(false);
     }
-  };
+  }, []);
 
   // Load chat history from backend
-  const loadChatHistory = async () => {
+  const loadChatHistory = useCallback(async () => {
     try {
       const chats = await aiService.getAllChats();
       if (chats && chats.length > 0) {
@@ -180,7 +162,27 @@ const Ai = ({userData}) => {
     } catch (error) {
       console.error("Failed to load chat history:", error);
     }
-  };
+  }, []);
+
+  // Load user data on component mount
+  useEffect(() => {
+    loadUserData();
+    loadChatHistory();
+  }, [loadUserData, loadChatHistory]);
+
+  // Load chat based on URL parameter
+  useEffect(() => {
+    if (chatId) {
+      loadSpecificChat(chatId);
+    } else {
+      // Clear current chat when no chatId is present
+      setCurrentChat(null);
+      setActiveChats([]);
+      setMessages([]);
+      setOutput("");
+      setError("");
+    }
+  }, [chatId, loadSpecificChat]);
 
   const createNewChat = async () => {
     try {

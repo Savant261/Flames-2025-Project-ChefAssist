@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { memo } from 'react';
 
-const MessageCard = ({ chat, isCurrentOutput = false, input = "" }) => {
+const MessageCard = memo(({ chat, isCurrentOutput = false, input = "" }) => {
   return (
     <div className="flex flex-col items-center w-full animate-fade-in-scale animate-expand-card">
       {/* User query pill on the right */}
@@ -55,6 +55,8 @@ const MessageCard = ({ chat, isCurrentOutput = false, input = "" }) => {
       </div>
     </div>
   );
-};
+});
+
+MessageCard.displayName = 'MessageCard';
 
 export default MessageCard;
