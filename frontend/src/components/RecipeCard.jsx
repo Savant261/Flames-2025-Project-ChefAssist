@@ -1,10 +1,99 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import userService from '../api/userService.js';
 
 const RecipeCard = ({ recipe, isMyRecipe = false }) => {
   const navigate = useNavigate();
   const [imageError, setImageError] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [checkedSaveStatus, setCheckedSaveStatus] = useState(false);
+  
+  // console.log(recipe)
 
+  // Check if recipe is already saved when component mounts
+  useEffect(() => {
+    const checkIfSaved = async () => {
+      try {
+        const response = await userService.checkRecipeSaved(recipe._id);
+        setIsSaved(response.isSaved);
+        setCheckedSaveStatus(true);
+      } catch (error) {
+        console.error('Error checking saved status:', error);
+        setCheckedSaveStatus(true);
+      }
+    };
+    
+    if (recipe._id && !isMyRecipe && !checkedSaveStatus) {
+      checkIfSaved();
+    }
+  }, [recipe._id, isMyRecipe, checkedSaveStatus]);
+
+  // Check save status on hover if not already checked
+  const handleMouseEnter = async () => {
+    setIsHovered(true);
+    
+    if (!checkedSaveStatus && !isMyRecipe && recipe._id) {
+      try {
+        const response = await userService.checkRecipeSaved(recipe._id);
+        setIsSaved(response.isSaved);
+        setCheckedSaveStatus(true);
+      } catch (error) {
+        console.error('Error checking saved status on hover:', error);
+      }
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+  };
+
+  // Handle save/unsave recipe with toggle
+  const handleSaveRecipe = async (e) => {
+    e.stopPropagation(); // Prevent card click navigation
+    setIsLoading(true);
+    
+    try {
+      const recipeData = {
+        recipeId: recipe._id,
+        title: recipe.title,
+        imageUrl: recipe.imageUrl || recipe.image,
+        author: recipe.author,
+        rating: recipe.rating,
+        cookTime: recipe.cookTime,
+        views: recipe.views
+      };
+      
+      const response = await userService.toggleSavedRecipe(recipeData);
+      
+      setIsSaved(response.isSaved);
+      
+      toast.success(response.message, {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      
+    } catch (error) {
+      console.error('Error toggling recipe save status:', error);
+      toast.error(error.message || 'Failed to save recipe. Please try again.', {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle author profile click
+  const handleAuthorClick = (e) => {
+    e.stopPropagation(); // Prevent card click navigation
+    if (recipe.author?.username || recipe.author?.name) {
+      const username = recipe.author.username || recipe.author.name;
+      navigate(`/profile/${username}`);
+    }
+  };
   const generateStars = (rating) => {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 !== 0;
@@ -67,7 +156,11 @@ const RecipeCard = ({ recipe, isMyRecipe = false }) => {
   };
 
   return (
-    <div className="recipe-card bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-chef-peach/20 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group">
+    <div 
+      className="recipe-card bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-chef-peach/20 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <div className="relative overflow-hidden">
         {/* Status Badge */}
         {recipe.status && (
@@ -87,12 +180,49 @@ const RecipeCard = ({ recipe, isMyRecipe = false }) => {
         {/* Overlay */}
         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
 
-        {/* Favorite Button */}
-        <button className="absolute top-2 right-2 p-2 bg-white/80 dark:bg-gray-800/80 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white dark:hover:bg-gray-700">
-          <svg className="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-          </svg>
-        </button>
+        {/* Favorite/Save Button */}
+        {!isMyRecipe && (
+          <button 
+            onClick={handleSaveRecipe}
+            disabled={isLoading}
+            className={`absolute top-2 right-2 p-2 rounded-full transition-all duration-300 ${
+              isHovered || isSaved ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+            } ${
+              isSaved 
+                ? 'bg-red-500/90 text-white' 
+                : 'bg-white/80 dark:bg-gray-800/80'
+            } ${isLoading || !checkedSaveStatus ? 'cursor-not-allowed opacity-50' : 'hover:bg-white dark:hover:bg-gray-700'}`}
+            title={
+              !checkedSaveStatus 
+                ? 'Checking save status...' 
+                : isSaved 
+                  ? 'Remove from saved recipes' 
+                  : 'Save recipe'
+            }
+          >
+            {!checkedSaveStatus ? (
+              <div className="w-4 h-4 animate-spin">
+                <div className="w-4 h-4 border-2 border-gray-300 border-t-red-500 rounded-full"></div>
+              </div>
+            ) : (
+              <svg 
+                className={`w-4 h-4 transition-all duration-200 ${
+                  isSaved ? 'text-white' : 'text-red-500'
+                }`} 
+                fill={isSaved ? "currentColor" : "none"}
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={isSaved ? "0" : "2"}
+                  d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" 
+                />
+              </svg>
+            )}
+          </button>
+        )}
 
         {/* Bottom Tags */}
         <div className="absolute bottom-2 left-2 flex space-x-1">
@@ -131,13 +261,17 @@ const RecipeCard = ({ recipe, isMyRecipe = false }) => {
 
         {/* Author Info */}
         {recipe.author && (
-          <div className="flex items-center mb-3">
+          <div 
+            onClick={handleAuthorClick}
+            className="flex items-center mb-3 cursor-pointer hover:text-chef-orange transition-colors duration-200"
+            title="View author profile"
+          >
             <img
               src={recipe.author.avatar || "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400"}
               alt={recipe.author.username}
-              className="w-6 h-6 rounded-full mr-2"
+              className="w-6 h-6 rounded-full mr-2 hover:ring-2 hover:ring-chef-orange transition-all duration-200"
             />
-            <span className="text-sm text-gray-600 dark:text-gray-400">
+            <span className="text-sm text-gray-600 dark:text-gray-400 hover:underline">
               by {recipe.author.fullName || recipe.author.username}
             </span>
           </div>

@@ -208,6 +208,30 @@ class UserService {
   }
 
   /**
+   * Toggle recipe save status (save if not saved, remove if saved)
+   */
+  async toggleSavedRecipe(recipe) {
+    try {
+      const response = await axiosInstance.put('/auth/savedRecipe/toggle', recipe);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to toggle recipe save status' };
+    }
+  }
+
+  /**
+   * Check if a specific recipe is saved by the user
+   */
+  async checkRecipeSaved(recipeId) {
+    try {
+      const response = await axiosInstance.get(`/auth/savedRecipe/check/${recipeId}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to check recipe save status' };
+    }
+  }
+
+  /**
    * Remove a recipe from saved recipes
    */
   async deleteSavedRecipe(recipeId) {

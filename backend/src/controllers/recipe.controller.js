@@ -17,7 +17,7 @@ const getExploreRecipes = async (req, res) => {
     } else if (type === 'new') {
       // Newest: just sort by createdAt
     } else if (type === 'easy') {
-      filter.difficulty = 'Easy';
+      filter.tags = { $in: ["easy", "Easy"] };
     } else if (type === 'chefs-pick') {
       filter.tags = { $in: ["Chef's Pick"] };
     } else if (type === 'following' && following) {
