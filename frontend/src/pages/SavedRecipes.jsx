@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/axiosInstance';
-import { Bookmark, Share2, Clock, Star, ChefHat, Sun, Moon } from 'lucide-react'; // Import Sun and Moon icons
+import { ChefHat } from 'lucide-react';
+import RecipeCard2 from '../components/RecipeCard2';
 
 const SavedRecipes = ({ onViewRecipe }) => {
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
-  const [visibleRecipes, setVisibleRecipes] = useState(5);
+  const [visibleRecipes, setVisibleRecipes] = useState(8);
   const [recipes, setRecipes] = useState([]);
 
   // Fetch saved recipes from backend on mount
@@ -13,69 +12,33 @@ const SavedRecipes = ({ onViewRecipe }) => {
     const fetchSavedRecipes = async () => {
       try {
         const res = await api.get('/auth/savedRecipe');
-        setRecipes(res.data);
+        console.log('Full API response:', res.data);
+        
+        // Handle both response formats (array or object with savedRecipes)
+        let savedRecipesData = [];
+        if (Array.isArray(res.data)) {
+          savedRecipesData = res.data;
+        } else if (res.data.savedRecipes && Array.isArray(res.data.savedRecipes)) {
+          savedRecipesData = res.data.savedRecipes;
+        }
+        
+        console.log('Processed saved recipes:', savedRecipesData);
+        setRecipes(savedRecipesData);
       } catch (error) {
-        setShowToast(true);
-        setToastMessage('Failed to load saved recipes');
+        console.error('Failed to load saved recipes:', error);
+        console.error('Error response:', error.response?.data);
       }
     };
     fetchSavedRecipes();
   }, []);
 
-  const showToastNotification = (message) => {
-    setToastMessage(message);
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000);
-  };
-
-  const removeRecipe = async (recipeId, recipeName) => {
-    try {
-      await axios.delete(`/api/savedRecipe/${recipeId}`);
-      setRecipes(prev => prev.filter(recipe => recipe.recipeId !== recipeId));
-      showToastNotification(`"${recipeName}" removed from saved recipes`);
-    } catch (error) {
-      showToastNotification('Failed to remove recipe');
-    }
+  // Handle recipe removal from the list
+  const handleRemoveFromSaved = (recipeId) => {
+    setRecipes(prev => prev.filter(recipe => recipe.recipeId !== recipeId));
   };
 
   const loadMoreRecipes = () => {
     setVisibleRecipes(recipes.length);
-  };
-
-  const shareRecipe = (recipeName) => {
-    if (navigator.share) {
-      navigator.share({
-        title: recipeName,
-        text: `Check out this amazing recipe: ${recipeName}`,
-        url: window.location.href,
-      });
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      showToastNotification('Recipe link copied to clipboard!');
-    }
-  };
-
-  const renderStars = (rating) => {
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
-
-    for (let i = 0; i < 5; i++) {
-      if (i < fullStars) {
-        stars.push(
-          <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-        );
-      } else if (i === fullStars && hasHalfStar) {
-        stars.push(
-          <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" style={{ clipPath: 'inset(0 50% 0 0)' }} />
-        );
-      } else {
-        stars.push(
-          <Star key={i} className="w-4 h-4 text-gray-300 dark:text-gray-600" /> // Dark mode text color
-        );
-      }
-    }
-    return stars;
   };
 
   return (
@@ -111,88 +74,36 @@ const SavedRecipes = ({ onViewRecipe }) => {
 
       {/* Recipe Cards Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {recipes.slice(0, visibleRecipes).map((recipe, index) => (
-            <div
-              key={recipe.recipeId || recipe.id}
-              className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:hover:shadow-gray-700/50 ${
-                index >= 5 ? 'animate-fade-in' : ''
-              }`}
-            >
-              {/* Recipe Image */}
-              <div className="relative">
-                <img
-                  src={recipe.image || recipe.imageUrl}
-                  alt={recipe.title}
-                  className="w-full h-48 object-cover"
-                />
-
-                {/* Cuisine and Difficulty Badges - Top */}
-                <div className="absolute top-3 left-3 flex gap-2">
-                  <span className="bg-[#D97706] text-white text-xs font-medium px-2 py-1 rounded dark:bg-orange-600">
-                    {recipe.cuisine}
-                  </span>
-                  <span className="bg-[#F59E0B] text-white text-xs font-medium px-2 py-1 rounded dark:bg-orange-500">
-                    {recipe.difficulty}
-                  </span>
-                </div>
-
-                {/* Bookmark Button */}
-                <button
-                  onClick={() => removeRecipe(recipe.recipeId || recipe.id, recipe.title)}
-                  className="absolute top-3 right-3 p-2 rounded-full bg-[#D97706] transition-transform duration-200 hover:scale-110 dark:bg-orange-600 dark:hover:bg-orange-700"
-                >
-                  <Bookmark className="w-5 h-5 text-white fill-white" />
-                </button>
-              </div>
-
-              {/* Recipe Content */}
-              <div className="p-5">
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-                  {recipe.title}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2">
-                  {recipe.description}
-                </p>
-
-                {/* Rating and Time */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-1">
-                    <div className="flex items-center">
-                      {renderStars(recipe.rating)}
-                    </div>
-                    <span className="text-sm font-medium text-gray-900 dark:text-white ml-1">
-                      {recipe.rating}
-                    </span>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      ({recipe.reviews})
-                    </span>
-                  </div>
-                  <div className="flex items-center text-gray-600 dark:text-gray-300">
-                    <Clock className="w-4 h-4 mr-1" />
-                    <span className="text-sm">{recipe.cookTime}</span>
-                  </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => onViewRecipe(recipe)}
-                    className="flex-1 py-2 px-4 bg-[#D97706] hover:bg-[#B45309] rounded-lg font-medium text-white transition-colors duration-200 dark:bg-orange-600 dark:hover:bg-orange-700"
-                  >
-                    View Recipe
-                  </button>
-                  <button
-                    onClick={() => shareRecipe(recipe.title)}
-                    className="p-2 border-2 border-[#D97706] rounded-lg transition-colors duration-200 hover:bg-[#FEF3E2] dark:border-orange-600 dark:text-orange-600 dark:hover:bg-gray-700"
-                  >
-                    <Share2 className="w-5 h-5 text-[#D97706] dark:text-orange-600" />
-                  </button>
-                </div>
-              </div>
+        {recipes.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="text-gray-500 dark:text-gray-400 text-lg">
+              No saved recipes found. Start saving your favorite recipes!
             </div>
-          ))}
-        </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {recipes.slice(0, visibleRecipes).map((recipe) => {
+              console.log('Rendering recipe:', recipe); // Debug log
+              return (
+                <RecipeCard2
+                  key={recipe.recipeId || recipe._id}
+                  recipe={{
+                    _id: recipe.recipeId,
+                    title: recipe.title,
+                    imageUrl: recipe.imageUrl || recipe.image,
+                    author: recipe.author,
+                    rating: recipe.rating,
+                    cookTime: recipe.cookTime,
+                    views: recipe.views,
+                    reviews: recipe.reviews
+                  }}
+                  initialSaved={true}
+                  onRemoveFromSaved={handleRemoveFromSaved}
+                />
+              );
+            })}
+          </div>
+        )}
 
         {/* Load More Button */}
         {visibleRecipes < recipes.length && (
@@ -206,24 +117,6 @@ const SavedRecipes = ({ onViewRecipe }) => {
           </div>
         )}
       </div>
-
-      {/* Toast Notification */}
-      {showToast && (
-        <div className="fixed top-4 right-4 z-50">
-          <div className="bg-white dark:bg-gray-700 border-l-4 border-[#D97706] dark:border-orange-600 rounded-lg shadow-lg p-4 max-w-sm animate-slide-in">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-2 h-2 bg-[#D97706] dark:bg-orange-600 rounded-full"></div>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {toastMessage}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

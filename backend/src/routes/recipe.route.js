@@ -13,6 +13,7 @@ import {
   validateRecipe,
   getUserRecipes,
   getAllPublicRecipes,
+  searchRecipes,
   getTrendingRecipes,
   getHighestViewsRecipes,
   getHighestLikesRecipes,
@@ -23,6 +24,10 @@ import {
 // Get recipes for Home page (optionally by tags)
 
 const router = express.Router();
+
+// Enhanced search route
+router.get("/search", searchRecipes);
+
 router.get("/explore", getExploreRecipes);
 router.get("/home", getHomeRecipes);
 // Get all public recipes (with pagination and search)

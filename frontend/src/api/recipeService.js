@@ -125,6 +125,34 @@ export const recipeService = {
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Failed to fetch explore recipes');
     }
+  },
+
+  // Enhanced search recipes
+  searchRecipes: async ({
+    q = '',
+    tags = '',
+    difficulty = '',
+    cookTime = '',
+    sortBy = 'relevance',
+    page = 1,
+    limit = 12
+  } = {}) => {
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+        ...(q && { q }),
+        ...(tags && { tags }),
+        ...(difficulty && { difficulty }),
+        ...(cookTime && { cookTime }),
+        ...(sortBy && { sortBy })
+      });
+      
+      const response = await axiosInstance.get(`/recipes/search?${params}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to search recipes');
+    }
   }
 };
 

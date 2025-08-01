@@ -529,7 +529,10 @@ const getSavedRecipe = async (req, res) => {
   try {
     const userId = req.user._id;
     const user = await User.findById(userId);
-    return res.status(200).json(user.savedRecipes || []);
+    return res.status(200).json({ 
+      message: "Saved recipes retrieved successfully",
+      savedRecipes: user.savedRecipes || [] 
+    });
   } catch (error) {
     console.log("Error in getSavedRecipe controller", error);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -565,6 +568,68 @@ const deleteSavedRecipe = async (req, res) => {
     return res.status(200).json({ message: "Recipe removed", savedRecipes: user.savedRecipes });
   } catch (error) {
     console.log("Error in deleteSavedRecipe controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const toggleSavedRecipe = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const recipe = req.body;
+    
+    if (!recipe.recipeId) {
+      return res.status(400).json({ message: "Recipe ID required" });
+    }
+
+    const user = await User.findById(userId);
+    const existingRecipeIndex = user.savedRecipes.findIndex(r => r.recipeId === recipe.recipeId);
+    
+    let message;
+    let isSaved;
+    
+    if (existingRecipeIndex !== -1) {
+      // Recipe is already saved, remove it
+      user.savedRecipes.splice(existingRecipeIndex, 1);
+      message = "Recipe removed from saved recipes";
+      isSaved = false;
+    } else {
+      // Recipe is not saved, add it
+      user.savedRecipes.push(recipe);
+      message = "Recipe saved successfully";
+      isSaved = true;
+    }
+    
+    await user.save();
+    
+    return res.status(200).json({ 
+      message, 
+      isSaved,
+      savedRecipes: user.savedRecipes 
+    });
+  } catch (error) {
+    console.log("Error in toggleSavedRecipe controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const checkRecipeSaved = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { recipeId } = req.params;
+    
+    if (!recipeId) {
+      return res.status(400).json({ message: "Recipe ID required" });
+    }
+
+    const user = await User.findById(userId);
+    const isSaved = user.savedRecipes.some(r => r.recipeId === recipeId);
+    
+    return res.status(200).json({ 
+      isSaved,
+      recipeId
+    });
+  } catch (error) {
+    console.log("Error in checkRecipeSaved controller", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -851,6 +916,8 @@ export {
   getSavedRecipe,
   addSavedRecipe,
   deleteSavedRecipe,
+  toggleSavedRecipe,
+  checkRecipeSaved,
   updateProfilePhoto,
   toogleTheme,
   getInventory,

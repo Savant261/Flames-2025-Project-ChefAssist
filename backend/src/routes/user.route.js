@@ -20,6 +20,8 @@ import {
   getSavedRecipe,
   addSavedRecipe,
   deleteSavedRecipe,
+  toggleSavedRecipe,
+  checkRecipeSaved,
   updateProfilePhoto,
   toogleTheme,
   getInventory,
@@ -45,7 +47,9 @@ router.get("/profile/:userName", optionalAuth, getPublicProfile);
 router.get("/profile/:userName/recipes", optionalAuth, getUserRecipesByUsername);
 
 router.get("/savedRecipe", protectRoute, getSavedRecipe);
+router.get("/savedRecipe/check/:recipeId", protectRoute, checkRecipeSaved);
 router.post("/savedRecipe", protectRoute, addSavedRecipe);
+router.put("/savedRecipe/toggle", protectRoute, toggleSavedRecipe);
 router.delete("/savedRecipe/:recipeId", protectRoute, deleteSavedRecipe);
 
 //settings
