@@ -607,15 +607,15 @@ const Explore = () => {
           recipes={trendingRecipes}
         />
         <RecipeCarousel title="✨ Newest Recipes" recipes={newRecipes} />
-        <RecipeCarousel
+        {/* <RecipeCarousel
           title="🍲 Quick & Easy Dinners"
           recipes={quickDinners}
-        />
+        /> */}
         <RecipeCarousel
           title="⭐ From Chefs You Follow"
           recipes={fromFollowing}
         />
-        <RecipeCarousel title="🏆 Chef's Picks" recipes={chefsPicks} />
+        {/* <RecipeCarousel title="🏆 Chef's Picks" recipes={chefsPicks} /> */}
       </main>
     </div>
   );
