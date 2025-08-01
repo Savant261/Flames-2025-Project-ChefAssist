@@ -118,6 +118,36 @@ const CreateRecipe = () => {
   useEffect(() => {
     if (isEditMode && recipeId) {
       loadRecipeData(recipeId);
+    } else {
+      // Reset all states to default when not in edit mode
+      setCurrentRecipeId(null);
+      setStep(1);
+      setLoading(false);
+      setError('');
+      setValidationErrors([]);
+      setCanPublish(false);
+      
+      // Reset image states
+      setSelectedImage(null);
+      setImagePreview('');
+      
+      // Reset form data to default
+      setFormData({
+        title: '',
+        description: '',
+        cookTime: '',
+        servings: '',
+        tags: '',
+        allowComments: true
+      });
+      
+      // Reset ingredients to default
+      setIngredients([
+        { id: 1, name: "", quantity: "", unit: "" },
+      ]);
+      
+      // Reset instructions to default
+      setInstructions([{ id: 1, step: "" }]);
     }
   }, [isEditMode, recipeId]);
 
@@ -502,7 +532,7 @@ const CreateRecipe = () => {
                     id="title"
                     value={formData.title}
                     onChange={(e) => handleFormChange('title', e.target.value)}
-                    className="w-full input-field p-3 border border-gray-200 rounded-lg "
+                    className="w-full input-field p-3 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white dark:bg-gray-700"
                     placeholder="e.g., Creamy Tomato Pasta"
                   />
                 </div>
@@ -518,7 +548,7 @@ const CreateRecipe = () => {
                     rows="3"
                     value={formData.description}
                     onChange={(e) => handleFormChange('description', e.target.value)}
-                    className="w-full input-field p-3 border border-gray-200 rounded-lg"
+                    className="w-full input-field p-3 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white dark:bg-gray-700"
                     placeholder="A short and enticing description of your recipe..."
                   ></textarea>
                 </div>
@@ -535,7 +565,7 @@ const CreateRecipe = () => {
                       id="cookTime"
                       value={formData.cookTime}
                       onChange={(e) => handleFormChange('cookTime', e.target.value)}
-                      className="w-full input-field p-3 border border-gray-200 rounded-lg"
+                      className="w-full input-field p-3 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white dark:bg-gray-700"
                       placeholder="e.g., 30 minutes"
                     />
                   </div>
@@ -551,7 +581,7 @@ const CreateRecipe = () => {
                       id="servings"
                       value={formData.servings}
                       onChange={(e) => handleFormChange('servings', e.target.value)}
-                      className="w-full input-field p-3 border border-gray-200 rounded-lg"
+                      className="w-full input-field p-3 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white dark:bg-gray-700"
                       placeholder="e.g., 4 people"
                     />
                   </div>
@@ -572,21 +602,21 @@ const CreateRecipe = () => {
                       placeholder="e.g., 2"
                       value={ing.quantity}
                       onChange={(e) => updateIngredient(ing.id, 'quantity', e.target.value)}
-                      className="w-1/4 input-field p-3 border border-gray-200 rounded-lg"
+                      className="w-1/4 input-field p-3 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white dark:bg-gray-700"
                     />
                     <input
                       type="text"
                       placeholder="e.g., cups"
                       value={ing.unit}
                       onChange={(e) => updateIngredient(ing.id, 'unit', e.target.value)}
-                      className="w-1/4 input-field p-3 border border-gray-200 rounded-lg"
+                      className="w-1/4 input-field p-3 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white dark:bg-gray-700"
                     />
                     <input
                       type="text"
                       placeholder="e.g., All-purpose flour"
                       value={ing.name}
                       onChange={(e) => updateIngredient(ing.id, 'name', e.target.value)}
-                      className="w-1/2 input-field p-3 border border-gray-200 rounded-lg"
+                      className="w-1/2 input-field p-3 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white dark:bg-gray-700"
                     />
                     <button
                       type="button"
@@ -624,7 +654,7 @@ const CreateRecipe = () => {
                       placeholder="Describe this step..."
                       value={inst.step}
                       onChange={(e) => updateInstruction(inst.id, e.target.value)}
-                      className="flex-1 input-field p-3 border border-gray-200 rounded-lg"
+                      className="flex-1 input-field p-3 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white dark:bg-gray-700"
                     ></textarea>
                     <button
                       type="button"
@@ -664,7 +694,7 @@ const CreateRecipe = () => {
                   id="tags"
                   value={formData.tags}
                   onChange={(e) => handleFormChange('tags', e.target.value)}
-                  className="w-full input-field p-3 border border-gray-200 rounded-lg"
+                  className="w-full input-field p-3 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white dark:bg-gray-700"
                   placeholder="e.g., vegan, quick dinner, italian"
                 />
               </div>

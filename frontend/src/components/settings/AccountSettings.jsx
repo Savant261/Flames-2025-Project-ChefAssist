@@ -2,15 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { 
   getUserSettings, 
-  updateEmail, 
-  updatePhoneNumber, 
-  changePassword, 
-  togglePublicProfile, 
   deleteAccount 
 } from '../../services/accountService';
+import { useUser } from '../../store';
 import Modal from './Modal';
 
 const AccountSettings = () => {
+  const { 
+    userData, 
+    updateEmail, 
+    updatePhoneNumber, 
+    changePassword, 
+    togglePublicProfile,
+    loading: globalLoading 
+  } = useUser();
   const [settings, setSettings] = useState({
     email: '',
     phoneNumber: '',
@@ -35,17 +40,32 @@ const AccountSettings = () => {
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const data = await getUserSettings();
-        setSettings({
-          email: data.email || '',
-          phoneNumber: data.phoneNumber || 'Not set',
-          isPublic: data.isPublic || false
-        });
-        setFormData(prev => ({
-          ...prev,
-          email: data.email || '',
-          phoneNumber: data.phoneNumber || ''
-        }));
+        // Use userData from global context
+        if (userData) {
+          setSettings({
+            email: userData.email || '',
+            phoneNumber: userData.phoneNo || userData.phoneNumber || 'Not set',
+            isPublic: userData.publicProfile || userData.isPublic || false
+          });
+          setFormData(prev => ({
+            ...prev,
+            email: userData.email || '',
+            phoneNumber: userData.phoneNo || userData.phoneNumber || ''
+          }));
+        } else {
+          // Fallback to API call if userData not available
+          const data = await getUserSettings();
+          setSettings({
+            email: data.email || '',
+            phoneNumber: data.phoneNumber || 'Not set',
+            isPublic: data.isPublic || false
+          });
+          setFormData(prev => ({
+            ...prev,
+            email: data.email || '',
+            phoneNumber: data.phoneNumber || ''
+          }));
+        }
       } catch (error) {
         toast.error('Failed to load settings');
         console.error('Error loading settings:', error);
@@ -55,7 +75,23 @@ const AccountSettings = () => {
     };
 
     loadSettings();
-  }, []);
+  }, [userData]); // Re-run when userData changes
+
+  // Sync settings when userData changes (after updates)
+  useEffect(() => {
+    if (userData && !globalLoading) {
+      const timer = setTimeout(() => {
+        setSettings(prev => ({
+          ...prev,
+          email: userData.email || prev.email,
+          phoneNumber: userData.phoneNo || userData.phoneNumber || prev.phoneNumber,
+          isPublic: userData.publicProfile !== undefined ? userData.publicProfile : userData.isPublic || prev.isPublic
+        }));
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [userData, globalLoading]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -80,7 +116,8 @@ const AccountSettings = () => {
   const handleTogglePublicProfile = async () => {
     try {
       await togglePublicProfile();
-      setSettings(prev => ({ ...prev, isPublic: !prev.isPublic }));
+      // The UserContext will handle updating the userData automatically
+      toast.success(`Profile visibility toggled successfully`);
     } catch (error) {
       toast.error('Failed to toggle public profile');
       console.error('Error toggling public profile:', error);
@@ -94,8 +131,9 @@ const AccountSettings = () => {
         return;
       }
       await updateEmail(formData.email);
-      setSettings(prev => ({ ...prev, email: formData.email }));
+      // The UserContext will handle updating the userData automatically
       setShowEmailModal(false);
+      toast.success('Email updated successfully');
     } catch (error) {
       toast.error('Failed to update email');
       console.error('Error updating email:', error);
@@ -105,8 +143,9 @@ const AccountSettings = () => {
   const handleUpdatePhone = async () => {
     try {
       await updatePhoneNumber(formData.phoneNumber);
-      setSettings(prev => ({ ...prev, phoneNumber: formData.phoneNumber }));
+      // The UserContext will handle updating the userData automatically
       setShowPhoneModal(false);
+      toast.success('Phone number updated successfully');
     } catch (error) {
       toast.error('Failed to update phone number');
       console.error('Error updating phone number:', error);
@@ -121,6 +160,15 @@ const AccountSettings = () => {
       }
       await changePassword(formData.currentPassword, formData.newPassword);
       setShowPasswordModal(false);
+      toast.success('Password changed successfully');
+      
+      // Clear form data
+      setFormData(prev => ({
+        ...prev,
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
+      }));
     } catch (error) {
       toast.error('Failed to change password');
       console.error('Error changing password:', error);

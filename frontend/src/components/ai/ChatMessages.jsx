@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { memo } from 'react';
 import MessageCard from './MessageCard';
 
-const ChatMessages = ({ activeChats, output, input }) => {
+const ChatMessages = memo(({ activeChats, output, input }) => {
   return (
     <div
       className="w-full max-w-xl mx-auto flex flex-col gap-8 justify-end"
@@ -32,6 +32,8 @@ const ChatMessages = ({ activeChats, output, input }) => {
       </div>
     </div>
   );
-};
+});
+
+ChatMessages.displayName = 'ChatMessages';
 
 export default ChatMessages;

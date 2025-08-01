@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import signin from "/Images/signin.jpg";
 import api from "../api/axiosInstance.js";
 import { toast } from 'react-toastify';
+import { useUser } from '../store';
 
-const Signin = ({ setSigninPopUp, what, setWhat,handleSucessAuth }) => {
+const Signin = ({ setSigninPopUp, what, setWhat }) => {
+  const { login, register, loading } = useUser();
 
   const [loginData, setLoginData] = useState({
     email: "",
@@ -28,24 +30,63 @@ const Signin = ({ setSigninPopUp, what, setWhat,handleSucessAuth }) => {
   };
   const submitLogin = async (e) => {
     e.preventDefault();
+    
+    // Basic validation
+    if (!loginData.email || !loginData.username || !loginData.password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+    
     try {
-      const response = await api.post("/auth/signin", loginData);
-      console.log(response.data);
-      handleSucessAuth(response.data)
+      await login(loginData);
+      toast.success("Logged in successfully!");
+      setSigninPopUp(false);
+      // UserContext will handle the redirect to /explore
     } catch (error) {
-      toast.error(error.response.data.message)
+      toast.error(error?.response?.data?.message || error?.message || "Login failed. Please try again.");
       console.log("Error in submitLogin", error);
     }
   };
+  
   const submitSignUp = async (e) => {
     e.preventDefault();
+    
+    // Basic validation
+    if (!signupData.email || !signupData.username || !signupData.password || !signupData.confirmPassword) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(signupData.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    
+    // Validate password confirmation
+    if (signupData.password !== signupData.confirmPassword) {
+      toast.error("Passwords do not match!");
+      return;
+    }
+    
+    // Validate password strength
+    if (signupData.password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return;
+    }
+    
     try {
-      const response = await api.post("/auth/signup", signupData);
-      console.log(response.data);
-      handleSucessAuth(response.data)
+      // Create data object without confirmPassword for API call
+      const { confirmPassword, ...registrationData } = signupData;
+      
+      await register(registrationData);
+      toast.success("Account created successfully!");
+      setSigninPopUp(false);
+      // UserContext will handle the redirect to /explore
     } catch (error) {
-      toast.error(error.response.data.message)
-      console.log("Error in submitSiginup", error);
+      toast.error(error?.response?.data?.message || error?.message || "Registration failed. Please try again.");
+      console.log("Error in submitSignup", error);
     }
   };
   // useEffect(() => {
@@ -132,16 +173,18 @@ const Signin = ({ setSigninPopUp, what, setWhat,handleSucessAuth }) => {
                 </div>
                 <button
                   type="submit"
-                  className="bg-[#D35400] text-white font-bold rounded-lg py-3"
+                  className="bg-[#D35400] text-white font-bold rounded-lg py-3 disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={(e) => submitLogin(e)}
+                  disabled={loading}
                 >
-                  Sign In
+                  {loading ? "Signing In..." : "Sign In"}
                 </button>
                 <button
                   type="button"
-                  className="flex items-center justify-center gap-2 border border-[#FFDAB9] bg-white text-[#D35400] font-semibold rounded-lg py-3"
+                  className="flex items-center justify-center gap-2 border border-[#FFDAB9] bg-white text-[#D35400] font-semibold rounded-lg py-3 disabled:opacity-50 disabled:cursor-not-allowed"
                   id="google-signin-btn"
-                  onClick={() => loginFun()}
+                  disabled={loading}
+                  onClick={() => toast.info("Google Sign-In coming soon!")}
                 >
                   <img
                     src="https://www.svgrepo.com/show/475656/google-color.svg"
@@ -222,16 +265,18 @@ const Signin = ({ setSigninPopUp, what, setWhat,handleSucessAuth }) => {
                 />
                 <button
                   type="submit"
-                  className="bg-[#D35400] text-white font-bold rounded-lg py-3"
+                  className="bg-[#D35400] text-white font-bold rounded-lg py-3 disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={(e) => submitSignUp(e)}
+                  disabled={loading}
                 >
-                  Sign Up
+                  {loading ? "Creating Account..." : "Sign Up"}
                 </button>
                 <button
                   type="button"
-                  className="flex items-center justify-center gap-2 border border-[#FFDAB9] bg-white text-[#D35400] font-semibold rounded-lg py-3"
+                  className="flex items-center justify-center gap-2 border border-[#FFDAB9] bg-white text-[#D35400] font-semibold rounded-lg py-3 disabled:opacity-50 disabled:cursor-not-allowed"
                   id="google-signup-btn"
-                  onClick={() => loginFun()}
+                  disabled={loading}
+                  onClick={() => toast.info("Google Sign-Up coming soon!")}
                 >
                   <img
                     src="https://www.svgrepo.com/show/475656/google-color.svg"
