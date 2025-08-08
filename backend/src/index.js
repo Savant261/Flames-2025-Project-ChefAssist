@@ -18,11 +18,24 @@ dotenv.config({
 
 connectDB();
 
+// Needed when behind a proxy (Render) so secure cookies work
+app.set("trust proxy", 1);
+
 app.use(express.json({ limit: "5mb" }));
 app.use(cookieParser());
+// Configure CORS for local dev and production (Vercel/Render)
+const allowedOrigins = (process.env.CLIENT_URLS || process.env.CLIENT_URL || "http://localhost:5173")
+  .split(",")
+  .map((o) => o.trim());
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error("Not allowed by CORS: " + origin));
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"],
     allowedHeaders: [
@@ -33,6 +46,7 @@ app.use(
       "Origin",
       "Accept",
     ],
+    optionsSuccessStatus: 204,
   })
 );
 app.use("/api/auth", UserRouter);
