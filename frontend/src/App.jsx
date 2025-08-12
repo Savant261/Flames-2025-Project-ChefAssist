@@ -8,7 +8,7 @@ import "./App.css";
 import Footer from "./components/Footer.jsx";
 import Navbar from "./components/Navbar.jsx";
 import Home from "./pages/Home.jsx";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import Explore from "./pages/Explore.jsx";
 import Profile from "./pages/Profile.jsx";
 import EditProfile from "./pages/EditProfile.jsx";
@@ -67,6 +67,7 @@ const StyledToastContainer = ({theme}) => {
 // App Content component that uses the UserContext
 function AppContent() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { 
     userData, 
     isAuthenticated, 
@@ -83,6 +84,9 @@ function AppContent() {
   const [theme, setTheme] = useState("light");
   const [popUp, setPopUp] = useState(false);
   const [signinPopUp, setSigninPopUp] = useState(false);
+  
+  // Check if current route is AI page (including AI chat with chatId)
+  const isAiPage = location.pathname.startsWith('/ai');
   
   // Handle theme updates from user data
   useEffect(() => {
@@ -228,7 +232,8 @@ function AppContent() {
                 </ProtectedRoute>
               } />
             </Routes>
-            <Footer />
+            {/* Conditionally render Footer - hide on AI pages */}
+            {!isAiPage && <Footer />}
           </main>
         </div>
       </div>

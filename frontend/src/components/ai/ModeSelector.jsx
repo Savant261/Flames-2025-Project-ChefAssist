@@ -3,7 +3,7 @@ import { modes } from './constants';
 
 const ModeSelector = ({ selectedMode, setSelectedMode }) => {
   return (
-    <div className="flex flex-row gap-2 mb-2">
+    <div className="flex flex-row gap-2 justify-center items-center w-full">
       {modes.map(({ id, label }, idx) => (
         <button
           key={id}

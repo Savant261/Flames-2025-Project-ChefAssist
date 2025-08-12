@@ -52,46 +52,39 @@ const AiInput = ({
   const isNewChat = !currentChat || activeChats.length === 0;
 
   return (
-    <div
-      className="w-full flex flex-col items-center justify-center z-30 mt-4 mb-0"
-      style={{ paddingBottom: "0" }}
-    >
+    <div className="w-full flex flex-col items-center z-30">
+      {/* Main Input Container - Contains everything */}
       <div
-        className={`w-full ${isNewChat ? 'max-w-4xl' : 'max-w-5xl'} mx-auto bg-gradient-to-br from-white/80 via-[#FFDCA9]/80 to-[#FF7F3F]/30 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 backdrop-blur-lg shadow-2xl p-6 flex flex-col items-center gap-6 rounded-3xl transition-all duration-300 border border-[#FFDCA9] dark:border-orange-400`}
+        className={`w-full ${isNewChat ? 'max-w-4xl' : 'max-w-5xl'} mx-auto bg-gradient-to-br from-white/80 via-[#FFDCA9]/80 to-[#FF7F3F]/30 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 backdrop-blur-lg shadow-2xl p-4 flex flex-col items-center gap-3 rounded-3xl transition-all duration-300 border border-[#FFDCA9] dark:border-orange-400`}
         style={{ boxShadow: "0 8px 32px #FFDCA9AA" }}
       >
         {/* Mode toggle pills */}
         <ModeSelector selectedMode={selectedMode} setSelectedMode={setSelectedMode} />
 
-        {/* Ingredients input section for ingredients mode */}
-        {selectedMode === "ingredients" && (
-          <IngredientsInput
-            useInventory={useInventory}
-            setUseInventory={setUseInventory}
-            userInventory={userInventory}
-            availableIngredients={availableIngredients}
-            setAvailableIngredients={setAvailableIngredients}
-          />
-        )}
-
-        {/* Original recipe input section for adapt mode */}
+        {/* Additional Fields - Compact inline versions */}
         {selectedMode === "adapt" && (
-          <AdaptRecipeInput
-            recipeId={recipeId}
-            setRecipeId={setRecipeId}
-            originalRecipe={originalRecipe}
-            setOriginalRecipe={setOriginalRecipe}
-          />
+          <div className="w-full">
+            <AdaptRecipeInput
+              recipeId={recipeId}
+              setRecipeId={setRecipeId}
+              originalRecipe={originalRecipe}
+              setOriginalRecipe={setOriginalRecipe}
+            />
+          </div>
+        )}
+        {selectedMode === "ingredients" && (
+          <div className="w-full">
+            <IngredientsInput
+              useInventory={useInventory}
+              setUseInventory={setUseInventory}
+              userInventory={userInventory}
+              availableIngredients={availableIngredients}
+              setAvailableIngredients={setAvailableIngredients}
+            />
+          </div>
         )}
 
-        {/* Chat Status Display */}
-        {/* <ChatStatus
-          isLoadingChat={isLoadingChat}
-          currentChat={currentChat}
-          activeChats={activeChats}
-          error={error}
-        /> */}
-
+        {/* Main input form */}
         <form
           className="w-full flex flex-row items-end gap-4"
           onSubmit={handleSubmit}

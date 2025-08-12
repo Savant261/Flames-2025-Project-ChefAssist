@@ -822,8 +822,8 @@ const Ai = () => {
         initializeStreamingFormatter();
         
         // Validate adaptation requirements
-        if (!recipeId && !originalRecipe.title) {
-          setError("Please provide either a recipe ID or original recipe details to adapt");
+        if (!originalRecipe.title) {
+          setError("Please provide recipe details to adapt");
           setIsStreaming(false);
           return;
         }
@@ -864,7 +864,6 @@ const Ai = () => {
             currentChatId,
             originalRecipe,
             userInput,
-            recipeId,
             // onChunk callback
             (chunkData) => {
               if (chunkData.chunk) {
@@ -1096,31 +1095,37 @@ const Ai = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start bg-gradient-to-br from-[#FFF6E9] via-[#FFDCA9] to-[#FF7F3F] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 px-4 pt-10 pb-40 relative">
-      {/* Header */}
-      <AiHeader
-        showDropdown={showDropdown}
-        setShowDropdown={setShowDropdown}
-        selectedRestrictions={selectedRestrictions}
-        handleRestrictionToggle={handleRestrictionToggle}
-        currentChat={currentChat}
-        startNewChat={startNewChat}
-        setShowHistory={setShowHistory}
-      />
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#FFF6E9] via-[#FFDCA9] to-[#FF7F3F] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 overflow-x-hidden" style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}>
+      <style jsx>{`
+        div::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
+      {/* Header section */}
+      <div className="w-full flex flex-col items-center px-4 py-8">
+        <AiHeader
+          showDropdown={showDropdown}
+          setShowDropdown={setShowDropdown}
+          selectedRestrictions={selectedRestrictions}
+          handleRestrictionToggle={handleRestrictionToggle}
+          currentChat={currentChat}
+          startNewChat={startNewChat}
+          setShowHistory={setShowHistory}
+        />
 
-      {/* Greeting */}
-      <AiGreeting
-        userName={userName}
-        output={output}
-        isLoadingChat={isLoadingChat}
-        activeChats={activeChats}
-      />
+        <AiGreeting
+          userName={userName}
+          output={output}
+          isLoadingChat={isLoadingChat}
+          activeChats={activeChats}
+        />
+      </div>
 
-      {/* Main Content Area */}
-      <div className="w-full flex flex-col items-center justify-center flex-1 relative min-h-0 max-w-7xl mx-auto">
-        {/* Chat Messages - Only show when there are active chats or output */}
+      {/* Main content area */}
+      <div className="flex-1 w-full max-w-7xl mx-auto px-4 pb-4">
+        {/* Chat Messages */}
         {(activeChats.length > 0 || output || isStreaming) && (
-          <div className="w-full flex-1 flex items-end pb-4 overflow-hidden">
+          <div className="mb-4">
             <ChatMessages 
               activeChats={activeChats} 
               output={output} 
@@ -1131,8 +1136,8 @@ const Ai = () => {
           </div>
         )}
         
-        {/* Input Bar - Centered when new chat, bottom when messages exist */}
-        <div className={`w-full ${!(activeChats.length > 0 || output || isStreaming) ? 'flex-1 flex items-center justify-center' : ''}`}>
+        {/* Input section */}
+        <div className="sticky bottom-4">
           <AiInput
             selectedMode={selectedMode}
             setSelectedMode={setSelectedMode}
@@ -1141,8 +1146,6 @@ const Ai = () => {
             userInventory={userInventory}
             availableIngredients={availableIngredients}
             setAvailableIngredients={setAvailableIngredients}
-            recipeId={recipeId}
-            setRecipeId={setRecipeId}
             originalRecipe={originalRecipe}
             setOriginalRecipe={setOriginalRecipe}
             isLoadingChat={isLoadingChat}
