@@ -628,6 +628,13 @@ const adaptExistingRecipeStream = async (req, res) => {
     const { aiChatId } = req.params;
     const { originalRecipe, recipeId, adaptationRequest } = req.body;
 
+    console.log('=== ADAPT RECIPE STREAM START ===');
+    console.log('Chat ID:', aiChatId);
+    console.log('Recipe ID:', recipeId);
+    console.log('Has originalRecipe:', !!originalRecipe);
+    console.log('Adaptation Request:', adaptationRequest?.substring(0, 100) + '...');
+    console.log('=== ADAPT RECIPE STREAM START ===');
+
     // Set up Server-Sent Events headers
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',
@@ -690,7 +697,7 @@ const adaptExistingRecipeStream = async (req, res) => {
       };
     } else if (originalRecipe) {
       // Use user-provided recipe
-      if (!originalRecipe.title && !originalRecipe.ingredients) {
+      if (!originalRecipe.title && (!originalRecipe.ingredients || originalRecipe.ingredients.length === 0)) {
         res.write(`data: ${JSON.stringify({ 
           type: 'error', 
           message: "Please provide a valid original recipe with at least title and ingredients" 
@@ -699,17 +706,31 @@ const adaptExistingRecipeStream = async (req, res) => {
         return;
       }
 
+      // Ensure ingredients and instructions are properly formatted
+      let ingredients = [];
+      let instructions = [];
+
+      if (Array.isArray(originalRecipe.ingredients)) {
+        ingredients = originalRecipe.ingredients.filter(ing => ing && ing.trim());
+      } else if (typeof originalRecipe.ingredients === 'string') {
+        ingredients = [originalRecipe.ingredients];
+      }
+
+      if (Array.isArray(originalRecipe.instructions)) {
+        instructions = originalRecipe.instructions.filter(inst => inst && inst.trim());
+      } else if (typeof originalRecipe.instructions === 'string') {
+        instructions = [originalRecipe.instructions];
+      }
+
       recipeToAdapt = {
         title: originalRecipe.title || "User Recipe",
         description: originalRecipe.description || "",
-        ingredients: Array.isArray(originalRecipe.ingredients)
-          ? originalRecipe.ingredients
-          : [],
-        instructions: Array.isArray(originalRecipe.instructions)
-          ? originalRecipe.instructions
-          : [],
+        ingredients: ingredients,
+        instructions: instructions,
         cookTime: originalRecipe.cookTime || "",
         servings: originalRecipe.servings || "",
+        cuisine: originalRecipe.cuisine || "",
+        difficulty: originalRecipe.difficulty || "",
         source: "user-provided",
       };
     } else {
@@ -729,6 +750,8 @@ const adaptExistingRecipeStream = async (req, res) => {
         ? `Adaptation request: ${adaptationRequest}`
         : "Please make it healthier and suitable for my dietary preferences."
     }`;
+    
+    console.log('Adding user message to chat:', userMessage);
     chat.messages.push({ role: "user", content: userMessage });
     await chat.save();
 
@@ -748,6 +771,12 @@ const adaptExistingRecipeStream = async (req, res) => {
     };
     const recipeType = "adapt_recipe";
 
+    console.log('Starting recipe adaptation with data:', { 
+      recipeTitle: recipeToAdapt.title, 
+      ingredientsCount: recipeToAdapt.ingredients.length,
+      adaptationRequest 
+    });
+
     let fullResponse = '';
     let finalRecipeData = null;
 
@@ -757,31 +786,47 @@ const adaptExistingRecipeStream = async (req, res) => {
       aiData, 
       dietaryRestrictions,
       (streamData) => {
-        if (streamData.error) {
+        try {
+          if (streamData.error) {
+            console.error('Adapt Recipe Streaming error:', streamData.message);
+            res.write(`data: ${JSON.stringify({ 
+              type: 'error', 
+              message: streamData.message 
+            })}\n\n`);
+            return;
+          }
+
+          if (streamData.isComplete) {
+            // Final response
+            finalRecipeData = streamData.finalData;
+            fullResponse = streamData.fullText;
+            
+            console.log('Recipe adaptation completed, data:', { 
+              hasData: !!finalRecipeData, 
+              dataKeys: finalRecipeData ? Object.keys(finalRecipeData) : [],
+              textLength: fullResponse ? fullResponse.length : 0
+            });
+            
+            res.write(`data: ${JSON.stringify({ 
+              type: 'complete',
+              data: finalRecipeData,
+              fullText: fullResponse
+            })}\n\n`);
+          } else {
+            // Streaming chunk
+            console.log('Adapt Recipe - Sending chunk, length:', streamData.chunk ? streamData.chunk.length : 0);
+            res.write(`data: ${JSON.stringify({ 
+              type: 'chunk',
+              chunk: streamData.chunk,
+              fullText: streamData.fullText,
+              isFirstChunk: streamData.isFirstChunk
+            })}\n\n`);
+          }
+        } catch (streamError) {
+          console.error('Error processing adapt recipe stream data:', streamError);
           res.write(`data: ${JSON.stringify({ 
             type: 'error', 
-            message: streamData.message 
-          })}\n\n`);
-          return;
-        }
-
-        if (streamData.isComplete) {
-          // Final response
-          finalRecipeData = streamData.finalData;
-          fullResponse = streamData.fullText;
-          
-          res.write(`data: ${JSON.stringify({ 
-            type: 'complete',
-            data: finalRecipeData,
-            fullText: fullResponse
-          })}\n\n`);
-        } else {
-          // Streaming chunk
-          res.write(`data: ${JSON.stringify({ 
-            type: 'chunk',
-            chunk: streamData.chunk,
-            fullText: streamData.fullText,
-            isFirstChunk: streamData.isFirstChunk
+            message: 'Error processing stream data: ' + streamError.message 
           })}\n\n`);
         }
       }
@@ -806,6 +851,13 @@ const adaptExistingRecipeStream = async (req, res) => {
 
       chat.messages.push(aiResponse);
       await chat.save();
+      
+      console.log('Adapt recipe response saved to chat:', { 
+        chatId: aiChatId, 
+        responseType: aiResponse.type 
+      });
+    } else {
+      console.error('Adapt recipe stream failed:', streamResult.error);
     }
 
     res.end();
@@ -819,7 +871,7 @@ const adaptExistingRecipeStream = async (req, res) => {
       })}\n\n`);
       res.end();
     } catch (writeError) {
-      console.error("Error writing to response:", writeError);
+      console.error("Error writing adapt recipe error response:", writeError);
     }
   }
 };

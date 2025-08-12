@@ -43,6 +43,9 @@ const Ai = () => {
     ingredients: [],
     instructions: [],
   });
+  
+  // Keep a backup of the original recipe data from sessionStorage
+  const [backupOriginalRecipe, setBackupOriginalRecipe] = useState(null);
 
   // Speech recognition state
   const [isListening, setIsListening] = useState(false);
@@ -248,16 +251,20 @@ const Ai = () => {
       
       if (adaptData) {
         try {
-          const { originalRecipe, prompt } = JSON.parse(adaptData);
+          const { recipeId, recipeTitle, prompt } = JSON.parse(adaptData);
+          
+          console.log('Retrieved adapt data from sessionStorage:', { recipeId, recipeTitle });
+          console.log('Setting selectedMode to adapt and recipeId to:', recipeId);
           
           // Set the mode to adapt
           setSelectedMode('adapt');
           
-          // Pre-fill the original recipe data
+          // Store recipe ID and title for adaptation
+          setRecipeId(recipeId);
           setOriginalRecipe({
-            title: originalRecipe.title || '',
-            ingredients: originalRecipe.ingredients || [],
-            instructions: originalRecipe.instructions || []
+            title: recipeTitle || '',
+            ingredients: [],
+            instructions: []
           });
           
           // Pre-fill the input with the adaptation prompt
@@ -307,6 +314,14 @@ const Ai = () => {
       setInput("");
       setStreamingOutput("");
       setHistory([]);
+      
+      // Clear adaptation state
+      setRecipeId("");
+      setOriginalRecipe({
+        title: "",
+        ingredients: [],
+        instructions: [],
+      });
       
       // Reset streaming formatter
       if (streamingFormatterRef.current) {
@@ -857,17 +872,46 @@ const Ai = () => {
 
       } else if (selectedMode === "adapt") {
         // For "adapt" mode, use streaming
+        console.log("=== ADAPT RECIPE DEBUG START ===");
+        console.log("originalRecipe at start of adapt mode:", originalRecipe);
+        console.log("typeof originalRecipe:", typeof originalRecipe);
+        console.log("userInput:", userInput);
+        console.log("=== ADAPT RECIPE DEBUG END ===");
+        
         setIsStreaming(true);
         
         // Initialize the streaming formatter
         initializeStreamingFormatter();
         
-        // Validate adaptation requirements
-        if (!originalRecipe.title) {
-          setError("Please provide recipe details to adapt");
+        // Validate adaptation requirements - either originalRecipe title or recipeId
+        if (!originalRecipe.title && !recipeId) {
+          setError("Please provide recipe details or recipe ID to adapt");
           setIsStreaming(false);
           return;
         }
+
+        console.log("Adaptation data:", { recipeId, originalRecipe, hasRecipeId: !!recipeId });
+
+        // Ensure we have a chat to work with
+        let currentChatId = chatId;
+        if (!currentChatId) {
+          try {
+            console.log("Creating new chat for recipe adaptation");
+            const newChat = await createNewChat(userInput);
+            currentChatId = newChat._id;
+            setCurrentChat(newChat);
+            
+            // Navigate to the new chat
+            navigate(`/ai/${currentChatId}`, { replace: true });
+          } catch (error) {
+            console.error("Failed to create chat for adaptation:", error);
+            setError("Failed to create chat session for adaptation");
+            setIsStreaming(false);
+            return;
+          }
+        }
+
+        console.log("Starting recipe adaptation with chat ID:", currentChatId);
         
         // Add user message to activeChats immediately for display
         const userChatEntry = {
@@ -901,12 +945,23 @@ const Ai = () => {
         setMessages(prev => [...prev, aiMessage]);
 
         try {
+          console.log("Starting adapt recipe stream with:", {
+            chatId: currentChatId,
+            recipeId: recipeId,
+            originalRecipeTitle: originalRecipe.title,
+            adaptationRequest: userInput
+          });
+          
+          console.log("Current state:", { originalRecipe, recipeId });
+          
           await aiService.adaptExistingRecipeStream(
             currentChatId,
-            originalRecipe,
+            recipeId ? null : originalRecipe, // Send null if we have recipeId
             userInput,
+            recipeId, // Pass recipeId as 4th parameter
             // onChunk callback
             (chunkData) => {
+              console.log("Received adapt recipe chunk:", chunkData);
               if (chunkData.chunk) {
                 // Use the new streaming formatter for real-time formatting
                 const formatted = processStreamingChunk(chunkData.chunk);
@@ -929,6 +984,7 @@ const Ai = () => {
             },
             // onComplete callback
             (completeData) => {
+              console.log("Adapt recipe stream completed:", completeData);
               setIsStreaming(false);
               
               // Get final formatted output from the formatter
@@ -945,6 +1001,8 @@ const Ai = () => {
               if (!formattedOutput) {
                 formattedOutput = completeData.fullText || "Recipe adaptation completed successfully!";
               }
+
+              console.log("Final formatted output:", formattedOutput.substring(0, 100) + "...");
 
               // Update the final AI message
               setMessages(prev => prev.map(msg => 
@@ -988,6 +1046,19 @@ const Ai = () => {
               
               // Clear streaming output
               setStreamingOutput("");
+              
+              // Clear input prompt for next adaptation, but keep recipe data
+              setInput("");
+              
+              // DON'T clear recipe data - keep it so user can adapt the same recipe again
+              // if (recipeId) {
+              //   setRecipeId("");
+              //   setOriginalRecipe({
+              //     title: "",
+              //     ingredients: [],
+              //     instructions: [],
+              //   });
+              // }
               
               // Refresh chat history to include the updated chat
               loadChatHistory();
@@ -1187,6 +1258,8 @@ const Ai = () => {
             userInventory={userInventory}
             availableIngredients={availableIngredients}
             setAvailableIngredients={setAvailableIngredients}
+            recipeId={recipeId}
+            setRecipeId={setRecipeId}
             originalRecipe={originalRecipe}
             setOriginalRecipe={setOriginalRecipe}
             isLoadingChat={isLoadingChat}

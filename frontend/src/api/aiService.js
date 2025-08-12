@@ -156,9 +156,21 @@ class AiService {
       
       if (recipeId) {
         payload.recipeId = recipeId;
-      } else {
+        console.log('Using recipe ID for adaptation:', recipeId);
+      } else if (originalRecipe) {
         payload.originalRecipe = originalRecipe;
+        console.log('Using original recipe object for adaptation');
+      } else {
+        throw new Error('Either recipeId or originalRecipe must be provided');
       }
+
+      console.log('Starting adapt recipe stream with payload:', {
+        chatId,
+        hasRecipeId: !!recipeId,
+        hasOriginalRecipe: !!originalRecipe,
+        originalRecipeTitle: originalRecipe?.title,
+        adaptationRequest: adaptationRequest?.substring(0, 50) + '...'
+      });
 
       const response = await fetch(this._getStreamingUrl(`/aiChats/${chatId}/adapt-recipe-stream`), {
         method: 'POST',
@@ -169,6 +181,8 @@ class AiService {
         credentials: 'include',
         body: JSON.stringify(payload)
       });
+
+      console.log('Adapt recipe stream response status:', response.status);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

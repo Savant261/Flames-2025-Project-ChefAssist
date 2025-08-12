@@ -108,17 +108,6 @@ const RecipeCard2 = ({ recipe, onRemoveFromSaved, initialSaved = false }) => {
   const handleAdaptRecipe = async (e) => {
     e.stopPropagation(); // Prevent triggering the card click
     try {
-      // Prepare recipe data for adaptation
-      const recipeData = {
-        title: recipe.title,
-        ingredients: recipe.ingredients?.map(ing => ing.item || ing.name) || [],
-        instructions: recipe.instructions?.map(inst => inst.step || inst) || [],
-        servings: recipe.servings,
-        cookTime: recipe.cookTime,
-        difficulty: recipe.difficulty,
-        cuisine: recipe.cuisine
-      };
-      
       // Generate a comprehensive prompt for AI adaptation
       const adaptPrompt = `I want to adapt this recipe: "${recipe.title}"
 
@@ -130,9 +119,10 @@ CURRENT RECIPE DETAILS:
 
 Please adapt this recipe based on my dietary preferences and restrictions. You can modify ingredients, cooking methods, or proportions to better suit my needs while maintaining the essence of the dish.`;
 
-      // Store recipe data in sessionStorage for the AI page to access
+      // Store recipe ID and prompt in sessionStorage for the AI page to access
       sessionStorage.setItem('adaptRecipeData', JSON.stringify({
-        originalRecipe: recipeData,
+        recipeId: recipe._id,  // Use recipe ID instead of full recipe data
+        recipeTitle: recipe.title, // Keep title for display purposes
         mode: 'adapt',
         prompt: adaptPrompt
       }));

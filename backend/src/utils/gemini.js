@@ -38,22 +38,30 @@ const getPromptForRecipeGeneration = (type, data, dietaryRestrictions = []) => {
 }${dietaryText}`;
 
     case 'adapt_recipe':
-      return `Adapt this recipe for dietary restrictions:
-Original: ${data.originalRecipe.title}
-Ingredients: ${data.originalRecipe.ingredients.slice(0, 5).join(', ')}...
+      return `Adapt this recipe for dietary restrictions and preferences:
+
+Original Recipe: "${data.originalRecipe.title}"
+Current Ingredients: ${Array.isArray(data.originalRecipe.ingredients) ? data.originalRecipe.ingredients.slice(0, 10).join(', ') : 'Not specified'}
+Current Instructions: ${Array.isArray(data.originalRecipe.instructions) ? data.originalRecipe.instructions.slice(0, 3).join('. ') : 'Not specified'}
+Servings: ${data.originalRecipe.servings || 'Not specified'}
+Cook Time: ${data.originalRecipe.cookTime || 'Not specified'}
+Cuisine: ${data.originalRecipe.cuisine || 'Not specified'}
+
+Adaptation Request: ${data.adaptationRequest}
 
 Return ONLY valid JSON:
 {
   "title": "Adapted Recipe Title",
-  "description": "What was changed",
-  "ingredients": ["adapted ingredient"],
-  "instructions": ["Step 1", "Step 2"],
+  "description": "Brief description of what was changed and why",
+  "ingredients": ["adapted ingredient with amount", "another ingredient"],
+  "instructions": ["Step 1", "Step 2", "Step 3"],
   "prepTime": "15 minutes",
   "cookTime": "30 minutes",
-  "difficulty": "Beginner",
+  "difficulty": "Beginner/Intermediate/Advanced",
   "servings": "4 people",
-  "adaptations": ["Key change made"],
-  "tips": ["Adaptation tip"]
+  "adaptations": ["Key change 1", "Key change 2"],
+  "tips": ["Adaptation tip 1", "Cooking tip 2"],
+  "nutritionalNotes": "Brief nutritional information about the adaptations"
 }${dietaryText}`;
 
     default:
