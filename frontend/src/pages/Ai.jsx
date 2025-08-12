@@ -236,6 +236,47 @@ const Ai = () => {
     }
   }, [chatId, loadSpecificChat, isStreaming]);
 
+  // Handle URL parameters for recipe adaptation
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode');
+    const action = urlParams.get('action');
+    
+    // Check if this is a recipe adaptation request
+    if (mode === 'adapt' && action === 'adapt-recipe') {
+      const adaptData = sessionStorage.getItem('adaptRecipeData');
+      
+      if (adaptData) {
+        try {
+          const { originalRecipe, prompt } = JSON.parse(adaptData);
+          
+          // Set the mode to adapt
+          setSelectedMode('adapt');
+          
+          // Pre-fill the original recipe data
+          setOriginalRecipe({
+            title: originalRecipe.title || '',
+            ingredients: originalRecipe.ingredients || [],
+            instructions: originalRecipe.instructions || []
+          });
+          
+          // Pre-fill the input with the adaptation prompt
+          setInput(prompt || '');
+          
+          // Clear the stored data after using it
+          sessionStorage.removeItem('adaptRecipeData');
+          
+          // Clear URL parameters to clean up the URL
+          const newUrl = window.location.pathname;
+          window.history.replaceState({}, '', newUrl);
+          
+        } catch (error) {
+          console.error('Error parsing recipe adaptation data:', error);
+        }
+      }
+    }
+  }, []); // Run only once on component mount
+
   // Simplified chat creation function - only creates chat, no state changes
   const createNewChat = async (userInput = "") => {
     try {

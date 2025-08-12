@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Star, Clock, Bookmark as BookmarkIcon, Eye } from "lucide-react";
+import { Star, Clock, Bookmark as BookmarkIcon, Eye, Sparkles } from "lucide-react";
 import { toast } from "react-toastify";
 import userService from "../api/userService.js";
 
@@ -103,9 +103,53 @@ const RecipeCard2 = ({ recipe, onRemoveFromSaved, initialSaved = false }) => {
       navigate(`/profile/${username}`);
     }
   };
+
+  // Adapt recipe function
+  const handleAdaptRecipe = async (e) => {
+    e.stopPropagation(); // Prevent triggering the card click
+    try {
+      // Prepare recipe data for adaptation
+      const recipeData = {
+        title: recipe.title,
+        ingredients: recipe.ingredients?.map(ing => ing.item || ing.name) || [],
+        instructions: recipe.instructions?.map(inst => inst.step || inst) || [],
+        servings: recipe.servings,
+        cookTime: recipe.cookTime,
+        difficulty: recipe.difficulty,
+        cuisine: recipe.cuisine
+      };
+      
+      // Generate a comprehensive prompt for AI adaptation
+      const adaptPrompt = `I want to adapt this recipe: "${recipe.title}"
+
+CURRENT RECIPE DETAILS:
+- Cuisine: ${recipe.cuisine || 'Not specified'}
+- Difficulty: ${recipe.difficulty || 'Not specified'}
+- Servings: ${recipe.servings || 'Not specified'}
+- Cook Time: ${recipe.cookTime || 'Not specified'}
+
+Please adapt this recipe based on my dietary preferences and restrictions. You can modify ingredients, cooking methods, or proportions to better suit my needs while maintaining the essence of the dish.`;
+
+      // Store recipe data in sessionStorage for the AI page to access
+      sessionStorage.setItem('adaptRecipeData', JSON.stringify({
+        originalRecipe: recipeData,
+        mode: 'adapt',
+        prompt: adaptPrompt
+      }));
+
+      // Navigate to AI page with adaptation mode
+      navigate('/ai?mode=adapt&action=adapt-recipe');
+      
+      toast.success('Redirecting to AI Chef for recipe adaptation! 🤖👨‍🍳');
+      
+    } catch (error) {
+      console.error('Error preparing recipe adaptation:', error);
+      toast.error('Failed to prepare recipe for adaptation. Please try again.');
+    }
+  };
   return (
     <div
-      className="flex-shrink-0 w-72 bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden group transform hover:-translate-y-2 transition-transform duration-300 ease-in-out border border-transparent hover:border-[var(--color-chef-peach)]"
+      className="flex-shrink-0 w-72 bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden group transform hover:-translate-y-2 transition-all duration-300 ease-in-out border border-transparent hover:border-[var(--color-chef-peach)] hover:shadow-xl"
       onClick={() => navigate(`/recipe/${recipe._id}`)}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -157,14 +201,14 @@ const RecipeCard2 = ({ recipe, onRemoveFromSaved, initialSaved = false }) => {
           )}
         </button>
       </div>
-      <div className="p-4">
+      <div className="p-4 pb-3">
         <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 truncate">
           {recipe.title}
         </h3>
         <div className="flex items-center gap-3 mt-2 text-sm text-gray-500 dark:text-gray-400">
           <div 
             onClick={handleAuthorClick}
-            className="flex items-center gap-3 cursor-pointer hover:text-[var(--color-chef-peach)] transition-colors duration-200"
+            className="flex items-center gap-3 cursor-pointer hover:text-[var(--color-chef-peach)] transition-colors duration-200 flex-1"
             title="View author profile"
           >
             <img
@@ -172,7 +216,7 @@ const RecipeCard2 = ({ recipe, onRemoveFromSaved, initialSaved = false }) => {
               alt={recipe.author?.username || recipe.author?.name || 'Chef'}
               className="w-8 h-8 rounded-full hover:ring-2 hover:ring-[var(--color-chef-peach)] transition-all duration-200"
             />
-            <div>
+            <div className="flex-1">
               <span className="font-semibold hover:underline">
                 {recipe.author?.username || recipe.author?.name || 'Anonymous Chef'}
               </span>
@@ -181,6 +225,16 @@ const RecipeCard2 = ({ recipe, onRemoveFromSaved, initialSaved = false }) => {
               </div>
             </div>
           </div>
+          
+          {/* AI Adapt button positioned at the end of author section */}
+          <button
+            onClick={handleAdaptRecipe}
+            className="opacity-0 group-hover:opacity-100 px-2 py-1 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 hover:from-purple-100 hover:to-indigo-100 dark:hover:from-purple-800/30 dark:hover:to-indigo-800/30 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 rounded-md transition-all duration-200 text-xs font-medium flex items-center gap-1"
+            title="Adapt recipe with AI"
+          >
+            <Sparkles className="w-3 h-3" />
+            AI Adapt
+          </button>
         </div>
         <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300">
           <div

@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { recipeService } from '../api/recipeService';
+import userService from '../api/userService';
 import { ArrowLeft, Clock, Users, Star, Bookmark, Share2, Play, Pause, ChefHat, Timer, Utensils, Heart, MessageCircle, Download, Printer as Print, Sun, Moon, CheckCircle2 } from 'lucide-react';
 
-const ViewRecipe = ({ recipe, onBack }) => {
+const ViewRecipe = ({ recipe, onBack, navigate }) => {
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [activeTab, setActiveTab] = useState('ingredients');
   const [checkedIngredients, setCheckedIngredients] = useState({});
   const [checkedSteps, setCheckedSteps] = useState({});
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
+  const [isRecipeSaved, setIsRecipeSaved] = useState(false);
+  const [savingRecipe, setSavingRecipe] = useState(false);
   // Define comprehensive default recipe data
   const defaultRecipeData = {
     id: 'default-recipe',
@@ -63,10 +65,237 @@ const ViewRecipe = ({ recipe, onBack }) => {
   };
 
 
-  const showToastNotification = (message) => {
-    setToastMessage(message);
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000);
+  // Check if recipe is saved on component mount
+  useEffect(() => {
+    if (recipe?.id) {
+      checkIfRecipeSaved();
+    }
+  }, [recipe?.id]);
+
+  const checkIfRecipeSaved = async () => {
+    try {
+      const result = await userService.checkRecipeSaved(recipe.id);
+      setIsRecipeSaved(result.isSaved);
+    } catch (error) {
+      console.error('Error checking if recipe is saved:', error);
+    }
+  };
+
+  // Toggle favorite/save recipe
+  const handleToggleFavorite = async () => {
+    if (savingRecipe) return;
+    
+    try {
+      setSavingRecipe(true);
+      const result = await userService.toggleSavedRecipe({ recipeId: recipe.id });
+      setIsRecipeSaved(result.isSaved);
+      
+      if (result.isSaved) {
+        toast.success('Recipe saved to your favorites! 💖', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+      } else {
+        toast.info('Recipe removed from favorites', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      toast.error('Failed to update favorites. Please try again.', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    } finally {
+      setSavingRecipe(false);
+    }
+  };
+
+  // Share recipe function
+  const handleShareRecipe = async () => {
+    try {
+      const recipeUrl = `${window.location.origin}/recipe/${recipe.id}`;
+      
+      // Try to use the Web Share API first (mobile/modern browsers)
+      if (navigator.share) {
+        await navigator.share({
+          title: recipe.title,
+          text: `Check out this amazing recipe: ${recipe.title}`,
+          url: recipeUrl,
+        });
+        toast.success('Recipe shared successfully! 🔗', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+      } else {
+        // Fallback to clipboard copy
+        await navigator.clipboard.writeText(recipeUrl);
+        toast.success('Recipe link copied to clipboard! 📋', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+      }
+    } catch (error) {
+      console.error('Error sharing recipe:', error);
+      // Fallback: manually copy to clipboard
+      try {
+        const recipeUrl = `${window.location.origin}/recipe/${recipe.id}`;
+        await navigator.clipboard.writeText(recipeUrl);
+        toast.success('Recipe link copied to clipboard! 📋', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+      } catch (clipboardError) {
+        toast.error('Unable to share recipe. Please try again.', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+      }
+    }
+  };
+
+  // Download recipe function
+  const handleDownloadRecipe = () => {
+    const recipeText = `
+${recipe.title}
+
+Description: ${recipe.description}
+
+Ingredients:
+${recipe.ingredients.map(ing => `• ${ing.item}`).join('\n')}
+
+Instructions:
+${recipe.instructions.map((inst, idx) => `${idx + 1}. ${inst.step} (${inst.time})`).join('\n')}
+
+Nutrition Information:
+${Object.entries(recipe.nutrition).map(([key, value]) => `${key}: ${value}`).join('\n')}
+
+Recipe from ChefAssist - ${window.location.origin}/recipe/${recipe.id}
+    `;
+    
+    const blob = new Blob([recipeText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${recipe.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_recipe.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    toast.success('Recipe downloaded successfully! 📄', {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+  };
+
+  // Adapt recipe function
+  const handleAdaptRecipe = async () => {
+    try {
+      // Prepare recipe data for adaptation
+      const recipeData = {
+        title: recipe.title,
+        ingredients: recipe.ingredients.map(ing => ing.item),
+        instructions: recipe.instructions.map(inst => inst.step),
+        servings: recipe.servings,
+        cookTime: recipe.cookTime,
+        difficulty: recipe.difficulty,
+        cuisine: recipe.cuisine
+      };
+      
+      // Generate a comprehensive prompt for AI adaptation
+      const adaptPrompt = `I want to adapt this recipe: "${recipe.title}"
+
+CURRENT RECIPE DETAILS:
+- Cuisine: ${recipe.cuisine}
+- Difficulty: ${recipe.difficulty}
+- Servings: ${recipe.servings}
+- Cook Time: ${recipe.cookTime}
+
+INGREDIENTS:
+${recipe.ingredients.map(ing => `• ${ing.item}`).join('\n')}
+
+INSTRUCTIONS:
+${recipe.instructions.map((inst, idx) => `${idx + 1}. ${inst.step}`).join('\n')}
+
+Please adapt this recipe based on my dietary preferences and restrictions. You can modify ingredients, cooking methods, or proportions to better suit my needs while maintaining the essence of the dish.`;
+
+      // Store recipe data in sessionStorage for the AI page to access
+      sessionStorage.setItem('adaptRecipeData', JSON.stringify({
+        originalRecipe: recipeData,
+        mode: 'adapt',
+        prompt: adaptPrompt
+      }));
+
+      // Navigate to AI page with adaptation mode
+      navigate('/ai?mode=adapt&action=adapt-recipe');
+      
+      toast.success('Redirecting to AI Chef for recipe adaptation! 🤖👨‍🍳', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      
+    } catch (error) {
+      console.error('Error preparing recipe adaptation:', error);
+      toast.error('Failed to prepare recipe for adaptation. Please try again.', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    }
+  };
+
+  // Print recipe function
+  const handlePrintRecipe = () => {
+    window.print();
+    toast.success('Print dialog opened! 🖨️', {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
   };
 
   const toggleIngredient = (id) => {
@@ -119,26 +348,35 @@ const ViewRecipe = ({ recipe, onBack }) => {
             </button>
             <div className="flex items-center space-x-3">
               <button
-                onClick={() => showToastNotification('Recipe saved to favorites!')}
-                className="p-2 rounded-full bg-[#FED7AA] hover:bg-[#D97706] hover:text-white transition-all duration-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                onClick={handleToggleFavorite}
+                disabled={savingRecipe}
+                className={`p-2 rounded-full transition-all duration-200 ${
+                  isRecipeSaved 
+                    ? 'bg-red-500 text-white hover:bg-red-600' 
+                    : 'bg-[#FED7AA] hover:bg-[#D97706] hover:text-white dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white'
+                }`}
+                title={isRecipeSaved ? "Remove from favorites" : "Add to favorites"}
               >
-                <Heart className="w-5 h-5" />
+                <Heart className={`w-5 h-5 ${isRecipeSaved ? 'fill-current' : ''}`} />
               </button>
               <button
-                onClick={() => showToastNotification('Recipe shared!')}
+                onClick={handleShareRecipe}
                 className="p-2 rounded-full bg-[#FED7AA] hover:bg-[#D97706] hover:text-white transition-all duration-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                title="Share recipe"
               >
                 <Share2 className="w-5 h-5" />
               </button>
               <button
-                onClick={() => showToastNotification('Recipe downloaded!')}
+                onClick={handleDownloadRecipe}
                 className="p-2 rounded-full bg-[#FED7AA] hover:bg-[#D97706] hover:text-white transition-all duration-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                title="Download recipe"
               >
                 <Download className="w-5 h-5" />
               </button>
               <button
-                onClick={() => showToastNotification('Recipe sent to printer!')}
+                onClick={handlePrintRecipe}
                 className="p-2 rounded-full bg-[#FED7AA] hover:bg-[#D97706] hover:text-white transition-all duration-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                title="Print recipe"
               >
                 <Print className="w-5 h-5" />
               </button>
@@ -378,19 +616,50 @@ const ViewRecipe = ({ recipe, onBack }) => {
               <h3 className="text-lg font-bold text-gray-900 mb-4 dark:text-gray-100">Quick Actions</h3>
               <div className="space-y-3">
                 <button
-                  onClick={() => showToastNotification('Added to meal plan!')}
+                  onClick={handleAdaptRecipe}
+                  className="w-full py-3 px-4 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white rounded-lg transition-all duration-200 font-medium flex items-center justify-center gap-2"
+                  title="Adapt this recipe to your dietary preferences using AI"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                  Adapt Recipe with AI
+                </button>
+                <button
+                  onClick={() => toast.success('Added to meal plan! 📅', {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                  })}
                   className="w-full py-3 px-4 bg-[#D97706] hover:bg-[#B45309] text-white rounded-lg transition-colors duration-200 dark:bg-[#F59E0B] dark:hover:bg-[#D97706]"
                 >
                   Add to Meal Plan
                 </button>
                 <button
-                  onClick={() => showToastNotification('Shopping list created!')}
+                  onClick={() => toast.success('Shopping list created! 🛒', {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                  })}
                   className="w-full py-3 px-4 bg-[#F59E0B] hover:bg-[#D97706] text-white rounded-lg transition-colors duration-200 dark:bg-[#D97706] dark:hover:bg-[#B45309]"
                 >
                   Create Shopping List
                 </button>
                 <button
-                  onClick={() => showToastNotification('Recipe scaled!')}
+                  onClick={() => toast.info('Recipe scaled successfully! ⚖️', {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                  })}
                   className="w-full py-3 px-4 border-2 border-[#D97706] text-[#D97706] hover:bg-[#FED7AA] rounded-lg transition-colors duration-200 dark:border-[#FBAD5E] dark:text-[#FBAD5E] dark:hover:bg-gray-700 dark:hover:text-gray-100"
                 >
                   Scale Recipe
@@ -400,24 +669,6 @@ const ViewRecipe = ({ recipe, onBack }) => {
           </div>
         </div>
       </div>
-
-      {/* Toast Notification */}
-      {showToast && (
-        <div className="fixed top-4 right-4 z-50">
-          <div className="bg-white border-l-4 border-[#D97706] rounded-lg shadow-lg p-4 max-w-sm animate-slide-in dark:bg-gray-800 dark:border-[#FBAD5E]">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-2 h-2 bg-[#D97706] rounded-full dark:bg-[#FBAD5E]"></div>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                  {toastMessage}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
@@ -534,7 +785,7 @@ const Recipe = () => {
     );
   }
 
-  return <ViewRecipe recipe={recipe} onBack={handleBack} />;
+  return <ViewRecipe recipe={recipe} onBack={handleBack} navigate={navigate} />;
 };
 
 export default Recipe;
