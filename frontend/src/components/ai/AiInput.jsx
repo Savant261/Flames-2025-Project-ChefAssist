@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import ModeSelector from './ModeSelector';
 import IngredientsInput from './IngredientsInput';
@@ -27,15 +27,37 @@ const AiInput = ({
   handleMicClick,
   handleImageUpload,
   isLoading,
+  isStreaming,
   handleSubmit
 }) => {
+  const textareaRef = useRef(null);
+
+  // Auto-resize textarea
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      const scrollHeight = textareaRef.current.scrollHeight;
+      const maxHeight = 6 * 24; // Approximately 6 lines
+      textareaRef.current.style.height = Math.min(scrollHeight, maxHeight) + 'px';
+    }
+  }, [input]);
+
+  const handleTextareaKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e);
+    }
+  };
+
+  const isNewChat = !currentChat || activeChats.length === 0;
+
   return (
     <div
       className="w-full flex flex-col items-center justify-center z-30 mt-4 mb-0"
       style={{ paddingBottom: "0" }}
     >
       <div
-        className="w-full max-w-3xl mx-auto bg-gradient-to-br from-white/80 via-[#FFDCA9]/80 to-[#FF7F3F]/30 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 backdrop-blur-lg shadow-2xl p-6 flex flex-col items-center gap-6 rounded-3xl transition-all duration-300 border border-[#FFDCA9] dark:border-orange-400"
+        className={`w-full ${isNewChat ? 'max-w-4xl' : 'max-w-5xl'} mx-auto bg-gradient-to-br from-white/80 via-[#FFDCA9]/80 to-[#FF7F3F]/30 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 backdrop-blur-lg shadow-2xl p-6 flex flex-col items-center gap-6 rounded-3xl transition-all duration-300 border border-[#FFDCA9] dark:border-orange-400`}
         style={{ boxShadow: "0 8px 32px #FFDCA9AA" }}
       >
         {/* Mode toggle pills */}
@@ -63,37 +85,42 @@ const AiInput = ({
         )}
 
         {/* Chat Status Display */}
-        <ChatStatus
+        {/* <ChatStatus
           isLoadingChat={isLoadingChat}
           currentChat={currentChat}
           activeChats={activeChats}
           error={error}
-        />
+        /> */}
 
         <form
-          className="w-full flex flex-row items-center gap-4"
+          className="w-full flex flex-row items-end gap-4"
           onSubmit={handleSubmit}
         >
-          <div className="relative flex-1 flex items-center">
-            <input
-              type="text"
+          <div className="relative flex-1 flex items-end">
+            <textarea
+              ref={textareaRef}
               value={input}
               onChange={handleInputChange}
+              onKeyDown={handleTextareaKeyDown}
               placeholder={
                 selectedMode === "idea"
                   ? "Search for recipes, ideas, or ingredients..."
                   : selectedMode === "ingredients"
-                  ? "Enter ingredients (e.g. chicken, tomato, cheese)"
+                  ? "Describe what kind of recipe you want (e.g. 'make something spicy' or 'quick dinner')"
                   : "How would you like to adapt the recipe?"
               }
-              className="w-full rounded-full bg-white/90 dark:bg-gray-900 text-[#FF7F3F] dark:text-orange-400 text-xl px-12 py-3 shadow focus:outline-none focus:ring-4 focus:ring-[#FF7F3F] dark:focus:ring-orange-400 placeholder:text-[#FF7F3F] dark:placeholder-orange-200 border-2 border-[#FFDCA9] dark:border-orange-400 transition-all duration-200 font-semibold pr-24 animate-slide-in-section"
+              className="w-full rounded-2xl bg-white/90 dark:bg-gray-900 text-[#FF7F3F] dark:text-orange-400 text-lg px-4 py-3 shadow focus:outline-none focus:ring-4 focus:ring-[#FF7F3F] dark:focus:ring-orange-400 placeholder:text-[#FF7F3F] dark:placeholder-orange-200 border-2 border-[#FFDCA9] dark:border-orange-400 transition-all duration-200 font-semibold pr-24 animate-slide-in-section resize-none overflow-hidden"
               style={{
                 boxShadow: "0 2px 12px #FFDCA955",
                 minWidth: "350px",
                 maxWidth: "100%",
+                minHeight: "48px",
+                maxHeight: "144px",
+                lineHeight: "24px"
               }}
+              rows={1}
             />
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-4">
+            <div className="absolute right-4 bottom-3 flex items-center gap-3">
               <button
                 type="button"
                 onClick={handleMicClick}
@@ -104,8 +131,8 @@ const AiInput = ({
                 title="Speak"
               >
                 <svg
-                  width="22"
-                  height="22"
+                  width="18"
+                  height="18"
                   fill="none"
                   stroke="#FF7F3F"
                   strokeWidth="2"
@@ -124,8 +151,8 @@ const AiInput = ({
                   style={{ boxShadow: "0 2px 8px #FFDCA955" }}
                 >
                   <svg
-                    width="24"
-                    height="24"
+                    width="18"
+                    height="18"
                     fill="none"
                     stroke="#FF7F3F"
                     strokeWidth="2"
@@ -146,9 +173,9 @@ const AiInput = ({
           </div>
           <button
             type="submit"
-            disabled={isLoading || input.trim().length === 0}
-            className={`rounded-full px-8 py-3 text-xl font-bold shadow-xl bg-gradient-to-r from-[#A5A6B2] to-[#FFDCA9] dark:from-orange-400 dark:to-orange-200 text-white dark:text-gray-900 transition-all duration-300 ${
-              isLoading || input.trim().length === 0
+            disabled={isLoading || isStreaming || input.trim().length === 0}
+            className={`rounded-full px-6 py-3 text-lg font-bold shadow-xl bg-gradient-to-r from-[#A5A6B2] to-[#FFDCA9] dark:from-orange-400 dark:to-orange-200 text-white dark:text-gray-900 transition-all duration-300 ${
+              isLoading || isStreaming || input.trim().length === 0
                 ? "bg-gray-400 dark:bg-gray-700 cursor-not-allowed"
                 : "hover:scale-105 hover:bg-[#FF7F3F] dark:hover:bg-orange-500 focus:outline-none focus:ring-4 focus:ring-[#FF7F3F] dark:focus:ring-orange-400 animate-pulse-on-hover"
             }`}
@@ -157,14 +184,17 @@ const AiInput = ({
               transition: "transform 0.2s",
             }}
           >
-            {isLoading ? (
-              <Loader2 className="w-6 h-6 mr-2 animate-spin inline" />
+            {isLoading || isStreaming ? (
+              <Loader2 className="w-5 h-5 mr-2 animate-spin inline" />
             ) : selectedMode === "idea" ? (
               "Ask ChefAI"
             ) : selectedMode === "ingredients" ? (
-              "Generate Recipe"
+              "Cook with Ingredients"
             ) : (
               "Adapt Recipe"
+            )}
+            {isStreaming && (
+              <span className="ml-2 text-sm opacity-80">Generating...</span>
             )}
           </button>
         </form>

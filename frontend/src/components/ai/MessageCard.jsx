@@ -1,15 +1,20 @@
 import React, { memo } from 'react';
 
-const MessageCard = memo(({ chat, isCurrentOutput = false, input = "" }) => {
+const MessageCard = memo(({ chat, isCurrentOutput = false, input = "", isStreaming = false }) => {
+  // Handle both old format (string) and new format (object)
+  const userInput = isCurrentOutput ? input : chat.input;
+  const aiOutput = isCurrentOutput ? chat : chat.output;
+  const chatIsStreaming = isStreaming || chat.isStreaming || false;
+
   return (
-    <div className="flex flex-col items-center w-full animate-fade-in-scale animate-expand-card">
+    <div className="flex flex-col items-center w-full animate-fade-in-scale animate-expand-card max-w-6xl mx-auto">
       {/* User query pill on the right */}
       <div className="w-full flex justify-end mb-4">
         <div
-          className="bg-[#A5A6B2] dark:bg-orange-400 text-white dark:text-gray-900 px-6 py-3 rounded-full text-lg font-semibold shadow-lg max-w-xs text-right animate-fade-in-item"
+          className="bg-[#A5A6B2] dark:bg-orange-400 text-white dark:text-gray-900 px-6 py-3 rounded-full text-lg font-semibold shadow-lg max-w-md text-right animate-fade-in-item"
           style={{ boxShadow: "0 2px 12px #A5A6B255" }}
         >
-          {isCurrentOutput ? input : chat.input}
+          {userInput}
         </div>
       </div>
       
@@ -22,7 +27,15 @@ const MessageCard = memo(({ chat, isCurrentOutput = false, input = "" }) => {
         }}
       >
         <div className="text-[#181A1B] dark:text-orange-200 whitespace-pre-line text-xl font-semibold tracking-wide mb-2">
-          {isCurrentOutput ? chat : chat.output}
+          {aiOutput}
+          {/* Show typing indicator when streaming */}
+          {chatIsStreaming && (
+            <span className="inline-block ml-2 animate-pulse">
+              <span className="bg-[#FF7F3F] w-2 h-2 rounded-full inline-block mr-1 animate-bounce"></span>
+              <span className="bg-[#FF7F3F] w-2 h-2 rounded-full inline-block mr-1 animate-bounce" style={{ animationDelay: '0.1s' }}></span>
+              <span className="bg-[#FF7F3F] w-2 h-2 rounded-full inline-block animate-bounce" style={{ animationDelay: '0.2s' }}></span>
+            </span>
+          )}
         </div>
         
         {/* Action buttons row (like Gemini) */}

@@ -12,9 +12,6 @@ const ChatStatus = ({ isLoadingChat, currentChat, activeChats, error }) => {
         </div>
       )}
       
-      {/* Active chat status - Removed as requested */}
-      {/* Chat ID is now managed via URL params only */}
-
       {/* Error display */}
       {error && (
         <div className="w-full mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">

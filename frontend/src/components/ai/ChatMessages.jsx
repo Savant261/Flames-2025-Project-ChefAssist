@@ -1,10 +1,10 @@
 import React, { memo } from 'react';
 import MessageCard from './MessageCard';
 
-const ChatMessages = memo(({ activeChats, output, input }) => {
+const ChatMessages = memo(({ activeChats, output, input, isStreaming, streamingOutput }) => {
   return (
     <div
-      className="w-full max-w-xl mx-auto flex flex-col gap-8 justify-end"
+      className="w-full max-w-5xl mx-auto flex flex-col gap-8 justify-end"
       style={{
         width: "100%",
         display: "flex",
@@ -22,13 +22,17 @@ const ChatMessages = memo(({ activeChats, output, input }) => {
       >
         {/* Render all active chats in scrollable middle section */}
         {activeChats.map((chat, idx) => (
-          <MessageCard key={chat.timestamp} chat={chat} />
+          <MessageCard 
+            key={`${chat.timestamp}-${idx}`} 
+            chat={chat} 
+            isStreaming={chat.isStreaming || false}
+          />
         ))}
         
-        {/* If no active chats, show current output as default */}
-        {activeChats.length === 0 && output && (
+        {/* If no active chats and not streaming, show current output as default
+        {activeChats.length === 0 && output && !isStreaming && (
           <MessageCard chat={output} isCurrentOutput={true} input={input} />
-        )}
+        )} */}
       </div>
     </div>
   );

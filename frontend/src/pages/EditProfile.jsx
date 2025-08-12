@@ -8,7 +8,7 @@ const EditProfile = () => {
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
                             <button
-                                onClick="goBack()"
+                                onClick={() => goBack()}
                                 className="p-2 text-gray-600 hover:text-chef-orange transition-colors"
                             >
                                 <svg
@@ -38,13 +38,13 @@ const EditProfile = () => {
                         </div>
                         <div className="flex items-center space-x-4">
                             <button
-                                onClick="cancelChanges()"
+                                onClick={() => cancelChanges()}
                                 className="px-4 py-2 text-gray-600 hover:text-chef-orange transition-colors"
                             >
                                 Cancel
                             </button>
                             <button
-                                onClick="saveProfile()"
+                                onClick={() => saveProfile()}
                                 className="bg-chef-orange text-white px-6 py-2 rounded-lg hover:bg-chef-orange-dark transition-colors"
                             >
                                 Save Changes

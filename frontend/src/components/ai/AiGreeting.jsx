@@ -3,7 +3,7 @@ import { Loader2 } from 'lucide-react';
 
 const AiGreeting = ({ userName, output, isLoadingChat, activeChats }) => {
   // Show greeting only when no output, not loading chat, and no active chats
-  if (output || isLoadingChat || activeChats.length > 0) {
+  if (output || isLoadingChat || (activeChats && activeChats.length > 0)) {
     return null;
   }
 
@@ -51,7 +51,7 @@ export const LoadingChatMessage = ({ isLoadingChat }) => {
           </span>
         </div>
       </div>
-    </div>
+    </div>  
   );
 };
 

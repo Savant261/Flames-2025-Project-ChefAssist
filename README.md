@@ -195,7 +195,7 @@ The frontend will run on `http://localhost:3000`
 - **API Calls**: Proxied through Vite (`/api` → `http://localhost:5001/api`)
 - **CORS**: Handled automatically by Vite proxy
 
-#### Production Deployment
+#### Production Deploymwent
 - **Backend**: Deploy to Heroku, Railway, or Render
 - **Frontend**: Deploy to Vercel, Netlify, or similar
 - **API Calls**: Direct calls to production backend URL
