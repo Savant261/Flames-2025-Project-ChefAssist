@@ -59,6 +59,16 @@ const recipeSchema = new Schema({
     type: Number,
     default: 0,
   },
+  likes: {
+    type: Number,
+    default: 0,
+  },
+  rating: {
+    type: Number,
+    min: 0,
+    max: 5,
+    default: 5.0,
+  },
 }, { timestamps: true });
 
 

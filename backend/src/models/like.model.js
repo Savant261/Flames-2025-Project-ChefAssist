@@ -13,6 +13,6 @@ const likeSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-likeSchema.index({ user: 1, recipe: 1 }, { unique: true });
+likeSchema.index({ userId: 1, recipeId: 1 }, { unique: true });
 
 export const Like = mongoose.model("Like", likeSchema);

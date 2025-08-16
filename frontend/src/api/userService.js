@@ -282,6 +282,58 @@ class UserService {
       throw error.response?.data || { message: 'Failed to update preferences' };
     }
   }
+
+  // ===================
+  // FOLLOW/SOCIAL METHODS
+  // ===================
+  
+  /**
+   * Follow or unfollow a user
+   */
+  async toggleFollow(userId) {
+    try {
+      const response = await axiosInstance.post(`/auth/follow/${userId}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to toggle follow status' };
+    }
+  }
+
+  /**
+   * Check if user is following another user
+   */
+  async checkFollowStatus(userId) {
+    try {
+      const response = await axiosInstance.get(`/auth/follow/check/${userId}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to check follow status' };
+    }
+  }
+
+  /**
+   * Get user's followers
+   */
+  async getFollowers(page = 1, limit = 20) {
+    try {
+      const response = await axiosInstance.get(`/auth/followers?page=${page}&limit=${limit}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to fetch followers' };
+    }
+  }
+
+  /**
+   * Get users that the current user is following
+   */
+  async getFollowing(page = 1, limit = 20) {
+    try {
+      const response = await axiosInstance.get(`/auth/following?page=${page}&limit=${limit}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to fetch following' };
+    }
+  }
 }
 
 // Export a singleton instance

@@ -1,4 +1,6 @@
 import { Recipe } from "../models/recipe.model.js";
+import { Comment } from "../models/comment.model.js";
+import { Like } from "../models/like.model.js";
 import cloudinary from "../utils/cloudinary.js";
 
 // Get recipes for Explore page, supporting various filters
@@ -36,7 +38,23 @@ const getExploreRecipes = async (req, res) => {
     }
     query = query.limit(Number(limit));
     const recipes = await query;
-    return res.status(200).json({ recipes });
+
+    // Add follower count to each recipe
+    const { Follow } = await import("../models/follow.model.js");
+    const recipesWithFollowerCount = await Promise.all(
+      recipes.map(async (recipe) => {
+        const followerCount = await Follow.countDocuments({ following: recipe.author._id });
+        return {
+          ...recipe.toObject(),
+          author: {
+            ...recipe.author.toObject(),
+            followersCount: followerCount
+          }
+        };
+      })
+    );
+
+    return res.status(200).json({ recipes: recipesWithFollowerCount });
   } catch (error) {
     console.log('Error in getExploreRecipes controller', error);
     return res.status(500).json({ message: 'Internal Server Error' });
@@ -57,7 +75,23 @@ const getHomeRecipes = async (req, res) => {
       .populate('author', 'username avatar')
       .sort({ createdAt: -1 })
       .limit(Number(limit));
-    return res.status(200).json({ recipes });
+
+    // Add follower count to each recipe
+    const { Follow } = await import("../models/follow.model.js");
+    const recipesWithFollowerCount = await Promise.all(
+      recipes.map(async (recipe) => {
+        const followerCount = await Follow.countDocuments({ following: recipe.author._id });
+        return {
+          ...recipe.toObject(),
+          author: {
+            ...recipe.author.toObject(),
+            followersCount: followerCount
+          }
+        };
+      })
+    );
+
+    return res.status(200).json({ recipes: recipesWithFollowerCount });
   } catch (error) {
     console.log('Error in getHomeRecipes controller', error);
     return res.status(500).json({ message: 'Internal Server Error' });
@@ -140,11 +174,38 @@ const updateRecipe = async (req, res) => {
 const getRecipe = async (req, res) => {
   try {
     const { recipeId } = req.params;
-    const recipe = await Recipe.findById(recipeId).populate("author", "username avatar");
+    const recipe = await Recipe.findById(recipeId).populate("author", "username avatar fullName");
     if (!recipe) return res.status(404).json({ message: "Recipe not found" });
+    
+    // Update view count
     recipe.views += 1;
     await recipe.save();
-    return res.status(200).json(recipe);
+    
+    // Get comment count and calculate rating if not set
+    const commentCount = await Comment.countDocuments({ recipe: recipeId });
+    if (commentCount > 0 && !recipe.rating) {
+      const comments = await Comment.find({ recipe: recipeId });
+      const totalRating = comments.reduce((sum, comment) => sum + comment.rating, 0);
+      const averageRating = totalRating / comments.length;
+      recipe.rating = Math.round(averageRating * 10) / 10;
+      await recipe.save();
+    }
+    
+    // Get author's follower count
+    const { Follow } = await import("../models/follow.model.js");
+    const followerCount = await Follow.countDocuments({ following: recipe.author._id });
+    
+    // Add follower count to author object
+    const recipeWithFollowerCount = {
+      ...recipe.toObject(),
+      commentCount,
+      author: {
+        ...recipe.author.toObject(),
+        followersCount: followerCount
+      }
+    };
+    
+    return res.status(200).json(recipeWithFollowerCount);
   } catch (error) {
     console.log("Error in get Recipe controller", error);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -504,7 +565,7 @@ const searchRecipes = async (req, res) => {
     console.log('MongoDB sort:', sort);
     
     const recipes = await Recipe.find(filter)
-      .populate("author", "username avatar followers")
+      .populate("author", "username avatar")
       .sort(sort)
       .limit(parseInt(limit))
       .skip((parseInt(page) - 1) * parseInt(limit))
@@ -514,8 +575,23 @@ const searchRecipes = async (req, res) => {
     
     console.log(`Found ${recipes.length} recipes out of ${total} total`);
     
+    // Add follower count to each recipe
+    const { Follow } = await import("../models/follow.model.js");
+    const recipesWithFollowerCount = await Promise.all(
+      recipes.map(async (recipe) => {
+        const followerCount = await Follow.countDocuments({ following: recipe.author._id });
+        return {
+          ...recipe,
+          author: {
+            ...recipe.author,
+            followersCount: followerCount
+          }
+        };
+      })
+    );
+    
     // Add calculated fields for better search results
-    const enrichedRecipes = recipes.map(recipe => ({
+    const enrichedRecipes = recipesWithFollowerCount.map(recipe => ({
       ...recipe,
       relevanceScore: calculateRelevanceScore(recipe, q),
     }));
@@ -575,6 +651,184 @@ const calculateRelevanceScore = (recipe, searchQuery) => {
   score += Math.log(recipe.views + 1) * 0.1;
   
   return score;
+};
+
+// Add comment to recipe
+const addComment = async (req, res) => {
+  try {
+    const { recipeId } = req.params;
+    const { text, rating } = req.body;
+
+    if (!text || !rating) {
+      return res.status(400).json({ message: "Comment text and rating are required" });
+    }
+
+    if (rating < 1 || rating > 5) {
+      return res.status(400).json({ message: "Rating must be between 1 and 5" });
+    }
+
+    const recipe = await Recipe.findById(recipeId);
+    if (!recipe) {
+      return res.status(404).json({ message: "Recipe not found" });
+    }
+
+    if (!recipe.allowComments) {
+      return res.status(403).json({ message: "Comments are disabled for this recipe" });
+    }
+
+    // Create the comment
+    const comment = await Comment.create({
+      text,
+      rating,
+      author: req.user._id,
+      recipe: recipeId
+    });
+
+    await comment.populate('author', 'username avatar');
+
+    // Calculate new average rating
+    const allComments = await Comment.find({ recipe: recipeId });
+    const totalRating = allComments.reduce((sum, comment) => sum + comment.rating, 0);
+    const averageRating = totalRating / allComments.length;
+    
+    // Update recipe with new average rating
+    recipe.rating = Math.round(averageRating * 10) / 10; // Round to 1 decimal place
+    await recipe.save();
+
+    return res.status(201).json({
+      message: "Comment added successfully",
+      comment: {
+        id: comment._id,
+        text: comment.text,
+        rating: comment.rating,
+        author: {
+          username: comment.author.username,
+          avatar: comment.author.avatar
+        },
+        createdAt: comment.createdAt
+      },
+      newRecipeRating: recipe.rating
+    });
+  } catch (error) {
+    console.log("Error in addComment controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+// Get comments for recipe
+const getComments = async (req, res) => {
+  try {
+    const { recipeId } = req.params;
+    const { page = 1, limit = 10 } = req.query;
+
+    const recipe = await Recipe.findById(recipeId);
+    if (!recipe) {
+      return res.status(404).json({ message: "Recipe not found" });
+    }
+
+    const comments = await Comment.find({ recipe: recipeId })
+      .populate('author', 'username avatar')
+      .sort({ createdAt: -1 })
+      .limit(parseInt(limit))
+      .skip((parseInt(page) - 1) * parseInt(limit));
+
+    const total = await Comment.countDocuments({ recipe: recipeId });
+
+    const formattedComments = comments.map(comment => ({
+      id: comment._id,
+      text: comment.text,
+      rating: comment.rating,
+      author: {
+        username: comment.author.username,
+        avatar: comment.author.avatar
+      },
+      createdAt: comment.createdAt
+    }));
+
+    return res.status(200).json({
+      comments: formattedComments,
+      total,
+      page: parseInt(page),
+      pages: Math.ceil(total / parseInt(limit))
+    });
+  } catch (error) {
+    console.log("Error in getComments controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+// Toggle recipe like
+const toggleLike = async (req, res) => {
+  try {
+    const { recipeId } = req.params;
+    const userId = req.user._id;
+
+    const recipe = await Recipe.findById(recipeId);
+    if (!recipe) {
+      return res.status(404).json({ message: "Recipe not found" });
+    }
+
+    const existingLike = await Like.findOne({ 
+      userId: userId, 
+      recipeId: recipeId 
+    });
+
+    if (existingLike) {
+      // Unlike
+      await Like.findByIdAndDelete(existingLike._id);
+      recipe.likes = Math.max(0, recipe.likes - 1);
+      await recipe.save();
+
+      return res.status(200).json({
+        message: "Recipe unliked",
+        isLiked: false,
+        likeCount: recipe.likes
+      });
+    } else {
+      // Like
+      await Like.create({
+        userId: userId,
+        recipeId: recipeId
+      });
+      recipe.likes += 1;
+      await recipe.save();
+
+      return res.status(200).json({
+        message: "Recipe liked",
+        isLiked: true,
+        likeCount: recipe.likes
+      });
+    }
+  } catch (error) {
+    console.log("Error in toggleLike controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+// Check if user liked recipe
+const checkLikeStatus = async (req, res) => {
+  try {
+    const { recipeId } = req.params;
+    const userId = req.user._id;
+
+    const recipe = await Recipe.findById(recipeId);
+    if (!recipe) {
+      return res.status(404).json({ message: "Recipe not found" });
+    }
+
+    const existingLike = await Like.findOne({ 
+      userId: userId, 
+      recipeId: recipeId 
+    });
+
+    return res.status(200).json({
+      isLiked: !!existingLike,
+      likeCount: recipe.likes
+    });
+  } catch (error) {
+    console.log("Error in checkLikeStatus controller", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
 };
 
 // Export all controllers
@@ -680,4 +934,8 @@ export {
   getHighestLikesRecipes,
   getHomeRecipes,
   getExploreRecipes,
+  addComment,
+  getComments,
+  toggleLike,
+  checkLikeStatus,
 };

@@ -10,6 +10,46 @@
 
 @custom-variant dark (&:where(.dark, .dark *)); 
 
+/* Prevent horizontal scrolling on mobile */
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Ensure all containers respect max width */
+* {
+  box-sizing: border-box;
+}
+
+/* Prevent any element from exceeding viewport width */
+.container, .max-w-7xl, .max-w-full {
+  max-width: 100%;
+}
+
+/* Fix for mobile viewport */
+.min-h-screen {
+  min-height: 100vh;
+  min-height: 100dvh; /* Use dynamic viewport height for mobile */
+}
+
+/* Responsive grid fixes */
+@media (max-width: 640px) {
+  .grid-cols-2 {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .grid-cols-4 {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  /* Prevent text overflow */
+  .truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 .blinking-cursor {
   animation: blink 1s steps(1) infinite;
 }

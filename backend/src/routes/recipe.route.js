@@ -19,6 +19,10 @@ import {
   getHighestLikesRecipes,
   getHomeRecipes,
   getExploreRecipes,
+  addComment,
+  getComments,
+  toggleLike,
+  checkLikeStatus,
 } from "../controllers/recipe.controller.js";
 // Get recipes for Explore page (type: trending, new, easy, chefs-pick, following)
 // Get recipes for Home page (optionally by tags)
@@ -73,5 +77,13 @@ router.post("/:recipeId/comment", protectRoute, toogleRecipeComment);
 
 // Get recipe analytics
 router.get("/:recipeId/analytics", protectRoute, getRecipeAnalytics);
+
+// Recipe comments
+router.post("/:recipeId/comments", protectRoute, addComment);
+router.get("/:recipeId/comments", getComments);
+
+// Recipe likes
+router.post("/:recipeId/like", protectRoute, toggleLike);
+router.get("/:recipeId/like-status", protectRoute, checkLikeStatus);
 
 export default router;

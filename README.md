@@ -1,4 +1,57 @@
-# ChefAssist - AI Rec## Technology Stack 🛠️
+# ChefAssist - AI Recipe Generator & Food Lovers Community
+
+🔗 **Live Demo:** [https://chef-assist-frontend.vercel.app/](https://chef-assist-frontend.vercel.app/)
+
+ChefAssist is an intelligent recipe generation and adaptation platform that combines AI-powered cooking assistance with a vibrant social community for food lovers. Transform your available ingredients into personalized recipes while connecting with fellow cooking enthusiasts who share similar dietary restrictions and culinary preferences. 🌟
+
+Think of it as "Instagram for Food Lovers" - but with smart AI that understands your dietary needs, ingredient availability, and cooking preferences. Whether you're vegan, gluten-free, keto, or have specific allergies, ChefAssist adapts recipes to fit your lifestyle while connecting you with a community that shares your culinary journey. 🥄
+
+## Table of Contents
+
+- [Features](#features-)
+- [Technology Stack](#technology-stack-%EF%B8%8F)
+- [System Architecture](#%EF%B8%8F-system-architecture)
+- [Project Structure](#project-structure-)
+- [Getting Started](#getting-started)
+- [Environment Variables Guide](#environment-variables-guide)
+- [Development vs Production Setup](#development-vs-production-setup)
+- [Getting API Keys](#getting-api-keys)
+- [Troubleshooting](#troubleshooting)
+- [Deployment](#deployment)
+- [How It Works](#how-it-works-%EF%B8%8F)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Features ✨
+
+### 🤖 AI-Powered Recipe Intelligence
+*   **Smart Recipe Generation**: AI creates recipes based on your available ingredients
+*   **Recipe Adaptation**: Automatically adapts any recipe to fit dietary restrictions (vegan, gluten-free, keto, allergen-free)
+*   **Preference Learning**: AI learns your taste preferences and cooking style over time
+*   **Ingredient Substitution**: Smart suggestions for ingredient replacements based on dietary needs
+*   **Interactive Chat**: Real-time conversation with AI for cooking tips and recipe modifications
+
+### 📱 Social Food Community (Instagram-style)
+*   **Food Feed**: Share your cooking creations with beautiful photos and stories
+*   **Follow Food Lovers**: Connect with people who share your dietary preferences and restrictions
+*   **Recipe Sharing**: Post and discover recipes from community members with similar needs
+*   **Cooking Stories**: Share your cooking journey, tips, and dietary transformation stories
+*   **Like & Comment**: Engage with the community through likes, comments, and recipe reviews
+*   **Dietary Groups**: Join communities based on specific diets (Vegan, Keto, Gluten-Free, etc.)
+
+### 🎯 Personalized Experience
+*   **Dietary Profile**: Set up detailed dietary restrictions, allergies, and preferences
+*   **Smart Inventory**: Track your pantry ingredients with expiry date management
+*   **Meal Planning**: AI suggests weekly meal plans based on your dietary goals
+*   **Nutrition Tracking**: Monitor your nutritional intake aligned with your dietary restrictions
+*   **Cooking Level Adaptation**: Recipes adapted to your cooking experience level
+
+### 🌍 Global Cuisine with Dietary Adaptations
+*   **Cultural Recipes**: Explore global cuisines adapted to your dietary needs
+*   **Traditional to Modern**: AI adapts traditional recipes to modern dietary requirements
+*   **Regional Preferences**: Discover how different cultures approach your dietary restrictions
+
+## Technology Stack 🛠️
 
 ### Frontend
 *   **React 19** with modern hooks and context
@@ -174,64 +227,9 @@ PUT    /api/users/dietary-preferences → Update dietary restrictions
 GET    /api/users/inventory    → Get ingredient inventory
 POST   /api/users/inventory    → Add inventory item with dietary tags
 GET    /api/users/recipe-adaptations → Get user's recipe adaptations
-``` **Live Demo:** [https://chef-assist-frontend.vercel.app/](https://chef-assist-frontend.vercel.app/)
+```
 
-# ChefAssist - AI Recipe Generator & Food Lovers Community
-
-🔗 **Live Demo:** [https://chef-assist-frontend.vercel.app/](https://chef-assist-frontend.vercel.app/)
-
-ChefAssist is an intelligent recipe generation and adaptation platform that combines AI-powered cooking assistance with a vibrant social community for food lovers. Transform your available ingredients into personalized recipes while connecting with fellow cooking enthusiasts who share similar dietary restrictions and culinary preferences. 🌟
-
-Think of it as "Instagram for Food Lovers" - but with smart AI that understands your dietary needs, ingredient availability, and cooking preferences. Whether you're vegan, gluten-free, keto, or have specific allergies, ChefAssist adapts recipes to fit your lifestyle while connecting you with a community that shares your culinary journey. 🥄
-
-## Features ✨
-
-### 🤖 AI-Powered Recipe Intelligence
-*   **Smart Recipe Generation**: AI creates recipes based on your available ingredients
-*   **Recipe Adaptation**: Automatically adapts any recipe to fit dietary restrictions (vegan, gluten-free, keto, allergen-free)
-*   **Preference Learning**: AI learns your taste preferences and cooking style over time
-*   **Ingredient Substitution**: Smart suggestions for ingredient replacements based on dietary needs
-*   **Interactive Chat**: Real-time conversation with AI for cooking tips and recipe modifications
-
-### 📱 Social Food Community (Instagram-style)
-*   **Food Feed**: Share your cooking creations with beautiful photos and stories
-*   **Follow Food Lovers**: Connect with people who share your dietary preferences and restrictions
-*   **Recipe Sharing**: Post and discover recipes from community members with similar needs
-*   **Cooking Stories**: Share your cooking journey, tips, and dietary transformation stories
-*   **Like & Comment**: Engage with the community through likes, comments, and recipe reviews
-*   **Dietary Groups**: Join communities based on specific diets (Vegan, Keto, Gluten-Free, etc.)
-
-### 🎯 Personalized Experience
-*   **Dietary Profile**: Set up detailed dietary restrictions, allergies, and preferences
-*   **Smart Inventory**: Track your pantry ingredients with expiry date management
-*   **Meal Planning**: AI suggests weekly meal plans based on your dietary goals
-*   **Nutrition Tracking**: Monitor your nutritional intake aligned with your dietary restrictions
-*   **Cooking Level Adaptation**: Recipes adapted to your cooking experience level
-
-### 🌍 Global Cuisine with Dietary Adaptations
-*   **Cultural Recipes**: Explore global cuisines adapted to your dietary needs
-*   **Traditional to Modern**: AI adapts traditional recipes to modern dietary requirements
-*   **Regional Preferences**: Discover how different cultures approach your dietary restrictions
-
-## Technology Stack �
-
-### Frontend
-*   **React 19** with modern hooks and context
-*   **Vite** for fast development and building
-*   **Tailwind CSS** for responsive design
-*   **React Router** for client-side routing
-*   **Axios** for API communication
-*   **Lucide React** for icons
-
-### Backend
-*   **Node.js** with Express.js framework
-*   **MongoDB** with Mongoose ODM
-*   **JWT** for authentication
-*   **Cloudinary** for image storage
-*   **Google Gemini API** for AI recipe generation
-*   **Cookie-based sessions** for secure auth
-
-## Project Structure �
+## Project Structure 📂
 
 ```
 ├── frontend/              # React frontend application
@@ -391,7 +389,7 @@ The frontend will run on `http://localhost:3000`
 - **API Calls**: Proxied through Vite (`/api` → `http://localhost:5001/api`)
 - **CORS**: Handled automatically by Vite proxy
 
-#### Production Deploymwent
+#### Production Deployment
 - **Backend**: Deploy to Heroku, Railway, or Render
 - **Frontend**: Deploy to Vercel, Netlify, or similar
 - **API Calls**: Direct calls to production backend URL
@@ -484,18 +482,18 @@ The frontend will run on `http://localhost:3000`
 ChefAssist combines AI recipe intelligence with social community features:
 
 ### 🤖 AI Recipe Generation & Adaptation:
-1.  **Input Your Ingredients�**: Tell the AI what ingredients you have available
-2.  **Set Dietary Preferences⚙️**: Specify restrictions (vegan, gluten-free, keto, allergies, etc.)
-3.  **AI Recipe Creation🚀**: Advanced AI generates personalized recipes that fit your needs
-4.  **Recipe Adaptation🔄**: AI automatically adapts existing recipes to match your dietary restrictions
-5.  **Save & Organize💾**: Save adapted recipes to your personal collection
+1.  **Input Your Ingredients 🥕**: Tell the AI what ingredients you have available
+2.  **Set Dietary Preferences ⚙️**: Specify restrictions (vegan, gluten-free, keto, allergies, etc.)
+3.  **AI Recipe Creation 🚀**: Advanced AI generates personalized recipes that fit your needs
+4.  **Recipe Adaptation 🔄**: AI automatically adapts existing recipes to match your dietary restrictions
+5.  **Save & Organize 💾**: Save adapted recipes to your personal collection
 
 ### 📱 Social Food Community:
-1.  **Create Food Posts�**: Share photos of your cooking creations with the community
-2.  **Connect with Food Lovers👥**: Follow users with similar dietary preferences and restrictions
-3.  **Discover Adapted Recipes🔍**: Browse recipes shared by people with your dietary needs
-4.  **Engage & Learn💬**: Like, comment, and learn from fellow food enthusiasts
-5.  **Join Dietary Communities🎯**: Connect with specific groups (Vegan, Keto, Gluten-Free, etc.)
+1.  **Create Food Posts 📸**: Share photos of your cooking creations with the community
+2.  **Connect with Food Lovers 👥**: Follow users with similar dietary preferences and restrictions
+3.  **Discover Adapted Recipes 🔍**: Browse recipes shared by people with your dietary needs
+4.  **Engage & Learn 💬**: Like, comment, and learn from fellow food enthusiasts
+5.  **Join Dietary Communities 🎯**: Connect with specific groups (Vegan, Keto, Gluten-Free, etc.)
 
 ### 🎯 Personalization Engine:
 - **Learning Algorithm**: AI learns your preferences and improves suggestions over time

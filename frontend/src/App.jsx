@@ -112,7 +112,7 @@ function AppContent() {
   }, [theme]);
 
   return (
-    <div className="min-h-screen flex flex-col dark:bg-gray-800 dark:border-gray-700/50">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden flex flex-col dark:bg-gray-800 dark:border-gray-700/50">
       <Navbar
         setIsSideBarExpanded={setIsSideBarExpanded}
         theme={theme}
@@ -124,8 +124,8 @@ function AppContent() {
       />
       <div className="flex flex-1 overflow-hidden">
         <SideBar isSidebarExpanded={isSidebarExpanded} />
-        <div className="flex-1 relative">
-          <main className="absolute inset-0 overflow-y-auto">
+        <div className="flex-1 relative min-w-0">
+          <main className="absolute inset-0 overflow-y-auto overflow-x-hidden">
             <StyledToastContainer theme={theme} />
             <Routes>
               {/* Public route - Home page */}

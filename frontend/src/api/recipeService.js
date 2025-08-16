@@ -153,6 +153,69 @@ export const recipeService = {
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Failed to search recipes');
     }
+  },
+
+  // Like/Unlike recipe
+  toggleLike: async (recipeId) => {
+    try {
+      const response = await axiosInstance.post(`/recipes/${recipeId}/like`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to toggle like');
+    }
+  },
+
+  // Check like status
+  checkLikeStatus: async (recipeId) => {
+    try {
+      const response = await axiosInstance.get(`/recipes/${recipeId}/like-status`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to check like status');
+    }
+  },
+
+  // Rate recipe (legacy - now part of comments)
+  rateRecipe: async (recipeId, rating) => {
+    try {
+      const response = await axiosInstance.post(`/recipes/${recipeId}/rate`, { rating });
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to rate recipe');
+    }
+  },
+
+  // Add comment to recipe
+  addComment: async (recipeId, text, rating) => {
+    try {
+      const response = await axiosInstance.post(`/recipes/${recipeId}/comments`, { 
+        text, 
+        rating 
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to add comment');
+    }
+  },
+
+  // Get recipe comments
+  getComments: async (recipeId, page = 1, limit = 10) => {
+    try {
+      const response = await axiosInstance.get(`/recipes/${recipeId}/comments?page=${page}&limit=${limit}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch comments');
+    }
+  },
+
+  // Like/Unlike comment (placeholder - would need separate comment like system)
+  toggleCommentLike: async (commentId) => {
+    try {
+      const response = await axiosInstance.post(`/recipes/comments/${commentId}/like`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to toggle comment like');
+    }
   }
 };
 
