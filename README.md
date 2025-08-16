@@ -1,21 +1,217 @@
-# ChefAssist - AI Recipe Generator
+# ChefAssist - AI Rec## Technology Stack 🛠️
 
-ChefAssist is a smart, web-based recipe generator that turns your available ingredients into delicious, easy-to-follow recipes. Built with a responsive React frontend and Node.js backend, it's designed to be the perfect kitchen companion for anyone looking to reduce food waste and discover new meal ideas. 🌟
+### Frontend
+*   **React 19** with modern hooks and context
+*   **Vite** for fast development and building
+*   **Tailwind CSS** for responsive design
+*   **React Router** for client-side routing
+*   **Axios** for API communication
+*   **Lucide React** for icons
 
-The application features a polished design with smooth animations, a dark mode, and a clear, step-by-step user flow to guide you from ingredients to a complete recipe. 🥄
+### Backend
+*   **Node.js** with Express.js framework
+*   **MongoDB** with Mongoose ODM
+*   **JWT** for authentication
+*   **Cloudinary** for image storage
+*   **Google Gemini API** for AI recipe generation
+*   **Cookie-based sessions** for secure auth
+
+## 🏗️ System Architecture
+
+### Overall System Architecture
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   FRONTEND      │    │    BACKEND      │    │   EXTERNAL      │
+│   (React +      │◄──►│  (Node.js +     │◄──►│   SERVICES      │
+│   Tailwind)     │    │   Express)      │    │                 │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         ▼                       ▼                       ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│  User Interface │    │   MongoDB       │    │ Google Gemini   │
+│  Components     │    │   Database      │    │ Cloudinary      │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+```
+
+### Database Models
+```
+USER MODEL:
+- _id, email, username, password (hashed)
+- avatar, fullName, bio, cookingLevel
+- dietaryPreferences: [vegan, gluten-free, keto, etc.]
+- allergies: [nuts, dairy, shellfish, etc.]
+- inventoryIngredient: [{ name, qty, expiryDate }]
+- savedRecipes, socialLinks, theme
+- followingCount, followersCount
+
+RECIPE MODEL:
+- _id, title, author → User
+- description, imageUrl, cookTime, servings
+- originalIngredients: [{ name, quantity, unit }]
+- adaptedIngredients: [{ name, quantity, unit, substitution }]
+- instructions: [{ step }], adaptationNotes
+- tags: [dietary-tags], nutrition, difficulty
+- visibility (public/draft/unlisted)
+- adaptations: [{ forDiet, changes }]
+
+AI CHAT MODEL:
+- _id, user → User, title
+- messages: [{ role: user/ai, content, recipeData }]
+- dietaryContext: user's restrictions and preferences
+- adaptationHistory: previous recipe modifications
+
+ACTIVITY FEED MODEL:
+- _id, author → User, content, images
+- type (recipe_post/cooking_story/adaptation_share)
+- originalRecipe → Recipe, adaptedRecipe → Recipe
+- dietaryTags: [vegan, keto, etc.]
+- likes: [{ user, createdAt }]
+- comments: [{ user, content, createdAt }]
+
+FOLLOW MODEL:
+- _id, follower → User, following → User
+- sharedDietaryInterests: [common dietary preferences]
+- followReason: dietary_match/recipe_interest/community
+```
+
+### Authentication Flow
+```
+1. USER LOGIN/SIGNUP:
+Client → Routes → Controller → Database → JWT Generation → Cookie Set
+
+2. PROTECTED ROUTES:
+Client → Middleware → JWT Verify → User Lookup → Controller → Response
+
+3. AI CHAT FLOW WITH STREAMING & RECIPE ADAPTATION:
+┌─────────────┐
+│ User Input  │ (ingredients + dietary restrictions)
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│ Validation  │ (sanitize, validate dietary preferences)
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│ Dietary     │ (load user's dietary profile)
+│ Context     │ (allergies, preferences, restrictions)
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│ Save User   │ (save user message with dietary context)
+│ Message     │
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│ AI Prompt   │ (construct prompt with dietary needs)
+│ Engineering │ (include adaptation requirements)
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│ Gemini API  │ (generate recipe + adaptations)
+│ Call        │ (stream: true for real-time)
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│ Stream      │ (real-time response chunks)
+│ Response    │ (with dietary adaptations)
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│ Parse &     │ (extract recipe + adaptation notes)
+│ Adapt       │ (identify substitutions made)
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│ Save        │ (save adapted recipe with notes)
+│ Adaptation  │ (track what was changed and why)
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│ Social      │ (option to share adaptation)
+│ Share       │ (post to community feed)
+└─────────────┘
+```
+
+### API Endpoints Structure
+```
+AUTHENTICATION:
+POST   /api/users/signup       → Register with dietary preferences
+POST   /api/users/signin       → Login user  
+POST   /api/users/logout       → Logout user
+
+RECIPES & ADAPTATIONS:
+GET    /api/recipes            → Get recipes filtered by dietary needs
+POST   /api/recipes            → Create new recipe
+GET    /api/recipes/:id        → Get recipe with adaptation options
+PUT    /api/recipes/:id/adapt  → Adapt recipe for dietary restrictions
+DELETE /api/recipes/:id        → Delete recipe
+
+AI CHAT & ADAPTATION:
+POST   /api/ai/chat            → Chat with dietary-aware AI
+POST   /api/ai/adapt-recipe    → Adapt existing recipe for diet
+GET    /api/ai/adaptation-history → Get user's adaptation history
+GET    /api/ai/dietary-suggestions → Get AI suggestions for diet
+
+SOCIAL FEATURES:
+GET    /api/feed               → Get personalized food feed
+POST   /api/feed               → Post cooking creation/recipe
+GET    /api/feed/dietary/:diet → Get feed filtered by diet type
+POST   /api/users/:id/follow   → Follow user with similar diet
+GET    /api/users/dietary-matches → Find users with similar restrictions
+
+USER MANAGEMENT:
+GET    /api/users/profile      → Get user profile with dietary info
+PUT    /api/users/dietary-preferences → Update dietary restrictions
+GET    /api/users/inventory    → Get ingredient inventory
+POST   /api/users/inventory    → Add inventory item with dietary tags
+GET    /api/users/recipe-adaptations → Get user's recipe adaptations
+``` **Live Demo:** [https://chef-assist-frontend.vercel.app/](https://chef-assist-frontend.vercel.app/)
+
+# ChefAssist - AI Recipe Generator & Food Lovers Community
+
+🔗 **Live Demo:** [https://chef-assist-frontend.vercel.app/](https://chef-assist-frontend.vercel.app/)
+
+ChefAssist is an intelligent recipe generation and adaptation platform that combines AI-powered cooking assistance with a vibrant social community for food lovers. Transform your available ingredients into personalized recipes while connecting with fellow cooking enthusiasts who share similar dietary restrictions and culinary preferences. 🌟
+
+Think of it as "Instagram for Food Lovers" - but with smart AI that understands your dietary needs, ingredient availability, and cooking preferences. Whether you're vegan, gluten-free, keto, or have specific allergies, ChefAssist adapts recipes to fit your lifestyle while connecting you with a community that shares your culinary journey. 🥄
 
 ## Features ✨
 
-ChefAssist is packed with features to assist you in creating dishes that are both healthy and tasty:
+### 🤖 AI-Powered Recipe Intelligence
+*   **Smart Recipe Generation**: AI creates recipes based on your available ingredients
+*   **Recipe Adaptation**: Automatically adapts any recipe to fit dietary restrictions (vegan, gluten-free, keto, allergen-free)
+*   **Preference Learning**: AI learns your taste preferences and cooking style over time
+*   **Ingredient Substitution**: Smart suggestions for ingredient replacements based on dietary needs
+*   **Interactive Chat**: Real-time conversation with AI for cooking tips and recipe modifications
 
-*   **Dynamic Recipe Creation🥗**: Instantly generates recipes based on the ingredients you have.
-*   **AI-Powered Chat Interface🤖**: Interactive chat with AI for recipe suggestions and cooking tips.
-*   **Dietary Personalization🌱**: Tailors recipes to your lifestyle, accommodating preferences like vegan, gluten-free, keto, and more.
-*   **User Authentication🔐**: Secure login/signup with JWT tokens and cookie-based sessions.
-*   **Recipe Management�**: Save, edit, and organize your favorite recipes.
-*   **Social Features�**: Follow other users, like recipes, and share culinary creations.
-*   **Inventory Management📦**: Track ingredients in your pantry for better meal planning.
-*   **Explore Global Cuisines🌍**: Discover new flavors and cooking techniques from around the world.
+### 📱 Social Food Community (Instagram-style)
+*   **Food Feed**: Share your cooking creations with beautiful photos and stories
+*   **Follow Food Lovers**: Connect with people who share your dietary preferences and restrictions
+*   **Recipe Sharing**: Post and discover recipes from community members with similar needs
+*   **Cooking Stories**: Share your cooking journey, tips, and dietary transformation stories
+*   **Like & Comment**: Engage with the community through likes, comments, and recipe reviews
+*   **Dietary Groups**: Join communities based on specific diets (Vegan, Keto, Gluten-Free, etc.)
+
+### 🎯 Personalized Experience
+*   **Dietary Profile**: Set up detailed dietary restrictions, allergies, and preferences
+*   **Smart Inventory**: Track your pantry ingredients with expiry date management
+*   **Meal Planning**: AI suggests weekly meal plans based on your dietary goals
+*   **Nutrition Tracking**: Monitor your nutritional intake aligned with your dietary restrictions
+*   **Cooking Level Adaptation**: Recipes adapted to your cooking experience level
+
+### 🌍 Global Cuisine with Dietary Adaptations
+*   **Cultural Recipes**: Explore global cuisines adapted to your dietary needs
+*   **Traditional to Modern**: AI adapts traditional recipes to modern dietary requirements
+*   **Regional Preferences**: Discover how different cultures approach your dietary restrictions
 
 ## Technology Stack �
 
@@ -285,14 +481,27 @@ The frontend will run on `http://localhost:3000`
 
 ## How It Works 🛠️
 
-Using ChefAssist is a simple process:
+ChefAssist combines AI recipe intelligence with social community features:
 
-1.  **Sign Up/Login🔐**: Create an account or log in to access personalized features.
-2.  **Navigate to AI Chat🤖**: Go to the `/ai` route to start chatting with the AI assistant.
-3.  **Enter Ingredients or Request📝**: Type the ingredients you have or ask for recipe suggestions.
-4.  **Specify Preferences⚙️**: Add any dietary restrictions, allergies, or cuisines you'd like to include or avoid.
-5.  **Generate Recipe🚀**: The AI processes your input and creates a unique, personalized recipe for you in moments.
-6.  **Save, Cook, or Share🍽️**: Save recipes to your profile, follow the cooking instructions, or share with the community.
+### 🤖 AI Recipe Generation & Adaptation:
+1.  **Input Your Ingredients�**: Tell the AI what ingredients you have available
+2.  **Set Dietary Preferences⚙️**: Specify restrictions (vegan, gluten-free, keto, allergies, etc.)
+3.  **AI Recipe Creation🚀**: Advanced AI generates personalized recipes that fit your needs
+4.  **Recipe Adaptation🔄**: AI automatically adapts existing recipes to match your dietary restrictions
+5.  **Save & Organize💾**: Save adapted recipes to your personal collection
+
+### 📱 Social Food Community:
+1.  **Create Food Posts�**: Share photos of your cooking creations with the community
+2.  **Connect with Food Lovers👥**: Follow users with similar dietary preferences and restrictions
+3.  **Discover Adapted Recipes🔍**: Browse recipes shared by people with your dietary needs
+4.  **Engage & Learn💬**: Like, comment, and learn from fellow food enthusiasts
+5.  **Join Dietary Communities🎯**: Connect with specific groups (Vegan, Keto, Gluten-Free, etc.)
+
+### 🎯 Personalization Engine:
+- **Learning Algorithm**: AI learns your preferences and improves suggestions over time
+- **Dietary Matching**: Connect with users who share your specific dietary requirements
+- **Smart Recommendations**: Get recipe and user suggestions based on your cooking behavior
+- **Adaptation History**: Track how recipes have been modified for your dietary needs
 
 ## Contributing
 

@@ -14,13 +14,8 @@ const SavedRecipes = ({ onViewRecipe }) => {
         const res = await api.get('/auth/savedRecipe');
         console.log('Full API response:', res.data);
         
-        // Handle both response formats (array or object with savedRecipes)
-        let savedRecipesData = [];
-        if (Array.isArray(res.data)) {
-          savedRecipesData = res.data;
-        } else if (res.data.savedRecipes && Array.isArray(res.data.savedRecipes)) {
-          savedRecipesData = res.data.savedRecipes;
-        }
+        // Handle the response format with savedRecipes array
+        const savedRecipesData = res.data.savedRecipes || [];
         
         console.log('Processed saved recipes:', savedRecipesData);
         setRecipes(savedRecipesData);
@@ -34,7 +29,7 @@ const SavedRecipes = ({ onViewRecipe }) => {
 
   // Handle recipe removal from the list
   const handleRemoveFromSaved = (recipeId) => {
-    setRecipes(prev => prev.filter(recipe => recipe.recipeId !== recipeId));
+    setRecipes(prev => prev.filter(recipe => (recipe._id || recipe.recipeId) !== recipeId));
   };
 
   const loadMoreRecipes = () => {
@@ -46,18 +41,18 @@ const SavedRecipes = ({ onViewRecipe }) => {
       {/* Header Banner */}
       <div className="relative overflow-hidden bg-gradient-to-br from-[#D97706] via-[#F59E0B] to-[#FED7AA] dark:from-gray-800 dark:via-gray-700 dark:to-gray-600 transition-colors duration-300">
         <div className="absolute inset-0 bg-opacity-10"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
-            <div className="flex justify-center items-center mb-6">
-              <ChefHat className="w-12 h-12 text-white dark:text-orange-400 mr-4" />
-              <h1 className="text-5xl font-bold text-white dark:text-orange-200">ChefAssist</h1>
+            <div className="flex justify-center items-center mb-4">
+              <ChefHat className="w-8 h-8 text-white dark:text-orange-400 mr-3" />
+              <h1 className="text-3xl font-bold text-white dark:text-orange-200">ChefAssist</h1>
             </div>
-            <h2 className="text-3xl font-semibold text-white dark:text-orange-200 mb-4">Your Saved Recipes</h2>
-            <p className="text-xl text-white dark:text-orange-100 opacity-90 max-w-2xl mx-auto">
-              Discover and revisit your favorite AI-generated recipes. From quick weeknight dinners to elaborate weekend feasts.
+            <h2 className="text-2xl font-semibold text-white dark:text-orange-200 mb-3">Your Saved Recipes</h2>
+            <p className="text-lg text-white dark:text-orange-100 opacity-90 max-w-2xl mx-auto">
+              Discover and revisit your favorite recipes with enhanced details including ratings, views, and author information.
             </p>
-            <div className="mt-8 flex justify-center">
-              <div className="bg-opacity-20 backdrop-blur-sm rounded-full px-6 py-3 bg-chef-orange-light dark:bg-gray-700/50"> {/* Added dark mode bg */}
+            <div className="mt-6 flex justify-center">
+              <div className="bg-opacity-20 backdrop-blur-sm rounded-full px-4 py-2 bg-chef-orange-light dark:bg-gray-700/50"> {/* Added dark mode bg */}
                 <span className="text-white dark:text-orange-200 font-medium">{recipes.length} Saved Recipes</span>
               </div>
             </div>
@@ -66,14 +61,14 @@ const SavedRecipes = ({ onViewRecipe }) => {
       
         {/* Decorative elements */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
-          <div className="absolute -top-16 -right-16 w-32 h-32 bg-white bg-opacity-10 rounded-full"></div>
-          <div className="absolute top-1/2 -left-8 w-24 h-24 bg-white bg-opacity-10 rounded-full"></div>
-          <div className="absolute bottom-0 right-1/4 w-20 h-20 bg-white bg-opacity-10 rounded-full"></div>
+          <div className="absolute -top-8 -right-8 w-16 h-16 bg-white bg-opacity-10 rounded-full"></div>
+          <div className="absolute top-1/2 -left-4 w-12 h-12 bg-white bg-opacity-10 rounded-full"></div>
+          <div className="absolute bottom-0 right-1/4 w-10 h-10 bg-white bg-opacity-10 rounded-full"></div>
         </div>
       </div>
 
       {/* Recipe Cards Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {recipes.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-gray-500 dark:text-gray-400 text-lg">
@@ -86,16 +81,19 @@ const SavedRecipes = ({ onViewRecipe }) => {
               console.log('Rendering recipe:', recipe); // Debug log
               return (
                 <RecipeCard2
-                  key={recipe.recipeId || recipe._id}
+                  key={recipe._id || recipe.recipeId}
                   recipe={{
-                    _id: recipe.recipeId,
+                    _id: recipe._id || recipe.recipeId,
                     title: recipe.title,
-                    imageUrl: recipe.imageUrl || recipe.image,
+                    imageUrl: recipe.imageUrl,
+                    image: recipe.imageUrl, // For backward compatibility
                     author: recipe.author,
                     rating: recipe.rating,
                     cookTime: recipe.cookTime,
                     views: recipe.views,
-                    reviews: recipe.reviews
+                    reviews: recipe.reviews,
+                    tags: recipe.tags,
+                    servings: recipe.servings
                   }}
                   initialSaved={true}
                   onRemoveFromSaved={handleRemoveFromSaved}

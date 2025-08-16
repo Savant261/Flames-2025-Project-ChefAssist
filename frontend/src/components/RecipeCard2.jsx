@@ -164,7 +164,7 @@ Please adapt this recipe based on my dietary preferences and restrictions. You c
           onClick={handleSaveRecipe}
           disabled={isLoading}
           className={`absolute top-2 left-2 p-2 rounded-full backdrop-blur-sm transition-all duration-200 ${
-            isHovered || isSaved ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+            isHovered || isSaved ? 'opacity-100' : 'opacity-100 md:opacity-0 md:group-hover:opacity-100'
           } ${
             isSaved 
               ? 'bg-[var(--color-chef-peach)]/90 text-white' 
@@ -219,7 +219,7 @@ Please adapt this recipe based on my dietary preferences and restrictions. You c
           {/* AI Adapt button positioned at the end of author section */}
           <button
             onClick={handleAdaptRecipe}
-            className="opacity-0 group-hover:opacity-100 px-2 py-1 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 hover:from-purple-100 hover:to-indigo-100 dark:hover:from-purple-800/30 dark:hover:to-indigo-800/30 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 rounded-md transition-all duration-200 text-xs font-medium flex items-center gap-1"
+            className="opacity-100 md:opacity-0 md:group-hover:opacity-100 px-2 py-1 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 hover:from-purple-100 hover:to-indigo-100 dark:hover:from-purple-800/30 dark:hover:to-indigo-800/30 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 rounded-md transition-all duration-200 text-xs font-medium flex items-center gap-1"
             title="Adapt recipe with AI"
           >
             <Sparkles className="w-3 h-3" />
