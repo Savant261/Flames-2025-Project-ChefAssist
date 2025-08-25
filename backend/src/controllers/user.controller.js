@@ -92,10 +92,21 @@ const logout = async (req, res) => {
 
 const chechAuth = async (req, res) => {
   try {
+    console.log("🔍 CheckAuth - Cookies received:", req.cookies ? Object.keys(req.cookies) : "No cookies");
+    console.log("🔍 CheckAuth - JWT cookie:", req.cookies?.jwt ? "Present" : "Missing");
+    console.log("🔍 CheckAuth - req.user:", req.user ? "User found" : "No user in request");
+    console.log("🔍 CheckAuth - Headers:", req.headers.cookie ? "Cookie header present" : "No cookie header");
+    
+    if (!req.user) {
+      console.log("❌ CheckAuth - No user found, authentication failed");
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+    
+    console.log("✅ CheckAuth - User authenticated:", req.user._id);
     return res.status(200).json(req.user);
   } catch (error) {
     console.log("Error in checkAuth controller", error.message);
-    return res.status(200).json({ message: "Internal Server Error" });
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
