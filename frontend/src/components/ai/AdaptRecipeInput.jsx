@@ -6,7 +6,6 @@ const AdaptRecipeInput = ({
   recipeId, // Add recipeId prop
   setRecipeId // Add setRecipeId prop
 }) => {
-  console.log('AdaptRecipeInput props:', { recipeId, originalRecipe, hasRecipeId: !!recipeId });
   
   // If we have a recipe ID, show a simpler read-only display
   if (recipeId) {

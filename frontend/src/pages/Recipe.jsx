@@ -100,32 +100,42 @@ const ViewRecipe = ({ recipe, onBack, navigate }) => {
     try {
       // Set follower count from recipe data first
       const initialFollowerCount = recipe?.author?.followers || recipe?.author?.followersCount || 0;
-      console.log('Recipe author data:', recipe?.author);
-      console.log('Initial follower count:', initialFollowerCount);
       setFollowerCount(initialFollowerCount);
       
-      // Initialize like status and count
-      if (recipe?.id) {
-        const likeStatus = await recipeService.checkLikeStatus(recipe.id);
-        setIsLiked(likeStatus.isLiked);
-        setLikeCount(likeStatus.likeCount);
+      // Initialize like status and count - check if user is logged in
+      const userId = userData?._id || userData?.id;
+      if (recipe?.id && userId) {
+        try {
+          const likeStatus = await recipeService.checkLikeStatus(recipe.id);
+          setIsLiked(likeStatus.isLiked);
+          setLikeCount(likeStatus.likeCount || recipe?.likes || 0);
+        } catch (likeError) {
+          // Fallback to recipe data
+          setLikeCount(recipe?.likes || 0);
+          setIsLiked(false);
+        }
+      } else {
+        // If no recipe ID or user not logged in, use default values
+        setLikeCount(recipe?.likes || 0);
+        setIsLiked(false);
       }
       
-      // Initialize follow status if author exists
-      if (recipe?.author?.id || recipe?.author?._id) {
+      // Initialize follow status if author exists and user is logged in
+      if ((recipe?.author?.id || recipe?.author?._id) && userId) {
         const authorId = recipe.author.id || recipe.author._id;
         try {
           const followStatus = await followService.getFollowStatus(authorId);
-          console.log('Follow status response:', followStatus);
           setIsFollowing(followStatus.isFollowing);
           // Update follower count from API if available
           if (followStatus.followerCount !== undefined) {
-            console.log('Updating follower count from API:', followStatus.followerCount);
             setFollowerCount(followStatus.followerCount);
           }
         } catch (error) {
-          console.log('Follow status not available:', error);
+          console.error('Follow status not available:', error);
+          setIsFollowing(false);
         }
+      } else {
+        setIsFollowing(false);
       }
       
       // Set default rating for comment form
@@ -166,13 +176,35 @@ const ViewRecipe = ({ recipe, onBack, navigate }) => {
 
   // Handle like/unlike recipe
   const handleToggleLike = async () => {
+    // Store previous state for potential rollback
+    let previousLiked = isLiked;
+    let previousCount = likeCount;
+    
     try {
       if (!recipe?.id) {
         toast.error('Recipe not available');
         return;
       }
 
+      // Check if user is authenticated
+      if (!userData?._id) {
+        toast.error('Please login to like recipes');
+        return;
+      }
+      
+      // Prevent multiple simultaneous requests
+      if (handleToggleLike.isProcessing) {
+        return;
+      }
+      handleToggleLike.isProcessing = true;
+      
+      // Optimistic update
+      setIsLiked(!isLiked);
+      setLikeCount(!isLiked ? likeCount + 1 : Math.max(0, likeCount - 1));
+
       const result = await recipeService.toggleLike(recipe.id);
+      
+      // Update with actual server response
       setIsLiked(result.isLiked);
       setLikeCount(result.likeCount);
       
@@ -183,7 +215,14 @@ const ViewRecipe = ({ recipe, onBack, navigate }) => {
       
     } catch (error) {
       console.error('Error toggling like:', error);
-      toast.error('Failed to update like status');
+      
+      // Revert optimistic update on error
+      setIsLiked(previousLiked);
+      setLikeCount(previousCount);
+      toast.error('Failed to update like status. Please try again.');
+    } finally {
+      // Reset the processing flag
+      handleToggleLike.isProcessing = false;
     }
   };
 
@@ -1225,7 +1264,7 @@ const Recipe = () => {
     );
   }
 
-  return <ViewRecipe recipe={recipe} onBack={handleBack} navigate={navigate} />;
+  return <ViewRecipe recipeId={recipeId} recipe={recipe} onBack={handleBack} navigate={navigate} />;
 };
 
 export default Recipe;

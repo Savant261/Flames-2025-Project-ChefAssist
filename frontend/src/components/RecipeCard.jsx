@@ -11,8 +11,6 @@ const RecipeCard = ({ recipe, isMyRecipe = false }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [checkedSaveStatus, setCheckedSaveStatus] = useState(false);
   
-  // console.log(recipe)
-
   // Check if recipe is already saved when component mounts
   useEffect(() => {
     const checkIfSaved = async () => {

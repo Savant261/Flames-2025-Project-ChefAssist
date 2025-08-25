@@ -53,7 +53,7 @@ const Signin = ({ setSigninPopUp, what, setWhat }) => {
       // UserContext will handle the redirect to /explore
     } catch (error) {
       toast.error(error?.response?.data?.message || error?.message || "Login failed. Please try again.");
-      console.log("Error in submitLogin", error);
+      console.error("Error in submitLogin", error);
     }
   };
   
@@ -95,12 +95,9 @@ const Signin = ({ setSigninPopUp, what, setWhat }) => {
       // UserContext will handle the redirect to /explore
     } catch (error) {
       toast.error(error?.response?.data?.message || error?.message || "Registration failed. Please try again.");
-      console.log("Error in submitSignup", error);
+      console.error("Error in submitSignup", error);
     }
   };
-  // useEffect(() => {
-  //   console.log(loginData, signupData);
-  // }, [loginData, signupData]);
   return (
     <div
       id="auth-modal"

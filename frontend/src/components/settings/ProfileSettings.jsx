@@ -146,14 +146,12 @@ const ProfileSettings = () => {
       toast.success(response.message || "Profile updated successfully!");
     } catch (error) {
       toast.error(error.message || "Something went wrong");
-      console.log("Error in submit Profile", error);
+      console.error("Error in submit Profile", error);
     }
   };
 
   // Remove the old useEffect that fetched profile data since we're using global store
   useEffect(() => {
-    console.log('ProfileSettings - Current profileData:', profileData);
-    console.log('ProfileSettings - Current userData:', userData);
   }, [profileData, userData]);
   return (
     <div className="space-y-8">

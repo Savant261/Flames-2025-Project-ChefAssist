@@ -178,8 +178,10 @@ const getRecipe = async (req, res) => {
     if (!recipe) return res.status(404).json({ message: "Recipe not found" });
     
     // Update view count
+    console.log(`Incrementing view count for recipe ${recipeId}. Current views: ${recipe.views}`);
     recipe.views += 1;
     await recipe.save();
+    console.log(`View count updated to: ${recipe.views}`);
     
     // Get comment count and calculate rating if not set
     const commentCount = await Comment.countDocuments({ recipe: recipeId });
@@ -757,51 +759,57 @@ const getComments = async (req, res) => {
   }
 };
 
-// Toggle recipe like
+// Toggle recipe like (SIMPLIFIED VERSION)
 const toggleLike = async (req, res) => {
   try {
     const { recipeId } = req.params;
     const userId = req.user._id;
 
+    console.log('🚀 SIMPLE toggleLike called:', { recipeId, userId });
+
+    // Find the recipe
     const recipe = await Recipe.findById(recipeId);
     if (!recipe) {
       return res.status(404).json({ message: "Recipe not found" });
     }
 
-    const existingLike = await Like.findOne({ 
+    // Use correct field names that match database index: userId and recipeId
+    const deleteResult = await Like.deleteOne({ 
       userId: userId, 
       recipeId: recipeId 
     });
 
-    if (existingLike) {
-      // Unlike
-      await Like.findByIdAndDelete(existingLike._id);
+    if (deleteResult.deletedCount > 0) {
+      // Unlike: like was deleted
       recipe.likes = Math.max(0, recipe.likes - 1);
       await recipe.save();
-
+      
       return res.status(200).json({
         message: "Recipe unliked",
         isLiked: false,
         likeCount: recipe.likes
       });
     } else {
-      // Like
+      // Like: create new like
       await Like.create({
         userId: userId,
         recipeId: recipeId
       });
       recipe.likes += 1;
       await recipe.save();
-
+      
       return res.status(200).json({
         message: "Recipe liked",
         isLiked: true,
         likeCount: recipe.likes
       });
     }
+    
   } catch (error) {
-    console.log("Error in toggleLike controller", error);
-    return res.status(500).json({ message: "Internal Server Error" });
+    console.log("Error in toggleLike:", error);
+    return res.status(500).json({ 
+      message: "Failed to toggle like"
+    });
   }
 };
 
@@ -822,7 +830,7 @@ const checkLikeStatus = async (req, res) => {
     });
 
     return res.status(200).json({
-      isLiked: !!existingLike,
+      isLiked: !!existingLike,  // ✅ FIXED: Convert to boolean correctly
       likeCount: recipe.likes
     });
   } catch (error) {

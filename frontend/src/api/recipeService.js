@@ -165,6 +165,16 @@ export const recipeService = {
     }
   },
 
+  // Save/Unsave recipe
+  toggleSave: async (recipeId) => {
+    try {
+      const response = await axiosInstance.put('/auth/savedRecipe/toggle', { recipeId });
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to toggle save');
+    }
+  },
+
   // Check like status
   checkLikeStatus: async (recipeId) => {
     try {

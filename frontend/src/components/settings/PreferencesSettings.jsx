@@ -108,7 +108,7 @@ const PreferencesSettings = () => {
       toast.success(response.message || "Preferences updated successfully!");
     } catch (error) {
       toast.error(error.message || "Something went wrong while saving.");
-      console.log("Error in submit Preference", error);
+      console.error("Error in submit Preference", error);
     }
   };
 

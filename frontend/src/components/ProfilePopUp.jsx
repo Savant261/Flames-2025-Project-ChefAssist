@@ -14,16 +14,15 @@ const profilePopUp = ({ theme, setTheme }) => {
             contextLogout(); // Use context logout
             navigate('/');
         } catch (error) {
-            console.log("Error in Logout function",error)
+            console.error("Error in Logout function",error)
         }
     };
     const toogletheme = async ()=>{
         setTheme(theme === 'light' ? 'dark' : 'light')
         try {
             const response = await api.get("/auth/toogle-theme");
-            console.log(response.data);
         } catch (error) {
-            console.log("Error in updateBackend in useEffect for updating them in backend",error);
+            console.error("Error in updateBackend in useEffect for updating them in backend",error);
     }}
     const MenuItem = ({ to, icon: Icon, children }) => (
         <Link to={to} className="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-white rounded-md hover:bg-[#FFDAB9] dark:hover:bg-gray-700">

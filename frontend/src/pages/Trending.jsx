@@ -51,7 +51,6 @@ const Trending = () => {
       try {
         const res = await api.get('/recipes/trending');
         setTrendingData(res.data);
-        // console.log(res)
       } catch (err) {
         setError('Failed to load trending recipes');
       } finally {

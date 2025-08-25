@@ -58,13 +58,10 @@ const Inventory = ({ sampleRecipes }) => {
   const ingredientHandler = (e) => {
     const name = e.target.name;
     const value = e.target.value;
-    console.log(name, value);
-    console.log(addIngredient);
     setAddIngredient((prev) => ({ ...prev, [name]: value }));
   };
   const deleteIngredientFunction = async (id) => {
     try {
-      console.log("delete ", id);
       await userService.deleteInventoryItem(id);
       
       // Update local state

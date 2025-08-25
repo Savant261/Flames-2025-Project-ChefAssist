@@ -31,15 +31,12 @@ const Search = () => {
     setError(null);
     
     try {
-      console.log('Performing search with:', { searchQuery, searchFilters, page });
       const response = await recipeService.searchRecipes({
         q: searchQuery,
         ...searchFilters,
         page,
         limit: 12
       });
-      
-      console.log('Search response:', response);
       
       if (page === 1) {
         setRecipes(response.recipes);

@@ -12,12 +12,10 @@ const SavedRecipes = ({ onViewRecipe }) => {
     const fetchSavedRecipes = async () => {
       try {
         const res = await api.get('/auth/savedRecipe');
-        console.log('Full API response:', res.data);
         
         // Handle the response format with savedRecipes array
         const savedRecipesData = res.data.savedRecipes || [];
         
-        console.log('Processed saved recipes:', savedRecipesData);
         setRecipes(savedRecipesData);
       } catch (error) {
         console.error('Failed to load saved recipes:', error);
@@ -78,7 +76,6 @@ const SavedRecipes = ({ onViewRecipe }) => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {recipes.slice(0, visibleRecipes).map((recipe) => {
-              console.log('Rendering recipe:', recipe); // Debug log
               return (
                 <RecipeCard2
                   key={recipe._id || recipe.recipeId}

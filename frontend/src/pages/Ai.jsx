@@ -101,7 +101,6 @@ const Ai = () => {
       
       // Get dietary preferences from the backend using the new endpoint
       const dietaryData = await aiService.getUserDietaryPreferences();
-      console.log("Dietary preferences fetched:", dietaryData);
       setUserDietaryPreferences(dietaryData.dietaryPreferences || []);
 
       const ingredientNames = inventoryData.ingredients
@@ -253,9 +252,6 @@ const Ai = () => {
         try {
           const { recipeId, recipeTitle, prompt } = JSON.parse(adaptData);
           
-          console.log('Retrieved adapt data from sessionStorage:', { recipeId, recipeTitle });
-          console.log('Setting selectedMode to adapt and recipeId to:', recipeId);
-          
           // Set the mode to adapt
           setSelectedMode('adapt');
           
@@ -380,7 +376,6 @@ const Ai = () => {
       // Update local state
       setUserDietaryPreferences(restrictionLabels);
       
-      console.log("Dietary preferences updated:", restrictionLabels);
     } catch (error) {
       console.error("Failed to update dietary preferences:", error);
       // Revert UI change on error
@@ -872,12 +867,6 @@ const Ai = () => {
 
       } else if (selectedMode === "adapt") {
         // For "adapt" mode, use streaming
-        console.log("=== ADAPT RECIPE DEBUG START ===");
-        console.log("originalRecipe at start of adapt mode:", originalRecipe);
-        console.log("typeof originalRecipe:", typeof originalRecipe);
-        console.log("userInput:", userInput);
-        console.log("=== ADAPT RECIPE DEBUG END ===");
-        
         setIsStreaming(true);
         
         // Initialize the streaming formatter
@@ -890,13 +879,10 @@ const Ai = () => {
           return;
         }
 
-        console.log("Adaptation data:", { recipeId, originalRecipe, hasRecipeId: !!recipeId });
-
         // Ensure we have a chat to work with
         let currentChatId = chatId;
         if (!currentChatId) {
           try {
-            console.log("Creating new chat for recipe adaptation");
             const newChat = await createNewChat(userInput);
             currentChatId = newChat._id;
             setCurrentChat(newChat);
@@ -911,8 +897,6 @@ const Ai = () => {
           }
         }
 
-        console.log("Starting recipe adaptation with chat ID:", currentChatId);
-        
         // Add user message to activeChats immediately for display
         const userChatEntry = {
           input: userInput,
@@ -945,14 +929,6 @@ const Ai = () => {
         setMessages(prev => [...prev, aiMessage]);
 
         try {
-          console.log("Starting adapt recipe stream with:", {
-            chatId: currentChatId,
-            recipeId: recipeId,
-            originalRecipeTitle: originalRecipe.title,
-            adaptationRequest: userInput
-          });
-          
-          console.log("Current state:", { originalRecipe, recipeId });
           
           await aiService.adaptExistingRecipeStream(
             currentChatId,
@@ -961,7 +937,6 @@ const Ai = () => {
             recipeId, // Pass recipeId as 4th parameter
             // onChunk callback
             (chunkData) => {
-              console.log("Received adapt recipe chunk:", chunkData);
               if (chunkData.chunk) {
                 // Use the new streaming formatter for real-time formatting
                 const formatted = processStreamingChunk(chunkData.chunk);
@@ -984,7 +959,6 @@ const Ai = () => {
             },
             // onComplete callback
             (completeData) => {
-              console.log("Adapt recipe stream completed:", completeData);
               setIsStreaming(false);
               
               // Get final formatted output from the formatter
@@ -1001,8 +975,6 @@ const Ai = () => {
               if (!formattedOutput) {
                 formattedOutput = completeData.fullText || "Recipe adaptation completed successfully!";
               }
-
-              console.log("Final formatted output:", formattedOutput.substring(0, 100) + "...");
 
               // Update the final AI message
               setMessages(prev => prev.map(msg => 

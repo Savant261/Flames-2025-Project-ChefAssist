@@ -11,19 +11,9 @@ const instance = axios.create({
   },
 });
 
-console.log('🌐 API Base URL:', import.meta.env.VITE_API_BASE_URL);
-
 // Add request interceptor for debugging
 instance.interceptors.request.use(
   (config) => {
-    console.log('🚀 API Request:', {
-      method: config.method.toUpperCase(),
-      url: config.url,
-      baseURL: config.baseURL,
-      fullURL: `${config.baseURL}${config.url}`,
-      data: config.data,
-      headers: config.headers
-    });
     return config;
   },
   (error) => {
@@ -35,11 +25,6 @@ instance.interceptors.request.use(
 // Add response interceptor for debugging
 instance.interceptors.response.use(
   (response) => {
-    console.log('✅ API Response:', {
-      status: response.status,
-      url: response.config.url,
-      data: response.data
-    });
     return response;
   },
   (error) => {

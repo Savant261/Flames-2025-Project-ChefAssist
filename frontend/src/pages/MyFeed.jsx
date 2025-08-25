@@ -1,1494 +1,391 @@
 import React, { useState, useEffect } from 'react';
 import { Heart, MessageCircle, Bookmark, Clock, Users, Star, ChefHat, TrendingUp, Play, Activity, Grid3X3, Filter } from 'lucide-react';
-
-// Mock data for chefs (added 2 more chefs)
-const mockChefs = [
-  {
-    id: 1,
-    name: 'Gordon Ramsay',
-    avatar: 'https://turkeyanaclinic.com/wp-content/uploads/2024/09/Gordon-Ramsay-2.jpg',
-    followers: '2.1M',
-    recipes: 156,
-    isActive: false
-  },
-  {
-    id: 2,
-    name: 'Julia Child',
-    avatar: 'https://www.southernliving.com/thmb/DmDECxT3WZsQ_KeGwDlaqmKjYik=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/image-2-20caed10bab24db3ba1b579c268c4625.jpg',
-    followers: '890K',
-    recipes: 89,
-    isActive: false
-  },
-  {
-    id: 3,
-    name: 'Marco Pierre',
-    avatar: 'https://onecms-res.cloudinary.com/image/upload/s--rp8wt59F--/f_auto,q_auto/c_fill,g_auto,h_622,w_830/v1/tdy-migration/mpc.jpg?itok=djPNzBA6',
-    followers: '1.5M',
-    recipes: 203,
-    isActive: false
-  },
-  {
-    id: 4,
-    name: 'Ina Garten',
-    avatar: 'https://www.sheknows.com/wp-content/uploads/2024/04/ina-garten.jpg',
-    followers: '750K',
-    recipes: 67,
-    isActive: false
-  },
-  {
-    id: 5,
-    name: 'Anthony Bourdain',
-    avatar: 'https://images.deepai.org/chat-style-image/a1e9406638f044ecb46b761f6470d7c5/output.jpg',
-    followers: '3.2M',
-    recipes: 245,
-    isActive: false
-  },
-  {
-    id: 6,
-    name: 'Ranveer Brar',
-    avatar: 'https://tse4.mm.bing.net/th/id/OIP.PSzO_55vct7nPBJV0MmeqQHaFv?r=0&rs=1&pid=ImgDetMain&o=7&rm=3',
-    followers: '850K',
-    recipes: 145,
-    isActive: false
-  },
-  {
-    id: 7,
-    name: 'Jamie Oliver',
-    avatar: 'https://cdn.britannica.com/20/200220-050-394A5A7C/Jamie-Oliver-2016.jpg',
-    followers: '1.8M',
-    recipes: 178,
-    isActive: false
-  },
-  {
-    id: 8,
-    name: 'Ritu Dalmia',
-    avatar: 'https://uaerg.ae/wp-content/uploads/2023/06/XN446MMJG5A27F3QS4UPZ6XYME.jpeg',
-    followers: '680K',
-    recipes: 123,
-    isActive: false
-  },
-  {
-    id: 9,
-    name: 'Anahita Dhondy',
-    avatar: 'https://i1.wp.com/www.smartfood.org/wp-content/uploads/2019/09/Anahita-resized-lowres.jpg?fit=1805%2C2215&ssl=1',
-    followers: '420K',
-    recipes: 98,
-    isActive: false
-  }
-];
-
-// Extended mock data for recipes (30+ items)
-const mockRecipes = [
-  {
-    id: 1,
-    type: 'recipe',
-    chef: mockChefs[0],
-    title: 'Perfect Beef Wellington',
-    image: 'https://i.pinimg.com/originals/13/ad/c9/13adc9200e47b425ad80a426ecb2bfab.jpg',
-    cookingTime: '2h 30m',
-    difficulty: 'Expert',
-    likes: 1847,
-    comments: 134,
-    timeAgo: '2 hours ago',
-    description: 'Master the art of creating the perfect Beef Wellington with this detailed recipe.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 2,
-    type: 'recipe',
-    chef: mockChefs[1],
-    title: 'Classic French Onion Soup',
-    image: 'https://cdn.apartmenttherapy.info/image/upload/f_auto,q_auto:eco,c_fill,g_center,w_730,h_487/k%2FPhoto%2FSeries%2F2020-01-Battle-French-Onion-Soup%2FFrenchOnion-lead-Julia',
-    cookingTime: '1h 15m',
-    difficulty: 'Intermediate',
-    likes: 892,
-    comments: 67,
-    timeAgo: '4 hours ago',
-    description: 'Traditional French onion soup with caramelized onions and gruyere cheese.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 3,
-    type: 'recipe',
-    chef: mockChefs[2],
-    title: 'Truffle Risotto Masterclass',
-    image: 'https://as2.ftcdn.net/v2/jpg/05/97/64/07/1000_F_597640799_wb9xaLTso2HRjijCJscrzGB09kTzFq5E.jpg',
-    cookingTime: '45m',
-    difficulty: 'Intermediate',
-    likes: 2156,
-    comments: 189,
-    timeAgo: '6 hours ago',
-    description: 'Learn the traditional technique for creating creamy, luxurious truffle risotto.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 4,
-    type: 'recipe',
-    chef: mockChefs[3],
-    title: 'Lemon Bars with Shortbread Crust',
-    image: 'https://woorecipe.com/wp-content/uploads/Homemade-lemon-bars-with-shortbread-crust.webp',
-    cookingTime: '1h 15m',
-    difficulty: 'Beginner',
-    likes: 934,
-    comments: 78,
-    timeAgo: '8 hours ago',
-    description: 'These tangy lemon bars with buttery shortbread crust are perfect for any occasion.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 5,
-    type: 'recipe',
-    chef: mockChefs[0],
-    title: 'Hell\'s Kitchen Signature Burger',
-    image: 'https://images.pexels.com/photos/1639562/pexels-photo-1639562.jpeg?auto=compress&cs=tinysrgb&w=800',
-    cookingTime: '30m',
-    difficulty: 'Intermediate',
-    likes: 3421,
-    comments: 267,
-    timeAgo: '1 day ago',
-    description: 'The ultimate burger recipe straight from Hell\'s Kitchen with hand-cut fries.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 6,
-    type: 'recipe',
-    chef: mockChefs[5],
-    title: 'Ranveer\'s Butter Chicken',
-    image: 'https://i.ytimg.com/vi/b7yuoRk227Y/maxresdefault.jpg',
-    cookingTime: '1h 30m',
-    difficulty: 'Intermediate',
-    likes: 2156,
-    comments: 156,
-    timeAgo: '1 day ago',
-    description: 'Rich and creamy butter chicken with aromatic Indian spices and tender chicken.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 7,
-    type: 'recipe',
-    chef: mockChefs[6],
-    title: 'Jamie\'s 15-Minute Pasta',
-    image: 'https://hdclump.com/wp-content/uploads/2019/02/Gnarly-peanut-chicken-1-800x450.jpg',
-    cookingTime: '15m',
-    difficulty: 'Beginner',
-    likes: 2890,
-    comments: 234,
-    timeAgo: '2 days ago',
-    description: 'Quick and delicious pasta that\'s perfect for busy weeknights.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 8,
-    type: 'recipe',
-    chef: mockChefs[7],
-    title: 'Ritu\'s Dal Makhani',
-    image: 'https://tse1.mm.bing.net/th/id/OIP.-Elx3DEYHlIHpSqv0f71yQHaDy?r=0&rs=1&pid=ImgDetMain&o=7&rm=3',
-    cookingTime: '2h',
-    difficulty: 'Beginner',
-    likes: 1890,
-    comments: 123,
-    timeAgo: '2 days ago',
-    description: 'Creamy black lentils slow-cooked with butter and aromatic spices.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 9,
-    type: 'recipe',
-    chef: mockChefs[1],
-    title: 'Coq au Vin Traditional',
-    image: 'https://leitesculinaria.com/wp-content/uploads/2022/09/julia-child-coq-au-vin-fp.jpg',
-    cookingTime: '2h',
-    difficulty: 'Expert',
-    likes: 1234,
-    comments: 89,
-    timeAgo: '3 days ago',
-    description: 'Classic French chicken braised in wine with vegetables.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 10,
-    type: 'recipe',
-    chef: mockChefs[2],
-    title: 'Pan-Seared Duck Breast',
-    image: 'https://images.squarespace-cdn.com/content/v1/5d9f817421aaa8460feade5f/ddc48964-ce51-4245-af0a-ab0856248617/20230117_164424.jpg',
-    cookingTime: '45m',
-    difficulty: 'Expert',
-    likes: 1876,
-    comments: 145,
-    timeAgo: '3 days ago',
-    description: 'Perfectly cooked duck breast with crispy skin and cherry sauce.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 11,
-    type: 'recipe',
-    chef: mockChefs[3],
-    title: 'Barefoot Contessa Roast Chicken',
-    image: 'https://images.pexels.com/photos/2338407/pexels-photo-2338407.jpeg?auto=compress&cs=tinysrgb&w=800',
-    cookingTime: '1h 30m',
-    difficulty: 'Intermediate',
-    likes: 2345,
-    comments: 178,
-    timeAgo: '4 days ago',
-    description: 'Simple yet elegant roast chicken with herbs and lemon.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 12,
-    type: 'recipe',
-    chef: mockChefs[4],
-    title: 'No Reservations Ramen',
-    image: 'https://images.pexels.com/photos/884600/pexels-photo-884600.jpeg?auto=compress&cs=tinysrgb&w=800',
-    cookingTime: '3h',
-    difficulty: 'Expert',
-    likes: 3456,
-    comments: 289,
-    timeAgo: '4 days ago',
-    description: 'Authentic tonkotsu ramen with rich, creamy broth.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 13,
-    type: 'recipe',
-    chef: mockChefs[5],
-    title: 'Ranveer\'s Biryani Masterclass',
-    image: 'https://curlytales.com/wp-content/uploads/2023/03/Untitled-design-2023-03-23T120056.376-1170x658.jpg',
-    cookingTime: '2h 30m',
-    difficulty: 'Intermediate',
-    likes: 2987,
-    comments: 156,
-    timeAgo: '5 days ago',
-    description: 'Authentic Hyderabadi biryani with fragrant basmati rice and tender mutton.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 14,
-    type: 'recipe',
-    chef: mockChefs[6],
-    title: 'Jamie\'s Fish and Chips',
-    image: 'https://i.ytimg.com/vi/BJ6UktxbcGc/maxresdefault.jpg',
-    cookingTime: '1h',
-    difficulty: 'Intermediate',
-    likes: 2678,
-    comments: 201,
-    timeAgo: '5 days ago',
-    description: 'Crispy beer-battered fish with perfect chips.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 15,
-    type: 'recipe',
-    chef: mockChefs[7],
-    title: 'Ritu\'s Goan Fish Curry',
-    image: 'https://i.ytimg.com/vi/rg1RYPpv7tU/maxresdefault.jpg',
-    cookingTime: '40m',
-    difficulty: 'Intermediate',
-    likes: 1689,
-    comments: 134,
-    timeAgo: '6 days ago',
-    description: 'Tangy and spicy Goan fish curry with coconut milk and kokum.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 16,
-    type: 'recipe',
-    chef: mockChefs[0],
-    title: 'Gordon\'s Scrambled Eggs',
-    image: 'https://pixel.nymag.com/imgs/daily/grub/2017/08/03/03-gordon-ramsay-scrambled-eggs.jpg',
-    cookingTime: '10m',
-    difficulty: 'Beginner',
-    likes: 4567,
-    comments: 345,
-    timeAgo: '1 week ago',
-    description: 'The secret to perfect, creamy scrambled eggs.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 17,
-    type: 'recipe',
-    chef: mockChefs[1],
-    title: 'Julia\'s Beef Bourguignon',
-    image: 'https://www.savingdessert.com/wp-content/uploads/2012/02/Julia-Childs-Beef-Bourguignon-10-800x533.jpg',
-    cookingTime: '3h',
-    difficulty: 'Expert',
-    likes: 2890,
-    comments: 234,
-    timeAgo: '1 week ago',
-    description: 'The classic French beef stew that made Julia famous.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 18,
-    type: 'recipe',
-    chef: mockChefs[2],
-    title: 'Marco\'s Perfect Risotto',
-    image: 'https://www.diningandcooking.com/wp-content/uploads/2024/08/1723236064_maxresdefault.jpg',
-    cookingTime: '30m',
-    difficulty: 'Intermediate',
-    likes: 1678,
-    comments: 123,
-    timeAgo: '1 week ago',
-    description: 'Learn the technique for perfect risotto every time.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 19,
-    type: 'recipe',
-    chef: mockChefs[3],
-    title: 'Ina\'s Chocolate Cake',
-    image: 'https://www.tasteofhome.com/wp-content/uploads/2018/11/Ina-Garten_Cake-800x450.jpeg',
-    cookingTime: '2h',
-    difficulty: 'Intermediate',
-    likes: 3456,
-    comments: 278,
-    timeAgo: '1 week ago',
-    description: 'Rich, moist chocolate cake with buttercream frosting.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 20,
-    type: 'recipe',
-    chef: mockChefs[4],
-    title: 'Anthony\'s Pho Bo',
-    image: 'https://vietnam.travel/sites/default/files/styles/top_banner/public/2019-04/vietnamese%20food%20anthony%20bourdain-1.jpg?itok=HlJDKO0U',
-    cookingTime: '4h',
-    difficulty: 'Expert',
-    likes: 2345,
-    comments: 189,
-    timeAgo: '1 week ago',
-    description: 'Authentic Vietnamese beef pho with aromatic broth.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 21,
-    type: 'recipe',
-    chef: mockChefs[5],
-    title: 'Ranveer\'s Tandoori Chicken',
-    image: 'https://i.pinimg.com/originals/57/9d/7b/579d7bb7c351c752d584bfb1f0036b86.jpg',
-    cookingTime: '4h',
-    difficulty: 'Intermediate',
-    likes: 2456,
-    comments: 156,
-    timeAgo: '2 weeks ago',
-    description: 'Smoky tandoori chicken marinated in yogurt and spices, cooked in clay oven.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 22,
-    type: 'recipe',
-    chef: mockChefs[6],
-    title: 'Jamie\'s Carbonara',
-    image: 'https://i.ytimg.com/vi/D_2DBLAt57c/maxresdefault.jpg',
-    cookingTime: '20m',
-    difficulty: 'Intermediate',
-    likes: 2678,
-    comments: 201,
-    timeAgo: '2 weeks ago',
-    description: 'Authentic Italian carbonara with guanciale and pecorino.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 23,
-    type: 'recipe',
-    chef: mockChefs[7],
-    title: 'Ritu\'s Paneer Makhani',
-    image: 'https://cdn.tasteatlas.com/images/dishes/f032751b7bfc4c828a229bd9d65d69b2.jpg?mw=1300',
-    cookingTime: '35m',
-    difficulty: 'Beginner',
-    likes: 1956,
-    comments: 134,
-    timeAgo: '2 weeks ago',
-    description: 'Creamy paneer in rich tomato gravy with butter and cream.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 24,
-    type: 'recipe',
-    chef: mockChefs[0],
-    title: 'Gordon\'s Fish Tacos',
-    image: 'https://img.freepik.com/free-photo/delicious-tacos-table_23-2150770547.jpg',
-    cookingTime: '30m',
-    difficulty: 'Intermediate',
-    likes: 2234,
-    comments: 167,
-    timeAgo: '2 weeks ago',
-    description: 'Fresh fish tacos with mango salsa and lime crema.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 25,
-    type: 'recipe',
-    chef: mockChefs[1],
-    title: 'Julia\'s Ratatouille',
-    image: 'https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=800',
-    cookingTime: '1h 30m',
-    difficulty: 'Intermediate',
-    likes: 1567,
-    comments: 123,
-    timeAgo: '3 weeks ago',
-    description: 'Traditional Provençal vegetable stew.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 26,
-    type: 'recipe',
-    chef: mockChefs[2],
-    title: 'Marco\'s Osso Buco',
-    image: 'https://www.simplyrecipes.com/thmb/DBvXQXAr-z9Wj7GMA3-179r6gsw=/2000x1334/filters:no_upscale():max_bytes(150000):strip_icc()/__opt__aboutcom__coeus__resources__content_migration__simply_recipes__uploads__2006__12__Osso-Buco-LEAD-5-a816159cbe9740a5b21f3c1e515f9da2.jpg',
-    cookingTime: '3h',
-    difficulty: 'Expert',
-    likes: 1890,
-    comments: 145,
-    timeAgo: '3 weeks ago',
-    description: 'Braised veal shanks with gremolata.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 27,
-    type: 'recipe',
-    chef: mockChefs[3],
-    title: 'Ina\'s Herb Roasted Turkey',
-    image: 'https://i.pinimg.com/originals/a1/3d/f0/a13df07c558e56d39e401d02bafac508.jpg',
-    cookingTime: '4h',
-    difficulty: 'Intermediate',
-    likes: 2456,
-    comments: 189,
-    timeAgo: '3 weeks ago',
-    description: 'Perfect holiday turkey with herb butter.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 28,
-    type: 'recipe',
-    chef: mockChefs[4],
-    title: 'Anthony\'s Banh Mi',
-    image: 'https://tse1.explicit.bing.net/th/id/OIP.pN6CqDQtXAsLEJ3k3g0OtQHaFj?r=0&rs=1&pid=ImgDetMain&o=7&rm=3',
-    cookingTime: '45m',
-    difficulty: 'Intermediate',
-    likes: 1678,
-    comments: 134,
-    timeAgo: '3 weeks ago',
-    description: 'Vietnamese sandwich with pickled vegetables.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 29,
-    type: 'recipe',
-    chef: mockChefs[5],
-    title: 'Ranveer\'s Chole Bhature',
-    image: 'https://www.slurrp.com/web/_next/image?url=https:%2F%2Fimages.slurrp.com%2Fprod%2Farticles%2Fbimzrlcyd0t.webp%3Fimpolicy%3Dslurrp-20210601%26width%3D1200%26height%3D900%26q%3D75&w=3840&q=75',
-    cookingTime: '3h',
-    difficulty: 'Intermediate',
-    likes: 2789,
-    comments: 167,
-    timeAgo: '1 month ago',
-    description: 'Spicy chickpea curry with fluffy deep-fried bread.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 30,
-    type: 'recipe',
-    chef: mockChefs[6],
-    title: 'Jamie\'s Shepherd\'s Pie',
-    image: 'https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=80https://i.ytimg.com/vi/PZVyaO-1f1I/maxresdefault.jpg',
-    cookingTime: '1h 45m',
-    difficulty: 'Intermediate',
-    likes: 1789,
-    comments: 145,
-    timeAgo: '1 month ago',
-    description: 'Comfort food classic with lamb and mashed potatoes.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 31,
-    type: 'recipe',
-    chef: mockChefs[7],
-    title: 'Ritu\'s Rajma Masala',
-    image: 'https://vegecravings.com/wp-content/uploads/2017/04/rajma-masala-recipe-step-by-step-instructions-7.jpg',
-    cookingTime: '1h 30m',
-    difficulty: 'Beginner',
-    likes: 1678,
-    comments: 112,
-    timeAgo: '1 month ago',
-    description: 'Kidney beans in spiced tomato gravy, perfect with rice.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 32,
-    type: 'recipe',
-    chef: mockChefs[0],
-    title: 'Gordon\'s Sticky Toffee Pudding',
-    image: 'https://mustdorecipes.com/wp-content/uploads/2024/11/gordon-ramsay-sticky-toffee-pudding.webp',
-    cookingTime: '1h 30m',
-    difficulty: 'Intermediate',
-    likes: 2890,
-    comments: 234,
-    timeAgo: '1 month ago',
-    description: 'British dessert with dates and toffee sauce.',
-    isLiked: false,
-    isSaved: false
-  },
-  // New recipes for Anahita Dhondy
-  {
-    id: 33,
-    type: 'recipe',
-    chef: mockChefs[8],
-    title: 'Anahita\'s Parsi Dhansak',
-    image: 'https://c.ndtvimg.com/2020-06/j5s2pmm8_dhansak_625x300_16_June_20.jpg',
-    cookingTime: '2h 30m',
-    difficulty: 'Expert',
-    likes: 1567,
-    comments: 123,
-    timeAgo: '3 days ago',
-    description: 'Traditional Parsi lentil curry with vegetables and aromatic spices.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 34,
-    type: 'recipe',
-    chef: mockChefs[8],
-    title: 'Anahita\'s Sali Boti',
-    image: 'https://i.ytimg.com/vi/TYeZN3rkyiQ/maxresdefault.jpg',
-    cookingTime: '1h 45m',
-    difficulty: 'Intermediate',
-    likes: 1234,
-    comments: 89,
-    timeAgo: '1 week ago',
-    description: 'Parsi mutton curry topped with crispy potato straws.',
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 35,
-    type: 'recipe',
-    chef: mockChefs[8],
-    title: 'Anahita\'s Berry Pulao',
-    image: 'https://tse1.mm.bing.net/th/id/OIP.yjTadYJysewATKhQV1pWGQAAAA?r=0&rs=1&pid=ImgDetMain&o=7&rm=3',
-    cookingTime: '45m',
-    difficulty: 'Intermediate',
-    likes: 987,
-    comments: 67,
-    timeAgo: '2 weeks ago',
-    description: 'Fragrant rice pilaf with dried fruits and nuts, Parsi style.',
-    isLiked: false,
-    isSaved: false
-  }
-];
-
-// Extended mock data for activities (30+ items)
-const mockActivities = [
-  {
-    id: 101,
-    type: 'activity',
-    chef: mockChefs[1],
-    title: 'Chef Julia shared a cooking tip',
-    content: 'The secret to perfect French onion soup is patience. Cook the onions low and slow for at least 45 minutes.',
-    timeAgo: '4 hours ago',
-    likes: 892,
-    comments: 67,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 102,
-    type: 'activity',
-    chef: mockChefs[4],
-    title: 'Chef Anthony liked a recipe',
-    content: 'Authentic Vietnamese Pho by Chef Linh',
-    timeAgo: '12 hours ago',
-    likes: 567,
-    comments: 23,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 103,
-    type: 'activity',
-    chef: mockChefs[1],
-    title: 'Chef Julia updated her profile',
-    content: 'Added 3 new French pastry recipes to her collection',
-    timeAgo: '2 days ago',
-    likes: 445,
-    comments: 34,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 104,
-    type: 'activity',
-    chef: mockChefs[0],
-    title: 'Chef Gordon started a live cooking session',
-    content: 'Teaching how to make perfect scrambled eggs - join now!',
-    timeAgo: '3 hours ago',
-    likes: 1234,
-    comments: 89,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 105,
-    type: 'activity',
-    chef: mockChefs[2],
-    title: 'Chef Marco shared kitchen wisdom',
-    content: 'Always taste your food before serving. Your palate is your best tool.',
-    timeAgo: '6 hours ago',
-    likes: 678,
-    comments: 45,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 106,
-    type: 'activity',
-    chef: mockChefs[3],
-    title: 'Chef Ina posted a behind-the-scenes video',
-    content: 'Setting up for today\'s Barefoot Contessa filming',
-    timeAgo: '8 hours ago',
-    likes: 789,
-    comments: 56,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 107,
-    type: 'activity',
-    chef: mockChefs[5],
-    title: 'Chef Ranveer announced a new cookbook',
-    content: 'Excited to share my new Indian spice cookbook coming this fall!',
-    timeAgo: '1 day ago',
-    likes: 1567,
-    comments: 123,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 108,
-    type: 'activity',
-    chef: mockChefs[6],
-    title: 'Chef Jamie shared a sustainability tip',
-    content: 'Use every part of your vegetables - stems, leaves, and peels can add amazing flavor!',
-    timeAgo: '1 day ago',
-    likes: 890,
-    comments: 67,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 109,
-    type: 'activity',
-    chef: mockChefs[7],
-    title: 'Chef Ritu celebrated a milestone',
-    content: 'Thank you for 500K followers! Here\'s to many more delicious Indian meals together',
-    timeAgo: '2 days ago',
-    likes: 2345,
-    comments: 189,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 110,
-    type: 'activity',
-    chef: mockChefs[0],
-    title: 'Chef Gordon reviewed a restaurant',
-    content: 'Just visited an incredible family-run Italian place in London. The passion shows in every dish!',
-    timeAgo: '2 days ago',
-    likes: 1678,
-    comments: 134,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 111,
-    type: 'activity',
-    chef: mockChefs[1],
-    title: 'Chef Julia shared a memory',
-    content: 'Remembering my first time making Beef Bourguignon - what a disaster that was!',
-    timeAgo: '3 days ago',
-    likes: 1234,
-    comments: 98,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 112,
-    type: 'activity',
-    chef: mockChefs[2],
-    title: 'Chef Marco announced a masterclass',
-    content: 'Join me next week for an exclusive pasta-making masterclass',
-    timeAgo: '3 days ago',
-    likes: 987,
-    comments: 76,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 113,
-    type: 'activity',
-    chef: mockChefs[3],
-    title: 'Chef Ina shared a party planning tip',
-    content: 'Always prepare what you can in advance. Your guests want to see you, not just your back in the kitchen!',
-    timeAgo: '4 days ago',
-    likes: 1456,
-    comments: 112,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 114,
-    type: 'activity',
-    chef: mockChefs[4],
-    title: 'Chef Anthony shared travel inspiration',
-    content: 'The best meals happen when you least expect them. Stay curious, stay hungry.',
-    timeAgo: '4 days ago',
-    likes: 2890,
-    comments: 234,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 115,
-    type: 'activity',
-    chef: mockChefs[5],
-    title: 'Chef Ranveer shared a spice tip',
-    content: 'Always toast your whole spices before grinding - it releases amazing aromas and flavors!',
-    timeAgo: '5 days ago',
-    likes: 678,
-    comments: 45,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 116,
-    type: 'activity',
-    chef: mockChefs[6],
-    title: 'Chef Jamie promoted healthy eating',
-    content: 'Small changes make big differences. Try swapping white rice for cauliflower rice this week!',
-    timeAgo: '5 days ago',
-    likes: 1789,
-    comments: 145,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 117,
-    type: 'activity',
-    chef: mockChefs[7],
-    title: 'Chef Ritu shared a time-saving hack',
-    content: 'Prep your masala base on Sunday for the whole week. Future you will thank present you!',
-    timeAgo: '6 days ago',
-    likes: 1234,
-    comments: 89,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 118,
-    type: 'activity',
-    chef: mockChefs[0],
-    title: 'Chef Gordon shared kitchen safety',
-    content: 'A sharp knife is a safe knife. Keep your blades properly maintained!',
-    timeAgo: '1 week ago',
-    likes: 2456,
-    comments: 178,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 119,
-    type: 'activity',
-    chef: mockChefs[1],
-    title: 'Chef Julia celebrated French cuisine',
-    content: 'French cooking is not about complicated techniques - it\'s about respecting ingredients.',
-    timeAgo: '1 week ago',
-    likes: 1567,
-    comments: 123,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 120,
-    type: 'activity',
-    chef: mockChefs[2],
-    title: 'Chef Marco shared perfectionism advice',
-    content: 'Perfection is not about being flawless - it\'s about caring deeply about what you do.',
-    timeAgo: '1 week ago',
-    likes: 890,
-    comments: 67,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 121,
-    type: 'activity',
-    chef: mockChefs[3],
-    title: 'Chef Ina shared entertaining wisdom',
-    content: 'The most important ingredient in any meal is the love you put into it.',
-    timeAgo: '1 week ago',
-    likes: 1678,
-    comments: 134,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 122,
-    type: 'activity',
-    chef: mockChefs[4],
-    title: 'Chef Anthony shared cultural appreciation',
-    content: 'Food is the universal language. It connects us across all cultures and borders.',
-    timeAgo: '2 weeks ago',
-    likes: 3456,
-    comments: 267,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 123,
-    type: 'activity',
-    chef: mockChefs[5],
-    title: 'Chef Ranveer shared Indian cooking wisdom',
-    content: 'Indian cooking is like classical music - it\'s all about harmony of spices and soul!',
-    timeAgo: '2 weeks ago',
-    likes: 1234,
-    comments: 98,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 124,
-    type: 'activity',
-    chef: mockChefs[6],
-    title: 'Chef Jamie promoted family cooking',
-    content: 'Get the kids involved in cooking. It\'s the best way to teach them about nutrition and creativity.',
-    timeAgo: '2 weeks ago',
-    likes: 2890,
-    comments: 234,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 125,
-    type: 'activity',
-    chef: mockChefs[7],
-    title: 'Chef Ritu shared positivity',
-    content: 'Every Indian meal is a chance to nourish not just the body, but the soul too!',
-    timeAgo: '2 weeks ago',
-    likes: 1567,
-    comments: 123,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 126,
-    type: 'activity',
-    chef: mockChefs[0],
-    title: 'Chef Gordon shared mentorship advice',
-    content: 'The best chefs never stop learning. Stay humble, stay hungry.',
-    timeAgo: '3 weeks ago',
-    likes: 2345,
-    comments: 189,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 127,
-    type: 'activity',
-    chef: mockChefs[1],
-    title: 'Chef Julia shared cooking philosophy',
-    content: 'Cooking is one of the great pleasures of life. Don\'t rush it, savor every moment.',
-    timeAgo: '3 weeks ago',
-    likes: 1789,
-    comments: 145,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 128,
-    type: 'activity',
-    chef: mockChefs[2],
-    title: 'Chef Marco shared excellence standards',
-    content: 'Excellence is not a skill, it\'s an attitude. Bring it to everything you do.',
-    timeAgo: '3 weeks ago',
-    likes: 1456,
-    comments: 112,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 129,
-    type: 'activity',
-    chef: mockChefs[3],
-    title: 'Chef Ina shared hosting tips',
-    content: 'The secret to great entertaining is making your guests feel at home.',
-    timeAgo: '1 month ago',
-    likes: 1234,
-    comments: 89,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 130,
-    type: 'activity',
-    chef: mockChefs[4],
-    title: 'Chef Anthony shared adventure spirit',
-    content: 'The best stories happen when you say yes to the unknown.',
-    timeAgo: '1 month ago',
-    likes: 2678,
-    comments: 201,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 131,
-    type: 'activity',
-    chef: mockChefs[5],
-    title: 'Chef Ranveer shared passion',
-    content: 'Cooking with passion and love is the secret ingredient that makes everything taste better!',
-    timeAgo: '1 month ago',
-    likes: 1890,
-    comments: 156,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 132,
-    type: 'activity',
-    chef: mockChefs[6],
-    title: 'Chef Jamie shared sustainability message',
-    content: 'Every small step towards sustainable cooking makes a difference for our planet.',
-    timeAgo: '1 month ago',
-    likes: 2456,
-    comments: 189,
-    isLiked: false,
-    isSaved: false
-  },
-  // New activities for Anahita Dhondy
-  {
-    id: 133,
-    type: 'activity',
-    chef: mockChefs[8],
-    title: 'Chef Anahita shared Parsi cooking wisdom',
-    content: 'The beauty of Parsi cuisine lies in its perfect balance of sweet, sour, and spicy flavors.',
-    timeAgo: '2 days ago',
-    likes: 567,
-    comments: 45,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 134,
-    type: 'activity',
-    chef: mockChefs[8],
-    title: 'Chef Anahita announced a cooking workshop',
-    content: 'Join me for an exclusive Parsi cuisine workshop next month in Mumbai!',
-    timeAgo: '1 week ago',
-    likes: 890,
-    comments: 67,
-    isLiked: false,
-    isSaved: false
-  },
-  {
-    id: 135,
-    type: 'activity',
-    chef: mockChefs[8],
-    title: 'Chef Anahita shared heritage cooking',
-    content: 'Preserving traditional Parsi recipes is not just cooking, it\'s keeping our culture alive.',
-    timeAgo: '2 weeks ago',
-    likes: 1234,
-    comments: 89,
-    isLiked: false,
-    isSaved: false
-  }
-];
+import { getMyFeed, getChefRecipes, getFollowedChefs } from '../api/myFeedService';
+import { recipeService } from '../api/recipeService';
+import userService from '../api/userService';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import ChefCards from '../components/myFeed/ChefCards';
+import NavigationTabs from '../components/myFeed/NavigationTabs';
+import FeedCard from '../components/myFeed/FeedCard';
+import LoadingState from '../components/myFeed/LoadingState';
+import EmptyState from '../components/myFeed/EmptyState';
 
 const MyFeed = () => {
-  const [activeTab, setActiveTab] = useState('all');
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('recipes');
   const [selectedChef, setSelectedChef] = useState(null);
-  const [recipes, setRecipes] = useState(mockRecipes);
-  const [activities, setActivities] = useState(mockActivities);
+  const [chefs, setChefs] = useState([]);
+  const [feedContent, setFeedContent] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
-  const [visibleCount, setVisibleCount] = useState(9); // Show 9 items initially
+  const [chefsLoading, setChefsLoading] = useState(true);
+  const [visibleCount, setVisibleCount] = useState(9);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
 
-  const showToastNotification = (message) => {
-    setToastMessage(message);
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000);
+  // Load followed chefs on component mount
+  useEffect(() => {
+    loadFollowedChefs();
+  }, []);
+
+  // Load feed content when tab or chef changes
+  useEffect(() => {
+    loadFeedContent(1);
+  }, [activeTab, selectedChef]);
+
+  const loadFollowedChefs = async () => {
+    try {
+      setChefsLoading(true);
+      const response = await getFollowedChefs();
+      
+      if (response.chefs) {
+        // Format backend data to match expected structure
+        const formattedChefs = response.chefs.map(chef => ({
+          id: chef.id,
+          _id: chef._id, // Add _id for profile navigation
+          name: chef.name,
+          username: chef.username,
+          avatar: chef.avatar || '/Images/chef-placeholder.png',
+          followers: chef.followers > 1000 ? `${(chef.followers / 1000).toFixed(1)}K` : chef.followers.toString(),
+          recipes: chef.recipes,
+          isFollowing: true
+        }));
+        
+        setChefs(formattedChefs);
+      } else {
+        setChefs([]);
+      }
+    } catch (error) {
+      console.error('Error loading followed chefs:', error);
+      setChefs([]);
+    } finally {
+      setChefsLoading(false);
+    }
+  };
+
+  const loadFeedContent = async (pageNum = 1) => {
+    try {
+      if (pageNum === 1) {
+        setLoading(true);
+        setFeedContent([]);
+      } else {
+        setLoadingMore(true);
+      }
+
+      let response;
+      let formattedContent = [];
+
+      if (selectedChef && selectedChef.id) {
+        // Load chef-specific content
+        response = await getChefRecipes(selectedChef.id, pageNum, 9);
+        if (response.recipes) {
+          formattedContent = response.recipes.map(recipe => ({
+            id: recipe._id,
+            _id: recipe._id, // Ensure both id and _id are set
+            type: 'recipe',
+            title: recipe.title,
+            image: recipe.image,
+            author: {
+              id: recipe.chef.id,
+              _id: recipe.chef._id, // Add _id for profile navigation
+              name: recipe.chef.name,
+              username: recipe.chef.username,
+              avatar: recipe.chef.avatar || '/Images/chef-placeholder.png'
+            },
+            category: recipe.category || 'General',
+            cookTime: recipe.cookingTime || '30 mins',
+            difficulty: recipe.difficulty || 'Medium',
+            likes: recipe.likes || 0,
+            comments: recipe.comments || 0,
+            views: recipe.views || 0,
+            description: recipe.description,
+            createdAt: recipe.timeAgo,
+            isLiked: recipe.isLiked || false,
+            isSaved: recipe.isSaved || false
+          }));
+        }
+        
+        setHasMore(response?.page < response?.pages);
+      } else {
+        // Load general feed based on active tab
+        const feedType = activeTab === 'recipes' ? 'recipes' : activeTab === 'activity' ? 'activities' : 'all';
+        response = await getMyFeed(pageNum, 9, feedType);
+        
+        formattedContent = response.feedItems?.map(item => {
+          const baseItem = {
+            id: item._id,
+            type: item.type,
+            author: {
+              id: item.chef.id,
+              _id: item.chef._id, // Add _id for profile navigation
+              name: item.chef.name,
+              username: item.chef.username,
+              avatar: item.chef.avatar || '/Images/chef-placeholder.png'
+            },
+            likes: item.likes || 0,
+            comments: item.comments || 0,
+            createdAt: item.timeAgo,
+            isLiked: item.isLiked || false,
+            isSaved: item.isSaved || false
+          };
+
+          if (item.type === 'recipe') {
+            return {
+              ...baseItem,
+              title: item.title,
+              image: item.image,
+              cookTime: item.cookingTime || '30 mins',
+              difficulty: item.difficulty || 'Medium',
+              description: item.description,
+              category: item.category || 'General',
+              views: item.views || 0
+            };
+          } else {
+            return {
+              ...baseItem,
+              user: item.chef,
+              action: item.action,
+              timestamp: item.timestamp,
+              recipe: item.recipe ? {
+                title: item.recipe.title,
+                image: item.recipe.image,
+                author: item.recipe.author
+              } : null
+            };
+          }
+        }) || [];
+        
+        setHasMore(response?.page < response?.pages);
+      }
+
+      if (pageNum === 1) {
+        setFeedContent(formattedContent);
+        setVisibleCount(formattedContent.length);
+      } else {
+        setFeedContent(prev => [...prev, ...formattedContent]);
+        setVisibleCount(prev => prev + formattedContent.length);
+      }
+      
+      setPage(pageNum);
+    } catch (error) {
+      console.error('Error loading feed:', error);
+      if (pageNum === 1) {
+        setFeedContent([]);
+        setVisibleCount(0);
+      }
+      toast.error('Error loading feed. Please try again.');
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
   };
 
   const handleTabChange = (tab) => {
-    setLoading(true);
     setActiveTab(tab);
-    setVisibleCount(9); // Reset to initial count when changing tabs
-    
-    // Simulate loading
-    setTimeout(() => {
-      setLoading(false);
-    }, 500);
+    setVisibleCount(9);
+    setPage(1);
   };
 
-  const handleLike = (contentId, type) => {
-    if (type === 'recipe') {
-      setRecipes(prev => prev.map(item => 
-        item.id === contentId 
-          ? { 
-              ...item, 
-              likes: item.isLiked ? item.likes - 1 : item.likes + 1,
-              isLiked: !item.isLiked 
-            }
-          : item
-      ));
-    } else {
-      setActivities(prev => prev.map(item => 
-        item.id === contentId 
-          ? { 
-              ...item, 
-              likes: item.isLiked ? item.likes - 1 : item.likes + 1,
-              isLiked: !item.isLiked 
-            }
-          : item
-      ));
+  // Handle recipe click - navigate to recipe detail page
+  const handleRecipeClick = (recipe) => {
+    const recipeId = recipe._id || recipe.id;
+    if (recipeId) {
+      navigate(`/recipe/${recipeId}`);
     }
-    
-    const action = type === 'recipe' ? 
-      (recipes.find(r => r.id === contentId)?.isLiked ? 'Recipe unliked!' : 'Recipe liked!') :
-      (activities.find(a => a.id === contentId)?.isLiked ? 'Activity unliked!' : 'Activity liked!');
-    
-    showToastNotification(action);
   };
 
-  const handleSave = (contentId, type) => {
-    if (type === 'recipe') {
-      setRecipes(prev => prev.map(item => 
-        item.id === contentId 
-          ? { ...item, isSaved: !item.isSaved }
-          : item
-      ));
+  // Handle chef click - navigate to chef profile
+  const handleChefClick = (chef) => {
+    const username = chef.username; // Use _id first, then fallback to id
+    if (username) {
+      navigate(`/profile/${username}`);
     } else {
-      setActivities(prev => prev.map(item => 
-        item.id === contentId 
-          ? { ...item, isSaved: !item.isSaved }
-          : item
-      ));
+      console.error('No valid user ID found in chef object:', chef);
     }
+  };
+
+  // Handle save functionality
+  const handleSave = async (contentId, type) => {
+    try {
+      const response = await recipeService.toggleSave(contentId);
+      
+      // Update the feed content with new save status
+      setFeedContent(prev => prev.map(item => {
+        if ((item._id || item.id) === contentId) {
+          return {
+            ...item,
+            isSaved: !item.isSaved
+          };
+        }
+        return item;
+      }));
+
+      toast.success(response.isSaved ? 'Recipe saved!' : 'Recipe unsaved!');
+    } catch (error) {
+      console.error('Error saving recipe:', error);
+      toast.error('Error updating save. Please try again.');
+    }
+  };
+
+  // Handle like functionality
+  const handleLike = async (contentId, type) => {
+    // Store previous state for potential rollback
+    let previousState = null;
     
-    const action = type === 'recipe' ? 
-      (recipes.find(r => r.id === contentId)?.isSaved ? 'Recipe removed from saved!' : 'Recipe saved to your collection!') :
-      (activities.find(a => a.id === contentId)?.isSaved ? 'Activity removed from saved!' : 'Activity saved!');
-    
-    showToastNotification(action);
+    try {
+      // Prevent multiple simultaneous like requests for the same item
+      if (handleLike.processing && handleLike.processing.has(contentId)) {
+        return;
+      }
+      
+      // Initialize processing set if it doesn't exist
+      if (!handleLike.processing) {
+        handleLike.processing = new Set();
+      }
+      handleLike.processing.add(contentId);
+
+      
+      // Store previous state for rollback
+      previousState = feedContent.find(item => (item._id || item.id) === contentId);
+      
+      // Optimistic update
+      setFeedContent(prev => prev.map(item => {
+        if ((item._id || item.id) === contentId) {
+          return {
+            ...item,
+            isLiked: !item.isLiked,
+            likes: !item.isLiked ? (item.likes || 0) + 1 : Math.max(0, (item.likes || 0) - 1)
+          };
+        }
+        return item;
+      }));
+      
+      const response = await recipeService.toggleLike(contentId);
+      
+      // Update with server response
+      setFeedContent(prev => prev.map(item => {
+        if ((item._id || item.id) === contentId) {
+          return {
+            ...item,
+            isLiked: response.isLiked,
+            likes: response.likeCount
+          };
+        }
+        return item;
+      }));
+
+      toast.success(response.isLiked ? 'Recipe liked!' : 'Recipe unliked!');
+    } catch (error) {
+      console.error('Error liking recipe:', error);
+      
+      // Revert optimistic update on error
+      if (previousState) {
+        setFeedContent(prev => prev.map(item => {
+          if ((item._id || item.id) === contentId) {
+            return {
+              ...item,
+              isLiked: previousState.isLiked,
+              likes: previousState.likes
+            };
+          }
+          return item;
+        }));
+      }
+      
+      // Handle specific errors
+      if (error.response?.status === 409) {
+        toast.error('Duplicate action detected. Please refresh the page.');
+      } else {
+        toast.error('Error updating like. Please try again.');
+      }
+    } finally {
+      // Remove from processing set
+      if (handleLike.processing) {
+        handleLike.processing.delete(contentId);
+      }
+    }
   };
 
   const getCurrentContent = () => {
-    let content = [];
-    
-    if (activeTab === 'all') {
-      // Mix recipes and activities for "all" view
-      content = [...recipes, ...activities].sort((a, b) => {
-        // Sort by a mix of likes and recency for more realistic feed
-        const aScore = a.likes + (Math.random() * 1000);
-        const bScore = b.likes + (Math.random() * 1000);
-        return bScore - aScore;
-      });
-    } else if (activeTab === 'recipes') {
-      content = recipes;
-    } else {
-      content = activities;
-    }
-    
-    // Filter by selected chef if one is selected
-    if (selectedChef) {
-      content = content.filter(item => item.chef.id === selectedChef.id);
-    }
-    
-    return content.slice(0, visibleCount); // Only return visible items
+    return feedContent.slice(0, visibleCount);
   };
 
   const getTotalContent = () => {
-    let content = [];
-    
-    if (activeTab === 'all') {
-      content = [...recipes, ...activities];
-    } else if (activeTab === 'recipes') {
-      content = recipes;
-    } else {
-      content = activities;
-    }
-    
-    if (selectedChef) {
-      content = content.filter(item => item.chef.id === selectedChef.id);
-    }
-    
-    return content;
+    return feedContent;
   };
 
-  const handleLoadMore = () => {
-    setLoadingMore(true);
-    
-    // Simulate loading delay
-    setTimeout(() => {
-      setVisibleCount(prev => prev + 6); // Load 6 more items
-      setLoadingMore(false);
-    }, 800);
+  const loadMoreContent = () => {
+    if (hasMore && !loadingMore) {
+      loadFeedContent(page + 1);
+    }
   };
 
-  const renderCard = (item) => {
-    if (item.type === 'recipe') {
-      return (
-        <div key={item.id} className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 group h-full">
-          <div className="relative overflow-hidden">
-            <img
-              src={item.image}
-              alt={item.title}
-              className="w-full  h-48 object-cover transition-transform duration-300 group-hover:scale-105"
-            />
-            <div className="absolute inset-0  bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 space-x-4">
-                <button
-                  onClick={() => handleLike(item.id, 'recipe')}
-                  className={`bg-white bg-opacity-90 p-3 rounded-full transition-all duration-200 transform hover:scale-110 ${
-                    item.isLiked ? 'bg-red-50' : 'hover:bg-red-50'
-                  }`}
-                >
-                  <Heart 
-                    size={20} 
-                    className={`transition-colors duration-200 ${
-                      item.isLiked ? 'text-red-500 fill-red-500' : 'text-red-500'
-                    }`} 
-                  />
-                </button>
-                <button
-                  onClick={() => handleSave(item.id, 'recipe')}
-                  className={`bg-white bg-opacity-90 p-3 rounded-full transition-all duration-200 transform hover:scale-110 ${
-                    item.isSaved ? 'bg-blue-50' : 'hover:bg-blue-50'
-                  }`}
-                >
-                  <Bookmark 
-                    size={20} 
-                    className={`transition-colors duration-200 ${
-                      item.isSaved ? 'text-blue-500 fill-blue-500' : 'text-blue-500'
-                    }`} 
-                  />
-                </button>
-              </div>
-            </div>
-            <div className="absolute top-4 right-4">
-              <span 
-                className="px-3 py-1 rounded-full text-xs font-medium text-white"
-                style={{ backgroundColor: '#D97706' }}
-              >
-                {item.difficulty}
-              </span>
-            </div>
-          </div>
-          
-          <div className="p-4 flex flex-col flex-grow">
-            <div className="flex items-center space-x-3 mb-3">
-              <img
-                src={item.chef.avatar}
-                alt={item.chef.name}
-                className="w-8 h-8 rounded-full object-cover"
-              />
-              <span className="text-sm font-medium text-gray-600">{item.chef.name}</span>
-            </div>
-            
-            <h3 className="font-bold text-gray-800 mb-2 line-clamp-2 flex-grow">{item.title}</h3>
-            <p className="text-sm text-gray-600 mb-3 line-clamp-2">{item.description}</p>
-            
-            <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
-              <div className="flex items-center space-x-2">
-                <Clock size={16} />
-                <span>{item.cookingTime}</span>
-              </div>
-              <span>{item.timeAgo}</span>
-            </div>
-            
-            <div className="flex items-center justify-between mt-auto">
-              <div className="flex items-center space-x-4">
-                <button 
-                  onClick={() => handleLike(item.id, 'recipe')}
-                  className={`flex items-center space-x-1 transition-all duration-200 transform hover:scale-105 ${
-                    item.isLiked ? 'text-red-600' : 'text-red-500 hover:text-red-600'
-                  }`}
-                >
-                  <Heart 
-                    size={16} 
-                    className={item.isLiked ? 'fill-red-600' : ''} 
-                  />
-                  <span className="text-sm font-medium">{item.likes}</span>
-                </button>
-                <button className="flex items-center space-x-1 text-blue-500 hover:text-blue-600 transition-colors duration-200">
-                  <MessageCircle size={16} />
-                  <span className="text-sm font-medium">{item.comments}</span>
-                </button>
-              </div>
-              <button 
-                className="text-orange-600 hover:text-orange-700 transition-colors duration-200 font-medium text-sm transform hover:scale-105"
-              >
-                View Recipe
-              </button>
-            </div>
-          </div>
-        </div>
-      );
-    } else {
-      return (
-        <div key={item.id} className="bg-white rounded-xl shadow-sm p-4 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 h-full">
-          <div className="flex items-start space-x-3 h-full">
-            <img
-              src={item.chef.avatar}
-              alt={item.chef.name}
-              className="w-12 h-12 rounded-full object-cover flex-shrink-0"
-            />
-            <div className="flex-1 flex flex-col h-full">
-              <h3 className="font-semibold text-gray-800 mb-1">{item.title}</h3>
-              <p className="text-gray-600 mb-3 flex-grow">{item.content}</p>
-              <div className="flex items-center justify-between text-sm text-gray-500 mt-auto">
-                <span>{item.timeAgo}</span>
-                <div className="flex items-center space-x-4">
-                  <button 
-                    onClick={() => handleLike(item.id, 'activity')}
-                    className={`flex items-center space-x-1 transition-all duration-200 transform hover:scale-105 ${
-                      item.isLiked ? 'text-red-600' : 'text-red-500 hover:text-red-600'
-                    }`}
-                  >
-                    <Heart 
-                      size={14} 
-                      className={item.isLiked ? 'fill-red-600' : ''} 
-                    />
-                    <span>{item.likes}</span>
-                  </button>
-                  <button className="flex items-center space-x-1 text-blue-500 hover:text-blue-600 transition-colors duration-200">
-                    <MessageCircle size={14} />
-                    <span>{item.comments}</span>
-                  </button>
-                  <button
-                    onClick={() => handleSave(item.id, 'activity')}
-                    className={`transition-all duration-200 transform hover:scale-105 ${
-                      item.isSaved ? 'text-blue-600' : 'text-blue-500 hover:text-blue-600'
-                    }`}
-                  >
-                    <Bookmark 
-                      size={14} 
-                      className={item.isSaved ? 'fill-blue-600' : ''} 
-                    />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    }
+  const renderFeedCard = (item, index) => {
+    return <FeedCard 
+      key={item.id} 
+      item={item} 
+      handleSave={handleSave} 
+      handleLike={handleLike}
+      onRecipeClick={handleRecipeClick}
+      onChefClick={handleChefClick}
+    />;
   };
 
   return (
-    <div className="min-h-screen bg-[#FEF3E2] dark:bg-gray-900 transition-colors duration-300">
-      {/* Toast Notification */}
-      {showToast && (
-        <div className="fixed top-4 right-4 z-50 transform transition-all duration-300 ease-in-out animate-bounce">
-          <div 
-            className="px-6 py-3 rounded-lg shadow-lg text-white font-medium bg-[#D97706] dark:bg-orange-700"
-          >
-            {toastMessage}
-          </div>
-        </div>
-      )}
-
-      {/* Chef Profile Cards Section */}
-      <div className="bg-white dark:bg-gray-800 border-b border-orange-100 dark:border-gray-700 shadow-sm">
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-center space-x-4 flex-wrap">
-            {/* All Chefs Card */}
-            <button
-              onClick={() => setSelectedChef(null)}
-              className={`flex flex-col items-center space-y-2 p-3 rounded-xl transition-all duration-300 transform hover:scale-105 ${
-                selectedChef === null
-                  ? 'bg-orange-100 dark:bg-orange-900 shadow-md'
-                  : 'hover:bg-orange-50 dark:hover:bg-orange-900'
-              }`}
-            >
-              <div 
-                className={`w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-lg ${
-                  selectedChef === null ? 'ring-4 ring-orange-300 dark:ring-orange-700' : ''
-                } bg-[#D97706] dark:bg-orange-700`}
-              >
-                All
-              </div>
-              <span className={`text-sm font-medium ${
-                selectedChef === null ? 'text-orange-700 dark:text-orange-300' : 'text-gray-600 dark:text-gray-300'
-              }`}>
-                All Chefs
-              </span>
-            </button>
-
-            {/* Individual Chef Cards */}
-            {mockChefs.map((chef) => 
-            (
-              <button
-                key={chef.id}
-                onClick={() => setSelectedChef(chef)}
-                className={`flex flex-col items-center space-y-2 p-3 rounded-xl transition-all duration-300 transform hover:scale-105 ${
-                  selectedChef?.id === chef.id
-                    ? 'bg-orange-100 dark:bg-orange-900 shadow-md'
-                    : 'hover:bg-orange-50 dark:hover:bg-orange-900'
-                }`}
-              >
-                <div className="relative">
-                  <img
-                    src={chef.avatar}
-                    alt={chef.name}
-                    className={`w-16 h-16 rounded-full object-cover ${
-                      selectedChef?.id === chef.id ? 'ring-4 ring-orange-300 dark:ring-orange-700' : ''
-                    }`}
-                  />
-                  {chef.isActive && (
-                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></div>
-                  )}
-                </div>
-                <span className={`text-sm font-medium text-center ${
-                  selectedChef?.id === chef.id ? 'text-orange-700 dark:text-orange-300' : 'text-gray-600 dark:text-gray-300'
-                }`}>
-                  {chef.name.split(' ')[0]}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* Chef Cards */}
+      <ChefCards
+        chefs={chefs}
+        selectedChef={selectedChef}
+        setSelectedChef={setSelectedChef}
+        loading={chefsLoading}
+      />
 
       {/* Navigation Tabs */}
-      <div className="sticky top-0 z-40 bg-white dark:bg-gray-800 border-b border-orange-100 dark:border-gray-700 shadow-sm">
-        <div className="px-6 py-4">
-          <div className="flex items-center space-x-8">
-            
-            
-            <button
-              onClick={() => handleTabChange('recipes')}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 ${
-                activeTab === 'recipes'
-                  ? 'text-white shadow-lg dark:text-gray-900'
-                  : 'text-gray-600 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900'
-              }`}
-              style={{ 
-                backgroundColor: activeTab === 'recipes' ? '#D97706' : 'transparent'
-              }}
-            >
-              <ChefHat size={20} />
-              <span>Recipes</span>
-            </button>
-            
-            <button
-              onClick={() => handleTabChange('activities')}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 ${
-                activeTab === 'activities'
-                  ? 'text-white shadow-lg dark:text-gray-900'
-                  : 'text-gray-600 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900'
-              }`}
-              style={{ 
-                backgroundColor: activeTab === 'activities' ? '#D97706' : 'transparent'
-              }}
-            >
-              <Activity size={20} />
-              <span>Activities</span>
-            </button>
-          </div>
-        </div>
-      </div>
+      <NavigationTabs
+        activeTab={activeTab}
+        setActiveTab={handleTabChange}
+      />
 
-      {/* Main Content Area */}
-      <div className="px-6 py-8">
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(9)].map((_, index) => (
-              <div key={index} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden animate-pulse">
-                <div className="h-48 bg-gray-200 dark:bg-gray-700"></div>
-                <div className="p-4">
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mb-4"></div>
-                  <div className="flex justify-between">
-                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
-                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {getCurrentContent().map((item) => renderCard(item))}
-          </div>
-        )}
+      {/* Feed Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {loading ? (
+            <LoadingState />
+          ) : getCurrentContent().length === 0 ? (
+            <EmptyState
+              title={selectedChef ? `No ${activeTab} from ${selectedChef.name}` : `No ${activeTab} available`}
+              message={selectedChef ? `${selectedChef.name} hasn't shared any ${activeTab} yet.` : `Your followed chefs haven't shared any ${activeTab} yet.`}
+            />
+          ) : (
+            getCurrentContent().map((item, index) => renderFeedCard(item, index))
+          )}
+        </div>
 
         {/* Load More Button */}
-        {!loading && getCurrentContent().length < getTotalContent().length && (
+        {!loading && getCurrentContent().length > 0 && hasMore && (
           <div className="flex justify-center mt-8">
             <button
-              onClick={handleLoadMore}
+              onClick={loadMoreContent}
               disabled={loadingMore}
-              className="px-8 py-3 rounded-full font-medium text-white transition-all duration-300 hover:shadow-lg transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none bg-[#D97706] dark:bg-orange-700"
+              className="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
             >
               {loadingMore ? (
-                <div className="flex items-center space-x-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                   <span>Loading...</span>
-                </div>
+                </>
               ) : (
-                `Load More (${getTotalContent().length - getCurrentContent().length} remaining)`
+                <>
+                  <span>Load More</span>
+                  <TrendingUp size={16} />
+                </>
               )}
             </button>
           </div>
         )}
       </div>
-
-      {/* Empty State */}
-      {getTotalContent().length === 0 && !loading && (
-        <div className="flex flex-col items-center justify-center py-16 px-6">
-          <ChefHat size={64} className="text-gray-400 dark:text-gray-600 mb-4" />
-          <h3 className="text-xl font-semibold text-gray-600 dark:text-gray-300 mb-2">No content yet</h3>
-          <p className="text-gray-500 dark:text-gray-400 text-center max-w-md">
-            Start following some chefs to see their latest recipes and updates in your feed.
-          </p>
-          <button 
-            className="mt-6 px-6 py-3 rounded-full font-medium text-white transition-all duration-300 hover:shadow-lg transform hover:scale-105 bg-[#D97706] dark:bg-orange-700"
-          >
-            Discover Chefs
-          </button>
-        </div>
-      )}
     </div>
   );
 };

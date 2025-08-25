@@ -70,7 +70,6 @@ export const UserProvider = ({ children }) => {
   const [providerId] = useState(() => Math.random().toString(36).substr(2, 9));
   
   useEffect(() => {
-    console.log('UserProvider initialized with ID:', providerId);
   }, [providerId]);
 
   // Action creators
@@ -458,7 +457,6 @@ export const useUser = () => {
     const context = useContext(UserContext);
     if (!context) {
       console.error('useUser called outside of UserProvider');
-      console.log('Available context:', context);
       // Return a default state instead of throwing error to prevent app crash
       return {
         userData: null,
