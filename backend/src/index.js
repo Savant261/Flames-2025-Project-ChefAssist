@@ -6,8 +6,11 @@ import RecipeRouter from "./routes/recipe.route.js";
 import AiChatRouter from "./routes/aiChat.route.js";
 import ActivityFeedRouter from "./routes/activityFeed.route.js";
 import FollowRouter from "./routes/follow.route.js";
+import AuthRouter from "./routes/auth.route.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import session from "express-session";
+import passport from "./config/passport.js";
 
 const app = express();
 const port = process.env.PORT;
@@ -23,6 +26,21 @@ app.set("trust proxy", 1);
 
 app.use(express.json({ limit: "5mb" }));
 app.use(cookieParser());
+
+// Configure sessions for Passport
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
+
+// Initialize passport
+app.use(passport.initialize());
+app.use(passport.session());
 // Configure CORS for local dev and production (Vercel/Render)
 const allowedOrigins = (process.env.CLIENT_URLS || process.env.CLIENT_URL || "http://localhost:5173")
   .split(",")
@@ -50,6 +68,7 @@ app.use(
   })
 );
 app.use("/api/auth", UserRouter);
+app.use("/api/auth", AuthRouter); // Google OAuth routes
 app.use("/api/recipes", RecipeRouter);
 app.use("/api/aiChats", AiChatRouter);
 app.use("/api/activity", ActivityFeedRouter);

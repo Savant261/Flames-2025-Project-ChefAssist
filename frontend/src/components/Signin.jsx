@@ -12,21 +12,30 @@ const Signin = ({ setSigninPopUp, what, setWhat }) => {
     password: "",
     username: "",
   });
+  
   const onChangeLoginHandler = (e) => {
     const name = e.target.name;
     const value = e.target.value;
     setLoginData((prev) => ({ ...prev, [name]: value }));
   };
+  
   const [signupData, setSignupData] = useState({
     email: "",
     username: "",
     password: "",
     confirmPassword: "",
   });
+  
   const onChangeSignupHandler = (e) => {
     const name = e.target.name;
     const value = e.target.value;
     setSignupData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Google Sign-In function
+  const handleGoogleAuth = () => {
+    const backendUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+    window.location.href = `${backendUrl}/auth/google`;
   };
   const submitLogin = async (e) => {
     e.preventDefault();
@@ -184,7 +193,7 @@ const Signin = ({ setSigninPopUp, what, setWhat }) => {
                   className="flex items-center justify-center gap-2 border border-[#FFDAB9] bg-white text-[#D35400] font-semibold rounded-lg py-3 disabled:opacity-50 disabled:cursor-not-allowed"
                   id="google-signin-btn"
                   disabled={loading}
-                  onClick={() => toast.info("Google Sign-In coming soon!")}
+                  onClick={handleGoogleAuth}
                 >
                   <img
                     src="https://www.svgrepo.com/show/475656/google-color.svg"
@@ -276,7 +285,7 @@ const Signin = ({ setSigninPopUp, what, setWhat }) => {
                   className="flex items-center justify-center gap-2 border border-[#FFDAB9] bg-white text-[#D35400] font-semibold rounded-lg py-3 disabled:opacity-50 disabled:cursor-not-allowed"
                   id="google-signup-btn"
                   disabled={loading}
-                  onClick={() => toast.info("Google Sign-Up coming soon!")}
+                  onClick={handleGoogleAuth}
                 >
                   <img
                     src="https://www.svgrepo.com/show/475656/google-color.svg"

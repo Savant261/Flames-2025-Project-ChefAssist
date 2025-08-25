@@ -50,6 +50,13 @@ const signin = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "Invalid Credentials" });
 
+    // Check if user signed up with Google
+    if (user.authProvider === 'google' && !user.password) {
+      return res.status(400).json({ 
+        message: "This account uses Google Sign-In. Please use Google to sign in." 
+      });
+    }
+
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
     if (!isPasswordCorrect)

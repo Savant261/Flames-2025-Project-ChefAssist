@@ -23,6 +23,8 @@ import MyFeed from "./pages/MyFeed.jsx";
 import SavedRecipes from "./pages/SavedRecipes.jsx";
 import Settings from "./pages/Settings.jsx";
 import CreateRecipe from "./pages/CreateRecipe.jsx";
+import AuthSuccess from "./components/AuthSuccess.jsx";
+import AuthFailure from "./components/AuthFailure.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import { UserProvider, useUser } from "./store";
 import useAuthValidation from "./hooks/useAuthValidation.js";
@@ -134,6 +136,10 @@ function AppContent() {
                   <Home />
                 </ProtectedRoute>
               } />
+              
+              {/* Google OAuth routes */}
+              <Route path="/auth/success" element={<AuthSuccess />} />
+              <Route path="/auth/failure" element={<AuthFailure />} />
               
               {/* Protected routes - require authentication */}
               <Route path="/ai" element={
